@@ -12,5 +12,6 @@
     "outDir": "dist",
     "skipLibCheck": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["**/*.stories.ts", "**/*.stories.tsx", ".storybook", "dist"]
 }

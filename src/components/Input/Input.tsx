@@ -9,8 +9,9 @@ type InputProps<T extends ValidComponent = "input"> = PolymorphicProps<T, TextFi
 
 interface ExtraProps {
   label?: string;
-  variant?: "bordered" | "none";
-  size?: "sm" | "md";
+  variant?: "ghost" | "none";
+  appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   inputProps?: InputProps;
   saveFunc?: (v: string) => Promise<any>;
 }
@@ -19,22 +20,54 @@ type InputRootProps<T extends ValidComponent = "div"> = ExtraProps &
   PolymorphicProps<T, TextFieldRootProps<T>>;
 
 const inputRoot = tv({
-  base: "relative flex flex-col gap-1",
+  base: "relative flex flex-col gap-1 mt-3",
+});
+
+const inputLabel = tv({
+  base: "absolute left-3 px-1 font-medium pointer-events-none z-10 bg-base-100",
+  variants: {
+    size: {
+      xs: "text-xs",
+      sm: "text-xs",
+      md: "text-sm",
+      lg: "text-sm",
+      xl: "text-md",
+    },
+  },
+  defaultVariants: {
+    size: "md",
+  },
 });
 
 const inputField = tv({
-  base: `w-full rounded-sm outline-none px-2 py-3 transition-all
-    bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)]
-    text-[var(--color-text-light-primary)] dark:text-[var(--color-text-dark-primary)]`,
+  base: "input outline-offset-0",
   variants: {
     variant: {
-      bordered: `border-2 border-[var(--color-light-muted)] dark:border-[var(--color-dark-muted)]
-        focus:border-[var(--color-light-primary)] dark:focus:border-[var(--color-dark-primary)]`,
+      ghost: "input-ghost",
       none: "",
+    },
+    size: {
+      xs: "input-xs",
+      sm: "input-sm",
+      md: "input-md",
+      lg: "input-lg",
+      xl: "input-xl",
+    },
+    appearance: {
+      neutral: "input-neutral",
+      primary: "input-primary",
+      secondary: "input-secondary",
+      accent: "input-accent",
+      info: "input-info",
+      success: "input-success",
+      warning: "input-warning",
+      error: "input-error",
     },
   },
   defaultVariants: {
     variant: "none",
+    size: "md",
+    appearance: "neutral",
   },
 });
 
@@ -43,6 +76,8 @@ export const Input: Component<InputRootProps> = (props) => {
     "label",
     "class",
     "variant",
+    "appearance",
+    "size",
     "inputProps",
     "saveFunc",
     "onChange",
@@ -59,15 +94,17 @@ export const Input: Component<InputRootProps> = (props) => {
     <TextField class={inputRoot({ class: local.class })} {...others} onChange={handleChange}>
       <div class="relative w-full">
         <Show when={local.label}>
-          <TextField.Label
-            class="absolute -top-3 left-2 px-1 bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] text-xs font-medium text-[var(--color-text-light-secondary)] dark:text-[var(--color-text-dark-secondary)] pointer-events-none z-10"
-            style="transform: translateY(-50%);"
-          >
+          <TextField.Label class={inputLabel({ size: local.size })} style="transform: translateY(-50%);">
             {local.label}
           </TextField.Label>
         </Show>
         <TextField.Input
-          class={inputField({ variant: local.variant, class: local.inputProps?.class })}
+          class={inputField({
+            appearance: local.appearance,
+            variant: local.variant,
+            size: local.size,
+            class: local.inputProps?.class,
+          })}
           {...local.inputProps}
         />
       </div>

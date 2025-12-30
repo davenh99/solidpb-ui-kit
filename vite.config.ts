@@ -8,6 +8,13 @@ export default defineConfig({
     port: 3000,
   },
   build: {
-    target: "esnext",
+    lib: {
+      entry: "src/index.ts",
+      formats: ["es"],
+      fileName: () => "index.js",
+    },
+    rollupOptions: {
+      external: ["solid-js", "solid-js/web"],
+    },
   },
 });

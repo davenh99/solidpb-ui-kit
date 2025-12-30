@@ -1,0 +1,120 @@
+import { createSolidTable, flexRender, getCoreRowModel, getFilteredRowModel, } from "@tanstack/solid-table";
+import { For, Show, createMemo, createSignal } from "solid-js";
+import { createVirtualizer } from "@tanstack/solid-virtual";
+import { tv } from "tailwind-variants";
+import Loader from "lucide-solid/icons/loader";
+import Plus from "lucide-solid/icons/plus";
+import { Button } from "../Button";
+import { Input } from "../Input";
+const containerClass = tv({
+    base: "overflow-y-auto relative flex-1",
+});
+export const DefaultRowRenderer = (props) => {
+    return (<div class="flex justify-between items-center cursor-pointer text-sm border-b border-[var(--color-light-muted)] dark:border-[var(--color-dark-muted)] py-2 hover:bg-[var(--color-light-muted)] dark:hover:bg-[var(--color-dark-muted)]" onClick={() => props.onClick(props.row.original)}>
+      <For each={props.row.getVisibleCells()}>
+        {(cell) => (<div class="flex-1 overflow-hidden truncate">
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </div>)}
+      </For>
+    </div>);
+};
+export const List = (props) => {
+    const [globalFilter, setGlobalFilter] = createSignal();
+    let parentRef;
+    const table = createSolidTable({
+        get data() {
+            return props.data?.() || [];
+        },
+        columns: props.columns(),
+        getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        state: {
+            get globalFilter() {
+                return globalFilter();
+            },
+            get columnFilters() {
+                return props.filters?.();
+            },
+        },
+    });
+    const rowCount = createMemo(() => table.getRowModel().rows.length);
+    const dataExists = createMemo(() => props.data?.() || props.loading);
+    const rows = createMemo(() => table.getRowModel().rows);
+    const virtualizer = createMemo(() => createVirtualizer({
+        get count() {
+            return rows().length;
+        },
+        getScrollElement: () => {
+            return parentRef;
+        },
+        estimateSize: () => 41,
+        get getItemKey() {
+            return (index) => rows()[index].id;
+        },
+    }));
+    const virtualRows = createMemo(() => virtualizer().getVirtualItems());
+    const totalSize = createMemo(() => virtualizer().getTotalSize());
+    const containerStyle = createMemo(() => containerClass({ class: props.containerClass }));
+    return (<div class="flex flex-col h-full max-h-[inherit]">
+      <Show when={dataExists()} fallback={props.loadingFallback || (<div class="fixed inset-0 z-100 flex items-center justify-center bg-[var(--color-dark-background)]/25 dark:bg-[var(--color-light-background)]/25">
+              <Loader class="w-9 h-9 animate-spin text-[var(--color-light-muted)] dark:text-[var(--color-dark-muted)]"/>
+            </div>)}>
+        <div class="sticky top-0 bg-charcoal-500/95 backdrop-blur-xs">
+          <Show when={props.search}>
+            <div class="flex items-center space-x-2 mt-3 mb-1">
+              <Show when={props.createFunc}>
+                <Button class="flex text-sm items-center pl-1 pr-2" variant="solid" appearance="success" onClick={props.createFunc}>
+                  <Plus size={20}/>
+                  New
+                </Button>
+              </Show>
+
+              <div class="w-full relative">
+                <Input class="w-full" value={globalFilter()} onChange={setGlobalFilter} inputProps={{ placeholder: props.searchPlaceholder ?? "Search", class: "p-1" }}/>
+                {props.loading && (<Loader size={16} class="absolute animate-spin top-1/2 transform -translate-y-1/2 right-2"/>)}
+              </div>
+            </div>
+          </Show>
+
+          <Show when={props.headerActions}>{props.headerActions}</Show>
+
+          <Show when={props.showItemCount}>
+            <p class="text-xs italic mb-1">{rowCount()} items</p>
+          </Show>
+        </div>
+
+        <Show when={props.headers}>
+          <For each={table.getHeaderGroups()}>
+            {(headerGroup) => (<div class="flex flex-row w-full justify-between sticky top-0 bg-[var(--color-light-surface)]/95 dark:bg-[var(--color-dark-surface)]/95 text-[var(--color-text-light-primary)] dark:text-[var(--color-dark-primary)] backdrop-blur-sm p-2 z-10">
+                <For each={headerGroup.headers}>
+                  {(header) => (<div class="text-left font-bold">
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                    </div>)}
+                </For>
+              </div>)}
+          </For>
+        </Show>
+
+        <div ref={parentRef} class={containerStyle()}>
+          <Show when={rowCount() > 0} fallback={props.emptyState || <div class="text-center py-4">No results found.</div>}>
+            <div class="w-full" style={{
+            height: `${totalSize()}px`,
+            position: "relative",
+        }}>
+              <For each={virtualRows()}>
+                {(virtualRow) => {
+            const row = rows()[virtualRow.index];
+            return (<div data-index={virtualRow.index} ref={(el) => queueMicrotask(() => virtualizer().measureElement(el))} class="absolute w-full" style={{ transform: `translateY(${virtualRow.start}px)` }}>
+                      <Show when={props.renderRow} fallback={<DefaultRowRenderer row={row} columns={props.columns} onClick={props.onRowClick}/>}>
+                        {props.renderRow(row, props.onRowClick)}
+                      </Show>
+                    </div>);
+        }}
+              </For>
+            </div>
+          </Show>
+        </div>
+      </Show>
+    </div>);
+};
+export default List;

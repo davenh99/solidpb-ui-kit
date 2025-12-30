@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
 import { createSignal } from "solid-js";
 import { TagArea } from "./TagArea";
-import type { TagRecord } from "./TagArea";
 
 const meta: Meta<typeof TagArea> = {
   title: "Components/TagArea",
