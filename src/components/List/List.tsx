@@ -122,7 +122,6 @@ export const List = <T,>(props: ListProps<T>): JSXElement => {
               <Show when={props.createFunc}>
                 <Button
                   class="flex text-sm items-center pl-1 pr-2"
-                  variant="solid"
                   appearance="success"
                   onClick={props.createFunc}
                 >

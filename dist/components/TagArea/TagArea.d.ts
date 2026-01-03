@@ -1,5 +1,5 @@
 import { JSX } from "solid-js";
-interface TagAreaProps<T extends TagRecord = TagRecord> {
+interface TagAreaProps<T extends Tag = Tag> {
     tags: T[];
     setTags: (tags: T[]) => void;
     onCreateTag: (name: string) => Promise<T>;
@@ -7,5 +7,5 @@ interface TagAreaProps<T extends TagRecord = TagRecord> {
     suggestions?: T[];
     placeholder?: string;
 }
-export declare const TagArea: <T extends TagRecord = TagRecord>(props: TagAreaProps<T>) => JSX.Element;
+export declare const TagArea: <T extends Tag = Tag>(props: TagAreaProps<T>) => JSX.Element;
 export default TagArea;

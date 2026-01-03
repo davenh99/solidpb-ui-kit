@@ -1,7 +1,7 @@
 import { Show } from "solid-js";
 import TagArea from "../TagArea/TagArea";
 
-interface RelationPickerProps<T extends TagRecord = TagRecord> {
+interface RelationPickerProps<T extends Tag = Tag> {
   relations: T[];
   setRelations: (relations: T[]) => void;
   suggestions?: T[];
@@ -11,7 +11,7 @@ interface RelationPickerProps<T extends TagRecord = TagRecord> {
   label?: string;
 }
 
-export const RelationPicker = <T extends TagRecord = TagRecord>(props: RelationPickerProps<T>) => {
+export const RelationPicker = <T extends Tag = Tag>(props: RelationPickerProps<T>) => {
   return (
     <div class="flex flex-col gap-1">
       <Show when={props.label}>

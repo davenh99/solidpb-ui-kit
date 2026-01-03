@@ -20,7 +20,16 @@ type InputRootProps<T extends ValidComponent = "div"> = ExtraProps &
   PolymorphicProps<T, TextFieldRootProps<T>>;
 
 const inputRoot = tv({
-  base: "relative flex flex-col gap-1 mt-3",
+  base: "relative flex flex-col gap-1",
+  variants: {
+    marginTop: {
+      yes: "mt-2",
+      no: "",
+    },
+  },
+  defaultVariants: {
+    marginTop: "no",
+  },
 });
 
 const inputLabel = tv({
@@ -91,7 +100,11 @@ export const Input: Component<InputRootProps> = (props) => {
   };
 
   return (
-    <TextField class={inputRoot({ class: local.class })} {...others} onChange={handleChange}>
+    <TextField
+      class={inputRoot({ class: local.class, marginTop: local.label ? "yes" : "no" })}
+      {...others}
+      onChange={handleChange}
+    >
       <div class="relative w-full">
         <Show when={local.label}>
           <TextField.Label class={inputLabel({ size: local.size })} style="transform: translateY(-50%);">

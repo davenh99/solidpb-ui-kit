@@ -2,7 +2,7 @@ import { createSignal, For, JSX, Show, createMemo } from "solid-js";
 import { Input } from "../Input";
 import Tag from "../Tag/Tag";
 
-interface TagAreaProps<T extends TagRecord = TagRecord> {
+interface TagAreaProps<T extends Tag = Tag> {
   tags: T[];
   setTags: (tags: T[]) => void;
   onCreateTag: (name: string) => Promise<T>;
@@ -11,7 +11,7 @@ interface TagAreaProps<T extends TagRecord = TagRecord> {
   placeholder?: string;
 }
 
-export const TagArea = <T extends TagRecord = TagRecord>(props: TagAreaProps<T>) => {
+export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
   const [tagInput, setTagInput] = createSignal("");
   const [showSuggestions, setShowSuggestions] = createSignal(false);
 

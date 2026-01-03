@@ -63,7 +63,7 @@ export const List = (props) => {
           <Show when={props.search}>
             <div class="flex items-center space-x-2 mt-3 mb-1">
               <Show when={props.createFunc}>
-                <Button class="flex text-sm items-center pl-1 pr-2" variant="solid" appearance="success" onClick={props.createFunc}>
+                <Button class="flex text-sm items-center pl-1 pr-2" appearance="success" onClick={props.createFunc}>
                   <Plus size={20}/>
                   New
                 </Button>

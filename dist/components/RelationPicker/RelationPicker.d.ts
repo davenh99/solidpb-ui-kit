@@ -1,4 +1,4 @@
-interface RelationPickerProps<T extends TagRecord = TagRecord> {
+interface RelationPickerProps<T extends Tag = Tag> {
     relations: T[];
     setRelations: (relations: T[]) => void;
     suggestions?: T[];
@@ -7,5 +7,5 @@ interface RelationPickerProps<T extends TagRecord = TagRecord> {
     placeholder?: string;
     label?: string;
 }
-export declare const RelationPicker: <T extends TagRecord = TagRecord>(props: RelationPickerProps<T>) => import("solid-js").JSX.Element;
+export declare const RelationPicker: <T extends Tag = Tag>(props: RelationPickerProps<T>) => import("solid-js").JSX.Element;
 export default RelationPicker;

@@ -9,11 +9,11 @@ const meta: Meta<typeof TagArea> = {
 export default meta;
 type Story = StoryObj<typeof TagArea>;
 
-const initialTags: TagRecord[] = [
+const initialTags: Tag[] = [
   { id: "1", name: "SolidJS", colorHex: "#10b981" },
   { id: "2", name: "UI", colorHex: "#3b82f6" },
 ];
-const suggestions: TagRecord[] = [
+const suggestions: Tag[] = [
   ...initialTags,
   { id: "3", name: "Component", colorHex: "#f59e0b" },
   { id: "4", name: "Design", colorHex: "#ef4444" },
@@ -21,7 +21,7 @@ const suggestions: TagRecord[] = [
 
 export const Default: Story = {
   render: () => {
-    const [tags, setTags] = createSignal<TagRecord[]>(initialTags);
+    const [tags, setTags] = createSignal<Tag[]>(initialTags);
     return (
       <TagArea
         tags={tags()}

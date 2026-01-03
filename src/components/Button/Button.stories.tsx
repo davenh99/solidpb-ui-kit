@@ -11,9 +11,18 @@ export default meta;
 type Story = StoryObj<typeof Button>;
 
 // Variants, appearances, sizes
-const variants = ["solid", "text"] as const;
-const appearances = ["primary", "success", "warning", "neutral", "error", "muted"] as const;
-const sizes = ["xs", "sm", "md", "lg"] as const;
+const variants = [undefined, "outline", "ghost", "dash", "soft", "link"] as const;
+const appearances = [
+  "primary",
+  "success",
+  "warning",
+  "neutral",
+  "error",
+  "secondary",
+  "info",
+  "accent",
+] as const;
+const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
 
 export const AllButtons: Story = {
   render: () => (

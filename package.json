@@ -35,7 +35,7 @@
     "publish": "npm publish --access=public",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "build": "vite build && tsc -p tsconfig.json",
+    "build": "vite build && tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run build"
   }
 }

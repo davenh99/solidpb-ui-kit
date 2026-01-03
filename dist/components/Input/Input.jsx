@@ -3,7 +3,16 @@ import { TextField } from "@kobalte/core/text-field";
 import { tv } from "tailwind-variants";
 import { debounce } from "../../methods/debounce";
 const inputRoot = tv({
-    base: "relative flex flex-col gap-1 mt-3",
+    base: "relative flex flex-col gap-1",
+    variants: {
+        marginTop: {
+            yes: "mt-2",
+            no: "",
+        },
+    },
+    defaultVariants: {
+        marginTop: "no",
+    },
 });
 const inputLabel = tv({
     base: "absolute left-3 px-1 font-medium pointer-events-none z-10 bg-base-100",
@@ -67,7 +76,7 @@ export const Input = (props) => {
         local.onChange?.(v);
         debouncedSave()?.(v);
     };
-    return (<TextField class={inputRoot({ class: local.class })} {...others} onChange={handleChange}>
+    return (<TextField class={inputRoot({ class: local.class, marginTop: local.label ? "yes" : "no" })} {...others} onChange={handleChange}>
       <div class="relative w-full">
         <Show when={local.label}>
           <TextField.Label class={inputLabel({ size: local.size })} style="transform: translateY(-50%);">

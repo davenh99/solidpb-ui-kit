@@ -8,10 +8,8 @@
     "types": ["vite/client"],
     "strict": true,
     "declaration": true,
-    "emitDeclarationOnly": false,
-    "outDir": "dist",
     "skipLibCheck": true
   },
   "include": ["src"],
-  "exclude": ["**/*.stories.ts", "**/*.stories.tsx", ".storybook", "dist"]
+  "exclude": ["dist"]
 }

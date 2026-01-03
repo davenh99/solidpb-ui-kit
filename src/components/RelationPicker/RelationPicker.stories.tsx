@@ -9,11 +9,11 @@ const meta: Meta<typeof RelationPicker> = {
 export default meta;
 type Story = StoryObj<typeof RelationPicker>;
 
-const initialRelations: TagRecord[] = [
+const initialRelations: Tag[] = [
   { id: "1", name: "Parent", colorHex: "#10b981" },
   { id: "2", name: "Child", colorHex: "#3b82f6" },
 ];
-const suggestions: TagRecord[] = [
+const suggestions: Tag[] = [
   ...initialRelations,
   { id: "3", name: "Sibling", colorHex: "#f59e0b" },
   { id: "4", name: "Cousin", colorHex: "#ef4444" },
@@ -21,7 +21,7 @@ const suggestions: TagRecord[] = [
 
 export const Default: Story = {
   render: () => {
-    const [relations, setRelations] = createSignal<TagRecord[]>(initialRelations);
+    const [relations, setRelations] = createSignal<Tag[]>(initialRelations);
     return (
       <RelationPicker
         label="Relations"
