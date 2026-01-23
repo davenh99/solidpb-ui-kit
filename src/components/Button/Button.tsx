@@ -84,7 +84,7 @@ export const Button: ParentComponent<Props> = (props) => {
       size: local.size,
       modifier: local.modifier,
       class: local.class as string,
-    })
+    }),
   );
 
   return (

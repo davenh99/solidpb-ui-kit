@@ -5,6 +5,7 @@ interface Props {
   class?: string;
   img?: string;
   imgAlt?: string;
+  imgClass?: string;
   bodyClass?: string;
 }
 
@@ -16,11 +17,15 @@ const cardBody = tv({
   base: "card-body w-full",
 });
 
+const cardImage = tv({
+  base: "px-4 pt-4",
+});
+
 export const Card: ParentComponent<Props> & { Title: typeof CardTitle } = (props) => {
   return (
     <div class={card({ class: props.class })}>
       <Show when={props.img}>
-        <figure>
+        <figure class={cardImage({ class: props.imgClass })}>
           <img src={props.img} alt={props.imgAlt ?? "Card Image"} />
         </figure>
       </Show>

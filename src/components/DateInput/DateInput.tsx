@@ -22,9 +22,7 @@ export const DateInput: Component<DateInputProps> = (props) => {
   return (
     <div class={props.class}>
       <Show when={props.label}>
-        <label class="block mb-1 text-xs font-medium text-[var(--color-text-light-secondary)] dark:text-[var(--color-text-dark-secondary)]">
-          {props.label}
-        </label>
+        <label class="block mb-1 text-xs font-medium">{props.label}</label>
       </Show>
       <input type="date" class={dateInput()} value={valueStr()} onInput={handleChange} />
     </div>

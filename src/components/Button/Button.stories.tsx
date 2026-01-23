@@ -38,7 +38,7 @@ export const AllButtons: Story = {
                   <For each={[false, true]}>
                     {(l) => (
                       <div class="space-x-3">
-                        <h5 class="mt-2 font-bold">Loading: {l}</h5>
+                        <h5 class="mt-2 font-bold">{l ? "Loading" : "Not Loading"}</h5>
                         <For each={appearances}>
                           {(a) => (
                             <Button variant={v} appearance={a} size={s} isLoading={l}>

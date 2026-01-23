@@ -5,7 +5,7 @@ import Tag from "../Tag/Tag";
 interface TagAreaProps<T extends Tag = Tag> {
   tags: T[];
   setTags: (tags: T[]) => void;
-  onCreateTag: (name: string) => Promise<T>;
+  onCreateTag: (name: string) => Promise<T | undefined>;
   onDeleteTag: (tag: T) => Promise<void>;
   suggestions?: T[];
   placeholder?: string;
@@ -17,8 +17,9 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
 
   const filteredSuggestions = createMemo(() =>
     (props.suggestions || []).filter(
-      (s) => s.name.toLowerCase().includes(tagInput().toLowerCase()) && !props.tags.some((t) => t.id === s.id)
-    )
+      (s) =>
+        s.name.toLowerCase().includes(tagInput().toLowerCase()) && !props.tags.some((t) => t.id === s.id),
+    ),
   );
 
   const handleTagInput: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = async (e) => {
@@ -49,14 +50,14 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
   };
 
   return (
-    <div class="rounded-md p-2 flex flex-col bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)]">
+    <div class="rounded-md p-2 flex flex-col bg-light-surface dark:bg-dark-surface">
       <div class="flex flex-wrap gap-2">
         <For each={props.tags || []}>
           {(t) => (
             <Tag title={t.name || ""} colorHex={t.colorHex || "#6b7280"} onClick={() => deleteTag(t)} />
           )}
         </For>
-        <div class="relative flex-1 min-w-[120px]">
+        <div class="relative flex-1 min-w-30">
           <Input
             label=""
             value={tagInput()}
@@ -73,11 +74,11 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
             class="w-full"
           />
           <Show when={showSuggestions() && filteredSuggestions().length > 0}>
-            <div class="absolute z-10 mt-1 w-full bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] border border-[var(--color-light-muted)] dark:border-[var(--color-dark-muted)] rounded shadow-lg max-h-40 overflow-auto">
+            <div class="absolute z-10 mt-1 w-full bg-light-surface dark:bg-dark-surface border border-light-muted dark:border-dark-muted rounded shadow-lg max-h-40 overflow-auto">
               <For each={filteredSuggestions()}>
                 {(s) => (
                   <div
-                    class="px-3 py-2 cursor-pointer hover:bg-[var(--color-light-muted)] dark:hover:bg-[var(--color-dark-muted)]"
+                    class="px-3 py-2 cursor-pointer hover:bg-light-muted dark:hover:bg-dark-muted"
                     onMouseDown={() => handleSuggestionClick(s)}
                   >
                     {s.name}

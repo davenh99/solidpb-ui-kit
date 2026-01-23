@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
-import { createSignal } from "solid-js";
+import { createSignal, For } from "solid-js";
 import { Checkbox } from "./Checkbox";
 
 const meta: Meta<typeof Checkbox> = {
@@ -9,9 +9,42 @@ const meta: Meta<typeof Checkbox> = {
 export default meta;
 type Story = StoryObj<typeof Checkbox>;
 
-export const Default: Story = {
+const appearances = [
+  "primary",
+  "success",
+  "warning",
+  "neutral",
+  "error",
+  "secondary",
+  "info",
+  "accent",
+] as const;
+const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
+
+export const AllCheckboxes: Story = {
   render: () => {
-    const [checked, setChecked] = createSignal(false);
-    return <Checkbox label="Accept terms" checked={checked()} onChange={setChecked} />;
+    return (
+      <div class="space-y-4">
+        <For each={sizes}>
+          {(s) => (
+            <div>
+              <h4 class="mt-2 font-bold">Size: {s}</h4>
+              <For each={[false, true]}>
+                {(c) => (
+                  <div class="space-x-3">
+                    <h5 class="mt-2 font-bold">{c ? "Checked" : "Unchecked"}</h5>
+                    <For each={appearances}>
+                      {(a) => (
+                        <Checkbox label="Accept terms" appearance={a} size={s} checked={c} class="my-1" />
+                      )}
+                    </For>
+                  </div>
+                )}
+              </For>
+            </div>
+          )}
+        </For>
+      </div>
+    );
   },
 };
