@@ -6,7 +6,7 @@ import Loader from "lucide-solid/icons/loader";
 
 type BaseProps<T extends ValidComponent = "button"> = PolymorphicProps<T, ButtonRootProps<T>>;
 
-interface Props extends BaseProps {
+export interface ButtonProps extends BaseProps {
   variant?: "outline" | "dash" | "soft" | "ghost" | "link";
   appearance?: "primary" | "secondary" | "success" | "warning" | "neutral" | "error" | "accent" | "info";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
@@ -58,7 +58,7 @@ const button = tv({
   },
 });
 
-const spinnerSizeMap: Record<NonNullable<Props["size"]>, number> = {
+const spinnerSizeMap: Record<NonNullable<ButtonProps["size"]>, number> = {
   xs: 12,
   sm: 16,
   md: 20,
@@ -66,7 +66,7 @@ const spinnerSizeMap: Record<NonNullable<Props["size"]>, number> = {
   xl: 28,
 };
 
-export const Button: ParentComponent<Props> = (props) => {
+export const Button: ParentComponent<ButtonProps> = (props) => {
   const [local, others] = splitProps(props, [
     "children",
     "class",
