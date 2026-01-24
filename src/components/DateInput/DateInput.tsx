@@ -5,11 +5,58 @@ interface DateInputProps {
   label?: string;
   value: Date | null;
   onChange: (date: Date | null) => void;
+  variant?: "ghost" | "none";
+  appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   class?: string;
 }
 
 const dateInput = tv({
-  base: "rounded border px-2 py-1 bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] text-[var(--color-text-light-primary)] dark:text-[var(--color-text-dark-primary)] border-[var(--color-light-muted)] dark:border-[var(--color-dark-muted)]",
+  base: "input outline-offset-0",
+  variants: {
+    variant: {
+      ghost: "input-ghost",
+      none: "",
+    },
+    appearance: {
+      neutral: "input-neutral",
+      primary: "input-primary",
+      secondary: "input-secondary",
+      accent: "input-accent",
+      info: "input-info",
+      success: "input-success",
+      warning: "input-warning",
+      error: "input-error",
+    },
+    size: {
+      xs: "input-xs",
+      sm: "input-sm",
+      md: "input-md",
+      lg: "input-lg",
+      xl: "input-xl",
+    },
+  },
+  defaultVariants: {
+    variant: "none",
+    appearance: "neutral",
+    size: "md",
+  },
+});
+
+const label = tv({
+  base: "block mb-1 text-xs font-medium",
+  variants: {
+    size: {
+      xs: "text-xs",
+      sm: "text-xs",
+      md: "text-sm",
+      lg: "text-sm",
+      xl: "text-md",
+    },
+  },
+  defaultVariants: {
+    size: "md",
+  },
 });
 
 export const DateInput: Component<DateInputProps> = (props) => {
@@ -22,9 +69,14 @@ export const DateInput: Component<DateInputProps> = (props) => {
   return (
     <div class={props.class}>
       <Show when={props.label}>
-        <label class="block mb-1 text-xs font-medium">{props.label}</label>
+        <label class={label({ size: props.size })}>{props.label}</label>
       </Show>
-      <input type="date" class={dateInput()} value={valueStr()} onInput={handleChange} />
+      <input
+        type="date"
+        class={dateInput({ size: props.size, variant: props.variant, appearance: props.appearance })}
+        value={valueStr()}
+        onInput={handleChange}
+      />
     </div>
   );
 };
