@@ -19,6 +19,7 @@ Also to index.css (refer daisyui docs):
 
 ### TODO light theme
 
+- [x] Avatar
 - [x] AlertDialog
 - [x] Button
 - [x] Card
@@ -46,9 +47,11 @@ Also to index.css (refer daisyui docs):
 - [ ] TextArea
 - [ ] Toast
 - [ ] Tooltip
+- [ ] Kanban
 
 ### TODO dark theme
 
+- [ ] Avatar
 - [ ] AlertDialog
 - [ ] Button
 - [ ] Card
@@ -76,8 +79,10 @@ Also to index.css (refer daisyui docs):
 - [ ] TextArea
 - [ ] Toast
 - [ ] Tooltip
+- [ ] Kanban
 
 ### TODO (more thorough/complex implementation)
 
 - [ ] DropdownMenu (complex groups etc check kobalte)
 - [ ] List (draggable, will be a challenge to integrate with virtualised)
+- [ ] Kanban (will be a bit of a beast)

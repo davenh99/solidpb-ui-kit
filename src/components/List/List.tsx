@@ -96,7 +96,7 @@ export const List = <T,>(props: ListProps<T>): JSXElement => {
       get getItemKey() {
         return (index: number) => rows()[index].id;
       },
-    })
+    }),
   );
 
   const virtualRows = createMemo(() => virtualizer().getVirtualItems());
