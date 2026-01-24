@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
 import DropdownMenu from "./DropdownMenu";
+import { Button } from "../Button";
 
 const meta: Meta<typeof DropdownMenu> = {
   title: "Components/DropdownMenu",
@@ -11,11 +12,11 @@ type Story = StoryObj<typeof DropdownMenu>;
 export const Default: Story = {
   render: () => (
     <DropdownMenu
-      label="Open Menu"
       items={[
-        { label: "Item 1", onSelect: () => alert("Item 1 selected") },
-        { label: "Item 2", onSelect: () => alert("Item 2 selected") },
+        { label: "Item 1", onSelect: () => {} },
+        { label: "Item 2", onSelect: () => {} },
       ]}
+      trigger={<Button appearance="neutral">Open Menu</Button>}
     />
   ),
 };

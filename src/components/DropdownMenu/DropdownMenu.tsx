@@ -1,32 +1,36 @@
 import { DropdownMenu as KDropdownMenu } from "@kobalte/core/dropdown-menu";
-import { Component, For } from "solid-js";
+import { Component, For, JSXElement } from "solid-js";
 import { tv } from "tailwind-variants";
 
 interface DropdownMenuProps {
-  label?: string;
   items: { label: string; onSelect: () => void }[];
-  class?: string;
+  trigger: JSXElement;
 }
 
 const menu = tv({
-  base: "bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] rounded shadow-md p-2 min-w-[120px]",
+  base: "dropdown-content menu bg-base-100 min-w-30 shadow-sm mt-2 p-2 rounded-box",
 });
+
 const item = tv({
-  base: "px-3 py-2 cursor-pointer hover:bg-[var(--color-light-muted)] dark:hover:bg-[var(--color-dark-muted)] rounded",
+  base: "px-3 py-2 cursor-pointer rounded",
 });
 
 export const DropdownMenu: Component<DropdownMenuProps> = (props) => (
   <KDropdownMenu>
-    <KDropdownMenu.Trigger class={props.class}>{props.label}</KDropdownMenu.Trigger>
+    <KDropdownMenu.Trigger>{props.trigger}</KDropdownMenu.Trigger>
     <KDropdownMenu.Portal>
       <KDropdownMenu.Content class={menu()}>
-        <For each={props.items}>
-          {(itemObj) => (
-            <KDropdownMenu.Item class={item()} onSelect={itemObj.onSelect}>
-              {itemObj.label}
-            </KDropdownMenu.Item>
-          )}
-        </For>
+        <ul>
+          <For each={props.items}>
+            {(itemObj) => (
+              <li>
+                <KDropdownMenu.Item class={item()} onSelect={itemObj.onSelect}>
+                  {itemObj.label}
+                </KDropdownMenu.Item>
+              </li>
+            )}
+          </For>
+        </ul>
       </KDropdownMenu.Content>
     </KDropdownMenu.Portal>
   </KDropdownMenu>
