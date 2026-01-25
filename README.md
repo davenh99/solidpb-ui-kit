@@ -40,7 +40,7 @@ Also to index.css (refer daisyui docs):
 - [ ] SearchInput
 - [ ] Select
 - [ ] Slider
-- [ ] Switch
+- [x] Switch
 - [ ] Tabs
 - [ ] Tag
 - [ ] TagArea

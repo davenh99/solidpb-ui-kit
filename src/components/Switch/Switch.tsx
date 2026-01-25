@@ -1,45 +1,59 @@
-import { Switch as KSwitch, SwitchRootProps } from "@kobalte/core/switch";
-import { Component, createMemo, Show, ValidComponent } from "solid-js";
+import { Component, splitProps, JSX } from "solid-js";
+import { tv } from "tailwind-variants";
 
-import { debounce } from "../../methods/debounce";
-import { PolymorphicProps } from "@kobalte/core";
-
-type SwitchProps<T extends ValidComponent = "div"> = PolymorphicProps<T, SwitchRootProps<T>>;
-
-interface Props extends SwitchProps {
+export interface SwitchProps extends Omit<JSX.InputHTMLAttributes<HTMLInputElement>, "type" | "onChange"> {
   label?: string;
-  size?: "sm" | "md";
-  saveFunc?: (v: boolean) => Promise<any>;
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  appearance?: "primary" | "secondary" | "success" | "warning" | "error" | "info" | "accent" | "neutral";
+  onChange?: (checked: boolean) => void;
 }
 
-export const Switch: Component<Props> = (props) => {
-  const debouncedSave = createMemo(() => (props.saveFunc ? debounce(props.saveFunc) : undefined));
+const toggle = tv({
+  base: "toggle",
+  variants: {
+    size: {
+      xs: "toggle-xs",
+      sm: "toggle-sm",
+      md: "toggle-md",
+      lg: "toggle-lg",
+      xl: "toggle-xl",
+    },
+    appearance: {
+      primary: "toggle-primary",
+      secondary: "toggle-secondary",
+      success: "toggle-success",
+      warning: "toggle-warning",
+      error: "toggle-error",
+      info: "toggle-info",
+      accent: "toggle-accent",
+      neutral: "toggle-neutral",
+    },
+  },
+  defaultVariants: {
+    size: "md",
+    appearance: "neutral",
+  },
+});
 
-  const handleChange = (v: boolean) => {
-    props.onChange?.(v);
-    debouncedSave()?.(v);
-  };
+export const Switch: Component<SwitchProps> = (props) => {
+  const [local, inputProps] = splitProps(props, ["label", "size", "appearance", "class", "onChange"]);
 
   return (
-    <KSwitch
-      class={`flex flex-row justify-between items-center ${props.class ?? ""}`}
-      checked={props.checked}
-      onChange={handleChange}
-    >
-      <Show when={props.label}>
-        <KSwitch.Label>{props.label}</KSwitch.Label>
-      </Show>
-      <KSwitch.Input />
-      <KSwitch.Control
-        class={`flex items-center w-10 h-6 bg-black rounded-full border-1 border-black
-        data-[checked]:bg-white data-[checked]:border-white transition-all`}
-      >
-        <KSwitch.Thumb
-          class={`h-5 w-5 rounded-full bg-white transition-transform 
-            data-[checked]:[transform:translateX(calc(100%-2px))]`}
-        />
-      </KSwitch.Control>
-    </KSwitch>
+    <label class="flex items-center gap-3">
+      <input
+        {...inputProps}
+        type="checkbox"
+        class={toggle({
+          size: local.size,
+          appearance: local.appearance,
+          class: local.class,
+        })}
+        onChange={(e) => {
+          local.onChange?.(Boolean(e.currentTarget.value));
+        }}
+      />
+      {local.label && <span class="select-none">{local.label}</span>}
+    </label>
   );
 };
 

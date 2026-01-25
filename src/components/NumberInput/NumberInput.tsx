@@ -12,7 +12,7 @@ type InputProps<T extends ValidComponent = "input"> = PolymorphicProps<T, Number
 
 interface ExtraProps {
   label?: string;
-  size?: "sm" | "md";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   inputProps?: InputProps;
   saveFunc?: (v: number) => Promise<any>;
 }

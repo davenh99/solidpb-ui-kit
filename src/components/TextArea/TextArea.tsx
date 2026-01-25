@@ -50,8 +50,8 @@ export const TextArea: Component<InputRootProps> = (props) => {
   createEffect(
     on(
       () => others.value,
-      () => autoResize()
-    )
+      () => autoResize(),
+    ),
   );
 
   return (

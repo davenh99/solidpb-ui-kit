@@ -1,117 +1,136 @@
-import { createSignal, JSXElement, onMount } from "solid-js";
+import { JSXElement } from "solid-js";
+import { createStore } from "solid-js/store";
+import { Dynamic } from "solid-js/web";
 
 import { Switch } from "../Switch";
-import { FormContext, useForm } from "./formContext";
+import { Select } from "../Select";
+import { Input } from "../Input";
+import { TextArea } from "../TextArea";
+import { Checkbox } from "../Checkbox";
+import { InternalFormContext, useInternalFormContext } from "./formContext";
+import { NumberInput } from "../NumberInput";
+import { Button } from "../Button";
 
-interface FormProps<T> {
+export interface FormProps<T> {
   data: T;
   title?: string;
   saveFunc?: (values: Partial<T>) => Promise<void>;
   children: JSXElement;
 }
 
-export const Form = <T,>(props: FormProps<T>): JSXElement => {
-  const [values, setValues] = createSignal<Partial<T>>(props.data);
+export type FormWidget = "text" | "number" | "checkbox" | "switch" | "textarea" | "select";
 
-  const register = <K extends keyof T>(key: K, initialValue: T[K] | undefined) => {
-    setValues((v) => (key in v ? v : { ...v, [key]: initialValue }));
-  };
-
-  const setValue = <K extends keyof T>(key: K, value: T[K]) => {
-    setValues((v) => ({ ...v, [key]: value }));
-  };
-
-  const getValue = <K extends keyof T>(key: K): T[K] | undefined => {
-    return values()[key];
-  };
-
-  const save = async () => {
-    if (props.saveFunc) {
-      await props.saveFunc(values());
-    }
-  };
-
-  return (
-    <FormContext.Provider value={{ register, setValue, getValue, values }}>
-      <div class="space-y-4">
-        {props.title && <h2 class="text-lg font-semibold">{props.title}</h2>}
-
-        {props.children}
-
-        {props.saveFunc && (
-          <button class="btn btn-primary" onClick={save}>
-            Save
-          </button>
-        )}
-      </div>
-    </FormContext.Provider>
-  );
-};
-
-export type FormWidget = "text" | "number" | "checkbox" | "switch" | "multilinetext" | "select";
 export interface WidgetProps<T> {
+  label: string;
   value: T | undefined;
   setValue: (v: T) => void;
+  // only for widget "select"
+  selectOptions?: { label: string; value: string }[];
 }
+
 type WidgetComponent<T> = (props: WidgetProps<T>) => JSXElement;
 
 export const widgets: Record<FormWidget, WidgetComponent<any>> = {
-  text: ({ value, setValue }) => (
-    <input
-      class="input input-bordered w-full"
-      value={value ?? ""}
-      onInput={(e) => setValue(e.currentTarget.value)}
-    />
+  text: ({ label, value, setValue }) => <Input label={label} value={value()} onChange={setValue} />,
+
+  number: ({ label, value, setValue }) => (
+    <NumberInput label={label} rawValue={value()} onRawValueChange={setValue} />
   ),
 
-  number: ({ value, setValue }) => (
-    <input
-      type="number"
-      class="input input-bordered w-full"
-      value={value ?? ""}
-      onInput={(e) => setValue(Number(e.currentTarget.value))}
-    />
+  checkbox: ({ label, value, setValue }) => (
+    <Checkbox label={label} checked={Boolean(value())} onChange={setValue} />
   ),
 
-  checkbox: ({ value, setValue }) => (
-    <input type="checkbox" checked={Boolean(value)} onChange={(e) => setValue(e.currentTarget.checked)} />
+  switch: ({ label, value, setValue }) => (
+    <Switch label={label} checked={Boolean(value())} onChange={setValue} />
   ),
 
-  switch: ({ value, setValue }) => <Switch checked={Boolean(value)} onChange={setValue} />,
+  textarea: ({ label, value, setValue }) => <TextArea label={label} value={value()} onChange={setValue} />,
 
-  textarea: ({ value, setValue }) => (
-    <textarea
-      class="textarea textarea-bordered w-full"
-      value={value ?? ""}
-      onInput={(e) => setValue(e.currentTarget.value)}
-    />
+  select: ({ label, value, setValue, selectOptions }) => (
+    <Select label={label} value={value()} onChange={setValue} options={selectOptions || []} />
   ),
-
-  select: ({ value, setValue }) => <Select value={value} onChange={setValue} options={[]} />,
 };
 
-interface FormFieldProps<T, K extends keyof T> {
-  field: K;
+type BaseFieldProps<T> = {
+  field: keyof T;
   label: string;
-  initialValue?: T[K];
-  widget: FormWidget;
-}
-
-export const FormField = <T, K extends keyof T>(props: FormFieldProps<T, K>) => {
-  const form = useForm<T>();
-
-  onMount(() => {
-    form.register(props.field, props.initialValue);
-  });
-
-  return (
-    <div class="space-y-1">
-      <label class="text-sm font-medium">{props.label}</label>
-      {props.children(form.getValue(props.field), (v) => form.setValue(props.field, v))}
-    </div>
-  );
 };
 
-Form.Field = FormField;
+type SelectFieldProps<T> = BaseFieldProps<T> & {
+  widget: "select";
+  selectOptions: { label: string; value: string }[];
+};
 
-export default Form;
+type NonSelectFieldProps<T> = BaseFieldProps<T> & {
+  widget: Exclude<FormWidget, "select">;
+  selectOptions?: never;
+};
+
+export type FieldProps<T> = SelectFieldProps<T> | NonSelectFieldProps<T>;
+
+export function createForm<T>() {
+  type Ctx = {
+    setValue<K extends keyof T>(key: K, value: T[K]): void;
+    getValue<K extends keyof T>(key: K): T[K] | undefined;
+    values: Partial<T>;
+  };
+
+  const Form = (props: FormProps<T>): JSXElement => {
+    const [values, setValues] = createStore<Partial<T>>({ ...props.data });
+
+    const setValue = <K extends keyof T>(key: K, value: T[K]) => {
+      setValues(key as any, value as any);
+    };
+
+    const getValue = <K extends keyof T>(key: K): T[K] | undefined => {
+      return values[key];
+    };
+
+    const save = async () => {
+      if (props.saveFunc) {
+        await props.saveFunc(values);
+      }
+    };
+
+    const contextValue: Ctx = { setValue, getValue, values };
+
+    return (
+      <InternalFormContext.Provider value={contextValue}>
+        <div class="space-y-4">
+          {props.title && <h2 class="text-lg font-semibold">{props.title}</h2>}
+
+          {props.children}
+
+          {props.saveFunc && (
+            <div class="flex justify-end">
+              <Button appearance="success" onClick={save} size="sm">
+                Save
+              </Button>
+            </div>
+          )}
+        </div>
+      </InternalFormContext.Provider>
+    );
+  };
+
+  const Field = (props: FieldProps<T>) => {
+    const form = useInternalFormContext() as Ctx;
+
+    return (
+      <div class="space-x-2 space-y-2">
+        <Dynamic
+          component={widgets[props.widget]}
+          label={props.label}
+          value={() => form.getValue(props.field)}
+          setValue={(v) => form.setValue(props.field, v)}
+          selectOptions={props.widget === "select" ? props.selectOptions : undefined}
+        />
+      </div>
+    );
+  };
+
+  Form.Field = Field;
+
+  return Form;
+}
