@@ -8,7 +8,7 @@ import { Input } from "../Input";
 import { TextArea } from "../TextArea";
 import { Checkbox } from "../Checkbox";
 import { InternalFormContext, useInternalFormContext } from "./formContext";
-import { NumberInput } from "../NumberInput";
+import { NumberInputRootProps, NumberInput } from "../NumberInput";
 import { Button } from "../Button";
 
 export interface FormProps<T> {
@@ -21,8 +21,8 @@ export interface FormProps<T> {
 export type FormWidget = "text" | "number" | "checkbox" | "switch" | "textarea" | "select";
 
 export interface WidgetProps<T> {
-  label: string;
-  value: T | undefined;
+  label?: string;
+  value: () => T | undefined;
   setValue: (v: T) => void;
   // only for widget "select"
   selectOptions?: { label: string; value: string }[];
@@ -54,7 +54,6 @@ export const widgets: Record<FormWidget, WidgetComponent<any>> = {
 
 type BaseFieldProps<T> = {
   field: keyof T;
-  label: string;
 };
 
 type SelectFieldProps<T> = BaseFieldProps<T> & {
@@ -121,7 +120,6 @@ export function createForm<T>() {
       <div class="space-x-2 space-y-2">
         <Dynamic
           component={widgets[props.widget]}
-          label={props.label}
           value={() => form.getValue(props.field)}
           setValue={(v) => form.setValue(props.field, v)}
           selectOptions={props.widget === "select" ? props.selectOptions : undefined}
@@ -130,6 +128,20 @@ export function createForm<T>() {
     );
   };
 
+  const NumberField = (props: NumberInputRootProps & BaseFieldProps<T>) => {
+    const form = useInternalFormContext() as Ctx;
+
+    return (
+      <NumberInput
+        {...props}
+        label={props.label}
+        rawValue={form.getValue(props.field) as any}
+        onRawValueChange={(v) => form.setValue(props.field, v as any)}
+      />
+    );
+  };
+
+  Form.NumberField = NumberField;
   Form.Field = Field;
 
   return Form;

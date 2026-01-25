@@ -38,7 +38,7 @@ export const Default: Story = {
           saveFunc={async (vals) => alert(JSON.stringify(vals))}
         >
           <ProductForm.Field field="name" label="Name" widget="text" />
-          {/* <ProductForm.Field field="price" label="Price" widget="number" /> */}
+          <ProductForm.NumberField field="price" label="Price" class="w-50" />
           <ProductForm.Field field="inStock" label="In Stock" widget="checkbox" />
           {/* <ProductForm.Field
         field="category"
