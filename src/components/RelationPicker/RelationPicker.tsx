@@ -9,6 +9,7 @@ interface RelationPickerProps<T extends Tag = Tag> {
   onDeleteRelation: (relation: T) => Promise<void>;
   placeholder?: string;
   label?: string;
+  multi: boolean;
 }
 
 export const RelationPicker = <T extends Tag = Tag>(props: RelationPickerProps<T>) => {

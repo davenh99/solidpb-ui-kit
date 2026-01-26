@@ -55,7 +55,7 @@ const inputLabel = tv({
 });
 
 const inputField = tv({
-  base: "input outline-offset-0 text-end",
+  base: "input outline-offset-0 text-end font-semibold",
   variants: {
     variant: {
       ghost: "input-ghost",
@@ -115,13 +115,13 @@ export const NumberInput: Component<NumberInputRootProps> = (props) => {
         </NumberField.Label>
       </Show>
       <NumberField.Input
+        {...local.inputProps}
         class={inputField({
           appearance: local.appearance,
           variant: local.variant,
           size: local.size,
           class: local.inputProps?.class,
         })}
-        {...local.inputProps}
       />
     </NumberField>
   );

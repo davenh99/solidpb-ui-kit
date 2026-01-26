@@ -4,9 +4,9 @@ import type { PolymorphicProps } from "@kobalte/core";
 import { tv } from "tailwind-variants";
 import { debounce } from "../../methods/debounce";
 
-type InputProps<T extends ValidComponent = "textarea"> = PolymorphicProps<T, TextFieldInputProps<T>>;
+export type InputProps<T extends ValidComponent = "textarea"> = PolymorphicProps<T, TextFieldInputProps<T>>;
 
-interface ExtraProps {
+export interface ExtraProps {
   label?: string;
   saveFunc?: (v: string) => Promise<any>;
   inputProps?: InputProps;
@@ -14,7 +14,7 @@ interface ExtraProps {
   size?: "sm" | "md";
 }
 
-type InputRootProps<T extends ValidComponent = "div"> = ExtraProps &
+export type TextAreaRootProps<T extends ValidComponent = "div"> = ExtraProps &
   PolymorphicProps<T, TextFieldRootProps<T>>;
 
 const root = tv({ base: "flex flex-col gap-1" });
@@ -31,7 +31,7 @@ const textarea = tv({
   },
 });
 
-export const TextArea: Component<InputRootProps> = (props) => {
+export const TextArea: Component<TextAreaRootProps> = (props) => {
   const [local, others] = splitProps(props, ["label", "class", "inputProps", "saveFunc", "variant"]);
   let textareaRef: HTMLTextAreaElement | undefined;
   const debouncedSave = createMemo(() => (local.saveFunc ? debounce(local.saveFunc) : undefined));

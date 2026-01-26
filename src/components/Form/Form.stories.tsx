@@ -37,9 +37,14 @@ export const Default: Story = {
           title="Edit Product"
           saveFunc={async (vals) => alert(JSON.stringify(vals))}
         >
-          <ProductForm.Field field="name" label="Name" widget="text" />
-          <ProductForm.NumberField field="price" label="Price" class="w-50" />
-          <ProductForm.Field field="inStock" label="In Stock" widget="checkbox" />
+          <ProductForm.TextField field="name" label="Name" />
+          <ProductForm.NumberField
+            field="price"
+            label="Price"
+            inputProps={{ class: "w-40" }}
+            formatOptions={{ style: "currency", currency: "AUD" }}
+          />
+          <ProductForm.CheckboxField field="inStock" label="In Stock" />
           {/* <ProductForm.Field
         field="category"
         label="Category"
@@ -50,7 +55,7 @@ export const Default: Story = {
           { label: "Books", value: "books" },
         ]}
       /> */}
-          <ProductForm.Field field="sellable" label="Sellable" widget="switch" />
+          <ProductForm.SwitchField field="sellable" label="Sellable" />
         </ProductForm>
       </Card>
     </Container>

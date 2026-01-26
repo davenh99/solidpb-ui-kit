@@ -3,41 +3,73 @@ import { Button as KobalteButton } from "@kobalte/core/button";
 import CloseIcon from "lucide-solid/icons/x";
 import { tv } from "tailwind-variants";
 
-interface Props {
-  onClick: () => void;
+export interface TagProps {
   title: string;
-  colorHex: string;
-  size?: "xs" | "s" | "m";
+  colorHex?: string;
+  onClick: () => void;
+  variant?: "none" | "ghost" | "outline" | "dash" | "soft";
+  appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   class?: string;
 }
 
 const tag = tv({
-  base: "flex items-center rounded-full select-none border-1 font-bold",
+  base: "badge rounded-full",
   variants: {
     size: {
-      m: "text-sm px-2 py-1",
-      s: "text-sm pl-1.5 pr-1 py-0.5",
-      xs: "text-xs px-1",
+      xs: "badge-xs",
+      sm: "badge-sm",
+      md: "badge-md",
+      lg: "badge-lg",
+      xl: "badge-xl",
+    },
+    appearance: {
+      neutral: "badge-neutral",
+      primary: "badge-primary",
+      secondary: "badge-secondary",
+      accent: "badge-accent",
+      info: "badge-info",
+      success: "badge-success",
+      warning: "badge-warning",
+      error: "badge-error",
+    },
+    variant: {
+      ghost: "badge-ghost",
+      outline: "badge-outline",
+      dash: "badge-dash",
+      soft: "badge-soft",
+      none: "",
     },
   },
   defaultVariants: {
-    size: "m",
+    size: "md",
+    appearance: "neutral",
+    variant: "none",
   },
 });
 
-export const Tag: Component<Props> = (props) => {
-  const classes = createMemo(() =>
-    tag({
-      size: props.size,
-      class: props.class,
-    })
-  );
+export const Tag: Component<TagProps> = (props) => {
+  const style = props.colorHex
+    ? {
+        "background-color": `${props.colorHex}40`,
+        color: `${props.colorHex}`,
+        "border-color": `${props.colorHex}`,
+      }
+    : {};
 
   return (
-    <div style={{ "background-color": `${props.colorHex}30`, color: `${props.colorHex}` }} class={classes()}>
+    <div
+      style={style}
+      class={tag({
+        size: props.size,
+        class: props.class,
+        appearance: props.appearance,
+        variant: props.variant,
+      })}
+    >
       <span>{props.title}</span>
-      <KobalteButton onClick={props.onClick} class="pl-1 flex items-center justify-center">
-        <CloseIcon size={14} />
+      <KobalteButton onClick={props.onClick}>
+        <CloseIcon size={14} stroke-width={4} />
       </KobalteButton>
     </div>
   );

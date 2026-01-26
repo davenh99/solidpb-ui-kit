@@ -5,9 +5,9 @@ import { tv } from "tailwind-variants";
 
 import { debounce } from "../../methods/debounce";
 
-type InputProps<T extends ValidComponent = "input"> = PolymorphicProps<T, TextFieldInputProps<T>>;
+export type InputProps<T extends ValidComponent = "input"> = PolymorphicProps<T, TextFieldInputProps<T>>;
 
-interface ExtraProps {
+export interface ExtraProps {
   label?: string;
   variant?: "ghost" | "none";
   appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
@@ -16,7 +16,7 @@ interface ExtraProps {
   saveFunc?: (v: string) => Promise<any>;
 }
 
-type InputRootProps<T extends ValidComponent = "div"> = ExtraProps &
+export type InputRootProps<T extends ValidComponent = "div"> = ExtraProps &
   PolymorphicProps<T, TextFieldRootProps<T>>;
 
 const inputRoot = tv({
@@ -101,8 +101,8 @@ export const Input: Component<InputRootProps> = (props) => {
 
   return (
     <TextField
-      class={inputRoot({ class: local.class, marginTop: local.label ? "yes" : "no" })}
       {...others}
+      class={inputRoot({ class: local.class, marginTop: local.label ? "yes" : "no" })}
       onChange={handleChange}
     >
       <div class="relative w-full">
@@ -112,13 +112,13 @@ export const Input: Component<InputRootProps> = (props) => {
           </TextField.Label>
         </Show>
         <TextField.Input
+          {...local.inputProps}
           class={inputField({
             appearance: local.appearance,
             variant: local.variant,
             size: local.size,
             class: local.inputProps?.class,
           })}
-          {...local.inputProps}
         />
       </div>
     </TextField>

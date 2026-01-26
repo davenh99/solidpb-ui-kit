@@ -1,12 +1,11 @@
 import { JSXElement } from "solid-js";
 import { createStore } from "solid-js/store";
-import { Dynamic } from "solid-js/web";
 
-import { Switch } from "../Switch";
-import { Select } from "../Select";
-import { Input } from "../Input";
-import { TextArea } from "../TextArea";
-import { Checkbox } from "../Checkbox";
+import { Switch, SwitchProps } from "../Switch";
+import { Select, SelectProps } from "../Select";
+import { Input, InputRootProps } from "../Input";
+import { TextArea, TextAreaRootProps } from "../TextArea";
+import { Checkbox, CheckboxProps } from "../Checkbox";
 import { InternalFormContext, useInternalFormContext } from "./formContext";
 import { NumberInputRootProps, NumberInput } from "../NumberInput";
 import { Button } from "../Button";
@@ -18,55 +17,9 @@ export interface FormProps<T> {
   children: JSXElement;
 }
 
-export type FormWidget = "text" | "number" | "checkbox" | "switch" | "textarea" | "select";
-
-export interface WidgetProps<T> {
-  label?: string;
-  value: () => T | undefined;
-  setValue: (v: T) => void;
-  // only for widget "select"
-  selectOptions?: { label: string; value: string }[];
-}
-
-type WidgetComponent<T> = (props: WidgetProps<T>) => JSXElement;
-
-export const widgets: Record<FormWidget, WidgetComponent<any>> = {
-  text: ({ label, value, setValue }) => <Input label={label} value={value()} onChange={setValue} />,
-
-  number: ({ label, value, setValue }) => (
-    <NumberInput label={label} rawValue={value()} onRawValueChange={setValue} />
-  ),
-
-  checkbox: ({ label, value, setValue }) => (
-    <Checkbox label={label} checked={Boolean(value())} onChange={setValue} />
-  ),
-
-  switch: ({ label, value, setValue }) => (
-    <Switch label={label} checked={Boolean(value())} onChange={setValue} />
-  ),
-
-  textarea: ({ label, value, setValue }) => <TextArea label={label} value={value()} onChange={setValue} />,
-
-  select: ({ label, value, setValue, selectOptions }) => (
-    <Select label={label} value={value()} onChange={setValue} options={selectOptions || []} />
-  ),
-};
-
 type BaseFieldProps<T> = {
   field: keyof T;
 };
-
-type SelectFieldProps<T> = BaseFieldProps<T> & {
-  widget: "select";
-  selectOptions: { label: string; value: string }[];
-};
-
-type NonSelectFieldProps<T> = BaseFieldProps<T> & {
-  widget: Exclude<FormWidget, "select">;
-  selectOptions?: never;
-};
-
-export type FieldProps<T> = SelectFieldProps<T> | NonSelectFieldProps<T>;
 
 export function createForm<T>() {
   type Ctx = {
@@ -113,18 +66,15 @@ export function createForm<T>() {
     );
   };
 
-  const Field = (props: FieldProps<T>) => {
+  const TextField = (props: InputRootProps & BaseFieldProps<T>) => {
     const form = useInternalFormContext() as Ctx;
 
     return (
-      <div class="space-x-2 space-y-2">
-        <Dynamic
-          component={widgets[props.widget]}
-          value={() => form.getValue(props.field)}
-          setValue={(v) => form.setValue(props.field, v)}
-          selectOptions={props.widget === "select" ? props.selectOptions : undefined}
-        />
-      </div>
+      <Input
+        {...props}
+        value={form.getValue(props.field) as any}
+        onChange={(v) => form.setValue(props.field, v as any)}
+      />
     );
   };
 
@@ -134,15 +84,75 @@ export function createForm<T>() {
     return (
       <NumberInput
         {...props}
-        label={props.label}
         rawValue={form.getValue(props.field) as any}
         onRawValueChange={(v) => form.setValue(props.field, v as any)}
       />
     );
   };
 
+  const CheckboxField = (props: CheckboxProps & BaseFieldProps<T>) => {
+    const form = useInternalFormContext() as Ctx;
+
+    return (
+      <Checkbox
+        {...props}
+        checked={Boolean(form.getValue(props.field))}
+        onChange={(v) => form.setValue(props.field, v as any)}
+      />
+    );
+  };
+
+  const SwitchField = (props: SwitchProps & BaseFieldProps<T>) => {
+    const form = useInternalFormContext() as Ctx;
+
+    return (
+      <Switch
+        {...props}
+        checked={Boolean(form.getValue(props.field) as any)}
+        onChange={(v) => form.setValue(props.field, v as any)}
+      />
+    );
+  };
+
+  const TextAreaField = (props: TextAreaRootProps & BaseFieldProps<T>) => {
+    const form = useInternalFormContext() as Ctx;
+
+    return (
+      <TextArea
+        {...props}
+        value={form.getValue(props.field) as any}
+        onChange={(v) => form.setValue(props.field, v as any)}
+      />
+    );
+  };
+
+  const SelectField = (props: SelectProps & BaseFieldProps<T>) => {
+    const form = useInternalFormContext() as Ctx;
+
+    return (
+      <Select
+        {...props}
+        value={form.getValue(props.field) as any}
+        onChange={(v) => form.setValue(props.field, v as any)}
+      />
+    );
+  };
+
+  const FileField = () => {};
+
+  const ImageField = () => {};
+
+  const RelationField = () => {};
+
+  Form.TextField = TextField;
   Form.NumberField = NumberField;
-  Form.Field = Field;
+  Form.CheckboxField = CheckboxField;
+  Form.SwitchField = SwitchField;
+  Form.TextAreaField = TextAreaField;
+  Form.SelectField = SelectField;
+  Form.FileField = FileField;
+  Form.ImageField = ImageField;
+  Form.RelationField = RelationField;
 
   return Form;
 }

@@ -34,7 +34,7 @@ Also to index.css (refer daisyui docs):
 - [ ] Link
 - [ ] List
 - [ ] Modal
-- [ ] NumberInput
+- [x] NumberInput
 - [ ] Popover
 - [ ] RelationPicker
 - [ ] SearchInput
@@ -42,7 +42,7 @@ Also to index.css (refer daisyui docs):
 - [ ] Slider
 - [x] Switch
 - [ ] Tabs
-- [ ] Tag
+- [x] Tag
 - [ ] TagArea
 - [ ] TextArea
 - [ ] Toast
@@ -86,4 +86,3 @@ Also to index.css (refer daisyui docs):
 - [ ] DropdownMenu (complex groups etc check kobalte)
 - [ ] List (draggable, will be a challenge to integrate with virtualised)
 - [ ] Kanban (will be a bit of a beast)
-- [ ] Form (add more field types when done)
