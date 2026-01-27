@@ -1,6 +1,7 @@
 import { createSignal, For, JSX, Show, createMemo } from "solid-js";
-import { Input } from "../Input";
+import { TextField } from "@kobalte/core/text-field";
 import Tag from "../Tag/Tag";
+import { tv } from "tailwind-variants";
 
 interface TagAreaProps<T extends Tag = Tag> {
   tags: T[];
@@ -9,11 +10,27 @@ interface TagAreaProps<T extends Tag = Tag> {
   onDeleteTag: (tag: T) => Promise<void>;
   suggestions?: T[];
   placeholder?: string;
+  editable?: boolean;
 }
+
+const tagArea = tv({
+  base: "textarea outline-offset-0 p-2 min-h-2",
+  variants: {
+    editing: {
+      true: "",
+      false: "cursor-pointer",
+    },
+  },
+  defaultVariants: {
+    editing: false,
+  },
+});
 
 export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
   const [tagInput, setTagInput] = createSignal("");
   const [showSuggestions, setShowSuggestions] = createSignal(false);
+  const [editing, setEditing] = createSignal(false);
+  let inputRef: HTMLInputElement | undefined;
 
   const filteredSuggestions = createMemo(() =>
     (props.suggestions || []).filter(
@@ -25,6 +42,7 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
   const handleTagInput: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = async (e) => {
     if (e.key === "Enter" && tagInput().trim()) {
       e.preventDefault();
+      e.stopPropagation();
       const newTagName = tagInput().trim();
       if (!props.tags.map((t) => t.name).includes(newTagName)) {
         let newTag: T | undefined = undefined;
@@ -35,6 +53,13 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
       setShowSuggestions(false);
     } else {
       setShowSuggestions(true);
+    }
+    if (e.key === "Delete" || e.key === "Backspace") {
+      if (tagInput() === "" && props.tags.length > 0) {
+        const lastTag = props.tags[props.tags.length - 1];
+        await props.onDeleteTag(lastTag);
+        props.setTags(props.tags.slice(0, -1));
+      }
     }
   };
 
@@ -50,44 +75,71 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
   };
 
   return (
-    <div class="rounded-md p-2 flex flex-col bg-light-surface dark:bg-dark-surface">
-      <div class="flex flex-wrap gap-2">
+    <div
+      class={tagArea({ editing: editing() }).toString()}
+      onMouseDown={(e) => {
+        if (props.editable === false) return;
+        e.preventDefault();
+        setEditing(true);
+        inputRef?.focus();
+      }}
+    >
+      <div class="flex flex-wrap gap-1">
         <For each={props.tags || []}>
           {(t) => (
-            <Tag title={t.name || ""} colorHex={t.colorHex || "#6b7280"} onClick={() => deleteTag(t)} />
+            <Tag
+              title={t.name || ""}
+              colorHex={t.colorHex || "#6b7280"}
+              onDelete={
+                editing()
+                  ? () => {
+                      setShowSuggestions(false);
+                      deleteTag(t);
+                    }
+                  : undefined
+              }
+            />
           )}
         </For>
-        <div class="relative flex-1 min-w-30">
-          <Input
-            label=""
-            value={tagInput()}
-            onChange={(v) => {
-              setTagInput(v);
-              setShowSuggestions(true);
-            }}
-            inputProps={{
-              onKeyDown: handleTagInput,
-              placeholder: props.placeholder || "Add tags (press Enter)",
-              onFocus: () => setShowSuggestions(true),
-              onBlur: () => setTimeout(() => setShowSuggestions(false), 100),
-            }}
-            class="w-full"
-          />
-          <Show when={showSuggestions() && filteredSuggestions().length > 0}>
-            <div class="absolute z-10 mt-1 w-full bg-light-surface dark:bg-dark-surface border border-light-muted dark:border-dark-muted rounded shadow-lg max-h-40 overflow-auto">
-              <For each={filteredSuggestions()}>
-                {(s) => (
-                  <div
-                    class="px-3 py-2 cursor-pointer hover:bg-light-muted dark:hover:bg-dark-muted"
-                    onMouseDown={() => handleSuggestionClick(s)}
-                  >
-                    {s.name}
-                  </div>
-                )}
-              </For>
-            </div>
-          </Show>
-        </div>
+        {editing() && props.editable !== false && (
+          <div class="relative flex-1 min-w-30">
+            <TextField
+              value={tagInput()}
+              onChange={(v) => {
+                setTagInput(v);
+                setShowSuggestions(true);
+              }}
+            >
+              <TextField.Input
+                ref={inputRef}
+                onKeyDown={handleTagInput}
+                placeholder={props.placeholder || ""}
+                onBlur={() => {
+                  setEditing(false);
+                  setShowSuggestions(false);
+                  setTagInput("");
+                }}
+                class="w-full focus:outline-none"
+              />
+            </TextField>
+            <Show when={showSuggestions() && filteredSuggestions().length > 0}>
+              <div class="dropdown-content bg-base-100 min-w-30 shadow-sm rounded-box menu p-0 absolute">
+                <ul>
+                  <For each={filteredSuggestions()}>
+                    {(s) => (
+                      <li
+                        class="px-3 py-2 cursor-pointer rounded"
+                        onMouseDown={() => handleSuggestionClick(s)}
+                      >
+                        {s.name}
+                      </li>
+                    )}
+                  </For>
+                </ul>
+              </div>
+            </Show>
+          </div>
+        )}
       </div>
     </div>
   );

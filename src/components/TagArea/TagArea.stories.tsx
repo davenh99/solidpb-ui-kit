@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
-import { createSignal } from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 import { TagArea } from "./TagArea";
 
 const meta: Meta<typeof TagArea> = {
@@ -22,10 +22,18 @@ const suggestions: Tag[] = [
 export const Default: Story = {
   render: () => {
     const [tags, setTags] = createSignal<Tag[]>(initialTags);
+    // const [searchText, setSearchText] = createSignal<string>("");
+    // const suggestionsFiltered = createMemo(() => {
+    //   return suggestions.filter((s) => s.name.includes(searchText()));
+    // });
+
     return (
       <TagArea
         tags={tags()}
+        // searchText={searchText()}
+        // setSearchText={setSearchText}
         setTags={setTags}
+        // suggestions={suggestionsFiltered}
         suggestions={suggestions}
         onCreateTag={async (name) => ({ id: Math.random().toString(), name, colorHex: "#6b7280" })}
         onDeleteTag={async () => {}}

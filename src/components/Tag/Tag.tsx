@@ -1,4 +1,4 @@
-import { Component, createMemo } from "solid-js";
+import { Component } from "solid-js";
 import { Button as KobalteButton } from "@kobalte/core/button";
 import CloseIcon from "lucide-solid/icons/x";
 import { tv } from "tailwind-variants";
@@ -6,7 +6,7 @@ import { tv } from "tailwind-variants";
 export interface TagProps {
   title: string;
   colorHex?: string;
-  onClick: () => void;
+  onDelete?: () => void;
   variant?: "none" | "ghost" | "outline" | "dash" | "soft";
   appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
@@ -68,9 +68,11 @@ export const Tag: Component<TagProps> = (props) => {
       })}
     >
       <span>{props.title}</span>
-      <KobalteButton onClick={props.onClick}>
-        <CloseIcon size={14} stroke-width={4} />
-      </KobalteButton>
+      {props.onDelete && (
+        <KobalteButton onClick={props.onDelete}>
+          <CloseIcon size={14} stroke-width={4} />
+        </KobalteButton>
+      )}
     </div>
   );
 };

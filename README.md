@@ -31,7 +31,7 @@ Also to index.css (refer daisyui docs):
 - [ ] Form
 - [ ] Image
 - [x] Input
-- [ ] Link
+- [x] Link
 - [ ] List
 - [ ] Modal
 - [x] NumberInput
@@ -43,11 +43,13 @@ Also to index.css (refer daisyui docs):
 - [x] Switch
 - [ ] Tabs
 - [x] Tag
-- [ ] TagArea
+- [x] TagArea
 - [ ] TextArea
 - [ ] Toast
 - [ ] Tooltip
 - [ ] Kanban
+- [ ] ThemeSwitch
+- [ ] ColorPicker
 
 ### TODO dark theme
 
@@ -80,6 +82,8 @@ Also to index.css (refer daisyui docs):
 - [ ] Toast
 - [ ] Tooltip
 - [ ] Kanban
+- [ ] ThemeSwitch
+- [ ] ColorPicker
 
 ### TODO (more thorough/complex implementation)
 

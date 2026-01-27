@@ -10,20 +10,22 @@ export interface ExtraProps {
   label?: string;
   saveFunc?: (v: string) => Promise<any>;
   inputProps?: InputProps;
-  variant?: "bordered" | "none";
+  variant?: "none" | "ghost";
   size?: "sm" | "md";
+  autoSize?: boolean;
 }
 
 export type TextAreaRootProps<T extends ValidComponent = "div"> = ExtraProps &
   PolymorphicProps<T, TextFieldRootProps<T>>;
 
 const root = tv({ base: "flex flex-col gap-1" });
+
 const textarea = tv({
-  base: "w-full resize-none rounded-sm outline-none px-2 py-1 min-h-[80px]",
+  base: "textarea outline-offset-0",
   variants: {
     variant: {
-      bordered: "border-2 border-[var(--color-light-muted)] dark:border-[var(--color-dark-muted)]",
       none: "",
+      ghost: "textarea-ghost",
     },
   },
   defaultVariants: {
@@ -50,7 +52,9 @@ export const TextArea: Component<TextAreaRootProps> = (props) => {
   createEffect(
     on(
       () => others.value,
-      () => autoResize(),
+      () => {
+        if (props.autoSize) autoResize();
+      },
     ),
   );
 
