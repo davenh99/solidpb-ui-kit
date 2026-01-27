@@ -124,7 +124,7 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
               />
             </TextField>
             <Show when={showSuggestions() && filteredSuggestions().length > 0}>
-              <div class="dropdown-content bg-base-100 min-w-30 shadow-sm rounded-box menu p-0 absolute">
+              <div class="dropdown-content bg-base-200 min-w-30 shadow-sm rounded-box menu p-0 absolute">
                 <ul>
                   <For each={filteredSuggestions()}>
                     {(s) => (

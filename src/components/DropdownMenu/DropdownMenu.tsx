@@ -8,7 +8,7 @@ interface DropdownMenuProps {
 }
 
 const menu = tv({
-  base: "dropdown-content menu bg-base-100 min-w-30 shadow-sm mt-2 p-2 rounded-box",
+  base: "dropdown-content menu bg-base-200 min-w-30 shadow-sm mt-2 p-2 rounded-box",
 });
 
 const item = tv({

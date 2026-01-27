@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "storybook-solidjs-vite";
 import { createForm } from "./Form";
 import { Container } from "../Container";
 import { Card } from "../Card";
+import { createSignal } from "solid-js";
 
 interface MockProduct {
   name: string;
@@ -31,40 +32,45 @@ export default meta;
 type Story = StoryObj<typeof ProductForm>;
 
 export const Default: Story = {
-  render: () => (
-    <Container class="bg-base-200 flex items-center justify-center">
-      <Card class="min-w-120">
-        <ProductForm
-          data={productData}
-          title="Edit Product"
-          onSave={async (vals) => alert(JSON.stringify(vals))}
-        >
-          <ProductForm.TextField field="name" label="Name" />
-          <ProductForm.NumberField
-            field="price"
-            label="Price"
-            inputProps={{ class: "w-40" }}
-            formatOptions={{ style: "currency", currency: "AUD" }}
-          />
-          <ProductForm.CheckboxField field="inStock" label="In Stock" />
-          {/* <ProductForm.Field
-        field="category"
-        label="Category"
-        widget="select"
-        selectOptions={[
-          { label: "Electronics", value: "electronics" },
-          { label: "Clothing", value: "clothing" },
-          { label: "Books", value: "books" },
-        ]}
-      /> */}
-          <ProductForm.TextAreaField
-            field="description"
-            label="Description"
-            textareaProps={{ autoResize: true }}
-          />
-          <ProductForm.SwitchField field="sellable" label="Sellable" />
-        </ProductForm>
-      </Card>
-    </Container>
-  ),
+  render: () => {
+    const [selected, setSelected] = createSignal<string | undefined>();
+
+    return (
+      <Container class="bg-base-200 flex items-center justify-center">
+        <Card class="min-w-120">
+          <ProductForm
+            data={productData}
+            title="Edit Product"
+            onSave={async (vals) => alert(JSON.stringify(vals))}
+          >
+            <ProductForm.TextField field="name" label="Name" />
+            <ProductForm.NumberField
+              field="price"
+              label="Price"
+              inputProps={{ class: "w-40" }}
+              formatOptions={{ style: "currency", currency: "AUD" }}
+            />
+            <ProductForm.CheckboxField field="inStock" label="In Stock" />
+            <ProductForm.SelectField
+              field="category"
+              label="Category"
+              onChange={setSelected}
+              value={selected()}
+              options={[
+                { label: "Electronics", value: "electronics" },
+                { label: "Clothing", value: "clothing" },
+                { label: "Books", value: "books" },
+              ]}
+            />
+            <ProductForm.TextAreaField
+              field="description"
+              label="Description"
+              textareaProps={{ autoResize: true }}
+            />
+            <ProductForm.SwitchField field="sellable" label="Sellable" />
+          </ProductForm>
+        </Card>
+      </Container>
+    );
+  },
 };

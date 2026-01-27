@@ -37,8 +37,8 @@ Also to index.css (refer daisyui docs):
 - [x] NumberInput
 - [ ] Popover
 - [ ] RelationPicker
-- [ ] SearchInput
-- [ ] Select
+- [x] SearchInput
+- [x] Select
 - [ ] Slider
 - [x] Switch
 - [ ] Tabs
