@@ -9,6 +9,7 @@ interface MockProduct {
   inStock: boolean;
   category: "electronics" | "clothing" | "books";
   sellable: boolean;
+  description: string;
 }
 
 const productData: MockProduct = {
@@ -17,6 +18,7 @@ const productData: MockProduct = {
   inStock: true,
   category: "electronics",
   sellable: true,
+  description: "This is a sample product used for demonstrating the Form component.",
 };
 
 const ProductForm = createForm<MockProduct>();
@@ -35,7 +37,7 @@ export const Default: Story = {
         <ProductForm
           data={productData}
           title="Edit Product"
-          saveFunc={async (vals) => alert(JSON.stringify(vals))}
+          onSave={async (vals) => alert(JSON.stringify(vals))}
         >
           <ProductForm.TextField field="name" label="Name" />
           <ProductForm.NumberField
@@ -55,6 +57,11 @@ export const Default: Story = {
           { label: "Books", value: "books" },
         ]}
       /> */}
+          <ProductForm.TextAreaField
+            field="description"
+            label="Description"
+            textareaProps={{ autoResize: true }}
+          />
           <ProductForm.SwitchField field="sellable" label="Sellable" />
         </ProductForm>
       </Card>

@@ -32,22 +32,6 @@ const inputRoot = tv({
   },
 });
 
-const inputLabel = tv({
-  base: "absolute left-3 px-1 font-medium pointer-events-none z-10 bg-base-100",
-  variants: {
-    size: {
-      xs: "text-xs",
-      sm: "text-xs",
-      md: "text-sm",
-      lg: "text-sm",
-      xl: "text-md",
-    },
-  },
-  defaultVariants: {
-    size: "md",
-  },
-});
-
 const inputField = tv({
   base: "input outline-offset-0",
   variants: {
@@ -106,20 +90,20 @@ export const Input: Component<InputRootProps> = (props) => {
       onChange={handleChange}
     >
       <div class="relative w-full">
-        <Show when={local.label}>
-          <TextField.Label class={inputLabel({ size: local.size })} style="transform: translateY(-50%);">
-            {local.label}
-          </TextField.Label>
-        </Show>
-        <TextField.Input
-          {...local.inputProps}
-          class={inputField({
-            appearance: local.appearance,
-            variant: local.variant,
-            size: local.size,
-            class: local.inputProps?.class,
-          })}
-        />
+        <TextField.Label class="floating-label">
+          <Show when={local.label}>
+            <span>{local.label}</span>
+          </Show>
+          <TextField.Input
+            {...local.inputProps}
+            class={inputField({
+              appearance: local.appearance,
+              variant: local.variant,
+              size: local.size,
+              class: local.inputProps?.class,
+            })}
+          />
+        </TextField.Label>
       </div>
     </TextField>
   );

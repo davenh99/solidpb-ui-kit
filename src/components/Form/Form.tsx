@@ -13,7 +13,8 @@ import { Button } from "../Button";
 export interface FormProps<T> {
   data: T;
   title?: string;
-  saveFunc?: (values: Partial<T>) => Promise<void>;
+  onSave?: (values: Partial<T>) => Promise<void>;
+  onCancel?: () => void;
   children: JSXElement;
 }
 
@@ -39,12 +40,6 @@ export function createForm<T>() {
       return values[key];
     };
 
-    const save = async () => {
-      if (props.saveFunc) {
-        await props.saveFunc(values);
-      }
-    };
-
     const contextValue: Ctx = { setValue, getValue, values };
 
     return (
@@ -54,13 +49,16 @@ export function createForm<T>() {
 
           {props.children}
 
-          {props.saveFunc && (
-            <div class="flex justify-end">
-              <Button appearance="success" onClick={save} size="sm">
+          <div class="flex justify-end gap-2">
+            <Button appearance="neutral" onClick={props.onCancel} size="sm">
+              Cancel
+            </Button>
+            {props.onSave && (
+              <Button appearance="success" onClick={() => props.onSave?.(values)} size="sm">
                 Save
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </InternalFormContext.Provider>
     );

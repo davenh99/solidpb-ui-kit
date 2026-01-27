@@ -38,22 +38,6 @@ const inputRoot = tv({
   },
 });
 
-const inputLabel = tv({
-  base: "absolute left-3 px-1 font-medium pointer-events-none z-10 bg-base-100",
-  variants: {
-    size: {
-      xs: "text-xs",
-      sm: "text-xs",
-      md: "text-sm",
-      lg: "text-sm",
-      xl: "text-md",
-    },
-  },
-  defaultVariants: {
-    size: "md",
-  },
-});
-
 const inputField = tv({
   base: "input outline-offset-0 text-end font-semibold",
   variants: {
@@ -109,20 +93,20 @@ export const NumberInput: Component<NumberInputRootProps> = (props) => {
       onChange={handleChange}
       class={inputRoot({ class: local.class, marginTop: local.label ? "yes" : "no" })}
     >
-      <Show when={local.label}>
-        <NumberField.Label class={inputLabel({ size: local.size })} style="transform: translateY(-50%);">
-          {local.label}
-        </NumberField.Label>
-      </Show>
-      <NumberField.Input
-        {...local.inputProps}
-        class={inputField({
-          appearance: local.appearance,
-          variant: local.variant,
-          size: local.size,
-          class: local.inputProps?.class,
-        })}
-      />
+      <NumberField.Label class="floating-label">
+        <Show when={local.label}>
+          <span>{local.label}</span>
+        </Show>
+        <NumberField.Input
+          {...local.inputProps}
+          class={inputField({
+            appearance: local.appearance,
+            variant: local.variant,
+            size: local.size,
+            class: local.inputProps?.class,
+          })}
+        />
+      </NumberField.Label>
     </NumberField>
   );
 };

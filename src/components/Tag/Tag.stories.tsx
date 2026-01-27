@@ -29,21 +29,21 @@ export const Default: Story = {
         <div class="space-x-2">
           <For each={variants}>
             {(v) => {
-              return <Tag title="Example tag" appearance="primary" variant={v} onClick={() => {}} />;
+              return <Tag title="Example tag" appearance="primary" variant={v} />;
             }}
           </For>
         </div>
         <div class="space-x-2">
           <For each={appearances}>
             {(a) => {
-              return <Tag title="Example tag" appearance={a} onClick={() => {}} />;
+              return <Tag title="Example tag" appearance={a} />;
             }}
           </For>
         </div>
         <div class="space-x-2">
           <For each={sizes}>
             {(s) => {
-              return <Tag title="Example tag" size={s} onClick={() => {}} />;
+              return <Tag title="Example tag" size={s} />;
             }}
           </For>
         </div>

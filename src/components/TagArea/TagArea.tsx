@@ -40,25 +40,32 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
   );
 
   const handleTagInput: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = async (e) => {
-    if (e.key === "Enter" && tagInput().trim()) {
-      e.preventDefault();
-      e.stopPropagation();
-      const newTagName = tagInput().trim();
-      if (!props.tags.map((t) => t.name).includes(newTagName)) {
-        let newTag: T | undefined = undefined;
-        newTag = await props.onCreateTag(newTagName);
-        if (newTag) props.setTags([...props.tags, newTag]);
-      }
-      setTagInput("");
-      setShowSuggestions(false);
-    } else {
+    if (tagInput().trim()) {
       setShowSuggestions(true);
-    }
-    if (e.key === "Delete" || e.key === "Backspace") {
-      if (tagInput() === "" && props.tags.length > 0) {
-        const lastTag = props.tags[props.tags.length - 1];
-        await props.onDeleteTag(lastTag);
-        props.setTags(props.tags.slice(0, -1));
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        const newTagName = tagInput().trim();
+        if (!props.tags.map((t) => t.name).includes(newTagName)) {
+          let newTag: T | undefined = undefined;
+          newTag = await props.onCreateTag(newTagName);
+          if (newTag) props.setTags([...props.tags, newTag]);
+        }
+        setTagInput("");
+        setShowSuggestions(false);
+      } else {
+        setShowSuggestions(true);
+      }
+    } else {
+      setShowSuggestions(false);
+
+      if (e.key === "Delete" || e.key === "Backspace") {
+        if (props.tags.length > 0) {
+          const lastTag = props.tags[props.tags.length - 1];
+          await props.onDeleteTag(lastTag);
+          props.setTags(props.tags.slice(0, -1));
+        }
       }
     }
   };
@@ -103,13 +110,7 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
         </For>
         {editing() && props.editable !== false && (
           <div class="relative flex-1 min-w-30">
-            <TextField
-              value={tagInput()}
-              onChange={(v) => {
-                setTagInput(v);
-                setShowSuggestions(true);
-              }}
-            >
+            <TextField value={tagInput()} onChange={setTagInput}>
               <TextField.Input
                 ref={inputRef}
                 onKeyDown={handleTagInput}

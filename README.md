@@ -44,7 +44,7 @@ Also to index.css (refer daisyui docs):
 - [ ] Tabs
 - [x] Tag
 - [x] TagArea
-- [ ] TextArea
+- [x] TextArea
 - [ ] Toast
 - [ ] Tooltip
 - [ ] Kanban

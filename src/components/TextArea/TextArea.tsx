@@ -1,40 +1,81 @@
-import { createEffect, on, Component, Show, splitProps, ValidComponent, createMemo } from "solid-js";
-import { TextField, type TextFieldInputProps, type TextFieldRootProps } from "@kobalte/core/text-field";
+import { Component, Show, splitProps, ValidComponent, createMemo } from "solid-js";
+import { TextField, type TextFieldTextAreaProps, type TextFieldRootProps } from "@kobalte/core/text-field";
 import type { PolymorphicProps } from "@kobalte/core";
 import { tv } from "tailwind-variants";
 import { debounce } from "../../methods/debounce";
 
-export type InputProps<T extends ValidComponent = "textarea"> = PolymorphicProps<T, TextFieldInputProps<T>>;
+export type InputProps<T extends ValidComponent = "textarea"> = PolymorphicProps<
+  T,
+  TextFieldTextAreaProps<T>
+>;
 
 export interface ExtraProps {
   label?: string;
   saveFunc?: (v: string) => Promise<any>;
-  inputProps?: InputProps;
+  textareaProps?: InputProps;
   variant?: "none" | "ghost";
-  size?: "sm" | "md";
-  autoSize?: boolean;
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  appearance?: "primary" | "secondary" | "success" | "warning" | "neutral" | "error" | "accent" | "info";
 }
 
 export type TextAreaRootProps<T extends ValidComponent = "div"> = ExtraProps &
   PolymorphicProps<T, TextFieldRootProps<T>>;
 
-const root = tv({ base: "flex flex-col gap-1" });
+const root = tv({
+  base: "flex flex-col gap-1",
+  variants: {
+    marginTop: {
+      yes: "mt-3",
+      no: "",
+    },
+  },
+  defaultVariants: {
+    marginTop: "no",
+  },
+});
 
 const textarea = tv({
-  base: "textarea outline-offset-0",
+  base: "textarea outline-offset-0 resize-none",
   variants: {
     variant: {
       none: "",
       ghost: "textarea-ghost",
     },
+    size: {
+      xs: "textarea-xs",
+      sm: "textarea-sm",
+      md: "textarea-md",
+      lg: "textarea-lg",
+      xl: "textarea-xl",
+    },
+    appearance: {
+      primary: "textarea-primary",
+      secondary: "textarea-secondary",
+      success: "textarea-success",
+      warning: "textarea-warning",
+      neutral: "textarea-neutral",
+      error: "textarea-error",
+      accent: "textarea-accent",
+      info: "textarea-info",
+    },
   },
   defaultVariants: {
     variant: "none",
+    size: "md",
+    appearance: "neutral",
   },
 });
 
 export const TextArea: Component<TextAreaRootProps> = (props) => {
-  const [local, others] = splitProps(props, ["label", "class", "inputProps", "saveFunc", "variant"]);
+  const [local, others] = splitProps(props, [
+    "label",
+    "class",
+    "textareaProps",
+    "saveFunc",
+    "variant",
+    "size",
+    "appearance",
+  ]);
   let textareaRef: HTMLTextAreaElement | undefined;
   const debouncedSave = createMemo(() => (local.saveFunc ? debounce(local.saveFunc) : undefined));
 
@@ -43,31 +84,30 @@ export const TextArea: Component<TextAreaRootProps> = (props) => {
     debouncedSave()?.(v);
   };
 
-  const autoResize = () => {
-    if (!textareaRef) return;
-    textareaRef.style.height = "auto";
-    textareaRef.style.height = `${textareaRef.scrollHeight}px`;
-  };
-
-  createEffect(
-    on(
-      () => others.value,
-      () => {
-        if (props.autoSize) autoResize();
-      },
-    ),
-  );
-
   return (
-    <TextField class={root({ class: local.class })} {...others} onChange={handleChange}>
-      <Show when={local.label}>
-        <TextField.Label>{local.label}</TextField.Label>
-      </Show>
-      <TextField.TextArea
-        ref={textareaRef}
-        class={textarea({ variant: local.variant, class: local.inputProps?.class })}
-        {...local.inputProps}
-      />
+    <TextField
+      {...others}
+      class={root({
+        marginTop: local.label ? "yes" : "no",
+        class: local.class,
+      })}
+      onChange={handleChange}
+    >
+      <TextField.Label class="floating-label">
+        <Show when={local.label}>
+          <span>{local.label}</span>
+        </Show>
+        <TextField.TextArea
+          {...local.textareaProps}
+          ref={textareaRef}
+          class={textarea({
+            variant: local.variant,
+            appearance: local.appearance,
+            size: local.size,
+            class: local.textareaProps?.class,
+          })}
+        />
+      </TextField.Label>
     </TextField>
   );
 };
