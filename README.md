@@ -35,18 +35,16 @@ Also to index.css (refer daisyui docs):
 - [ ] List
 - [ ] Modal
 - [x] NumberInput
-- [ ] Popover
-- [ ] RelationPicker
 - [x] SearchInput
 - [x] Select
-- [ ] Slider
+- [x] Slider
 - [x] Switch
 - [ ] Tabs
 - [x] Tag
 - [x] TagArea
 - [x] TextArea
 - [ ] Toast
-- [ ] Tooltip
+- [x] Tooltip
 - [ ] Kanban
 - [ ] ThemeSwitch
 - [ ] ColorPicker
@@ -69,8 +67,6 @@ Also to index.css (refer daisyui docs):
 - [ ] List
 - [ ] Modal
 - [ ] NumberInput
-- [ ] Popover
-- [ ] RelationPicker
 - [ ] SearchInput
 - [ ] Select
 - [ ] Slider

@@ -11,6 +11,7 @@ interface TagAreaProps<T extends Tag = Tag> {
   suggestions?: T[];
   placeholder?: string;
   editable?: boolean;
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
 }
 
 const tagArea = tv({
@@ -23,6 +24,22 @@ const tagArea = tv({
   },
   defaultVariants: {
     editing: false,
+  },
+});
+
+const menu = tv({
+  base: "dropdown-content bg-base-200 min-w-30 shadow-sm rounded-box menu p-0 absolute",
+  variants: {
+    size: {
+      xs: "menu-xs",
+      sm: "menu-sm",
+      md: "menu-base",
+      lg: "menu-lg",
+      xl: "menu-xl",
+    },
+  },
+  defaultVariants: {
+    size: "md",
   },
 });
 
@@ -105,6 +122,7 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
                     }
                   : undefined
               }
+              size={props.size}
             />
           )}
         </For>
@@ -124,7 +142,7 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
               />
             </TextField>
             <Show when={showSuggestions() && filteredSuggestions().length > 0}>
-              <div class="dropdown-content bg-base-200 min-w-30 shadow-sm rounded-box menu p-0 absolute">
+              <div class={menu({ size: props.size })}>
                 <ul>
                   <For each={filteredSuggestions()}>
                     {(s) => (

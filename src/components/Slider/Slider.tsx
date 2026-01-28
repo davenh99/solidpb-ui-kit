@@ -1,48 +1,90 @@
-import { Component, createMemo, JSX } from "solid-js";
-import { Slider as KSlider } from "@kobalte/core/slider";
+import { Component, createMemo, Show } from "solid-js";
 import { debounce } from "../../methods/debounce";
+import { tv } from "tailwind-variants";
 
-interface Props {
-  label?: JSX.Element;
-  value: number;
-  min?: number;
-  max?: number;
+export interface SliderProps {
+  value?: number;
+  min: number;
+  max: number;
   step?: number;
-  onValueChange: (v: number) => void;
+  onChange?: (v: number) => void;
   saveFunc?: (v: number) => Promise<any>;
+  appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  class?: string;
+  labelClass?: string;
+  label?: string;
 }
 
-export const Slider: Component<Props> = (props) => {
+const slider = tv({
+  base: "range",
+  variants: {
+    appearance: {
+      neutral: "range-neutral",
+      primary: "range-primary",
+      secondary: "range-secondary",
+      accent: "range-accent",
+      info: "range-info",
+      success: "range-success",
+      warning: "range-warning",
+      error: "range-error",
+    },
+    size: {
+      xs: "range-xs",
+      sm: "range-sm",
+      md: "range-md",
+      lg: "range-lg",
+      xl: "range-xl",
+    },
+  },
+  defaultVariants: {
+    appearance: "neutral",
+    size: "md",
+  },
+});
+
+const label = tv({
+  base: "label text-xs",
+  variants: {
+    size: {
+      xs: "text-xs",
+      sm: "text-xs",
+      md: "text-xs",
+      lg: "text-sm",
+      xl: "text-sm",
+    },
+  },
+  defaultVariants: {
+    size: "md",
+  },
+});
+
+export const Slider: Component<SliderProps> = (props) => {
   const debouncedSave = createMemo(() => (props.saveFunc ? debounce(props.saveFunc) : undefined));
 
   const handleChange = (val: number[]) => {
     const v = val[0];
-    props.onValueChange(v);
+    props.onChange?.(v);
     debouncedSave()?.(v);
   };
 
   return (
-    <KSlider
-      class="w-full"
-      value={[props.value]}
-      onChange={handleChange}
-      minValue={props.min ?? 0}
-      maxValue={props.max ?? 100}
-      step={props.step ?? 1}
-      getValueLabel={(params) => `${params.values[0]}%`}
-    >
-      <>{props.label && <KSlider.Label>{props.label}</KSlider.Label>}</>
-
-      <div class="flex items-center mx-2 justify-between">
-        <KSlider.Track class="h-2 w-[85%] rounded-4xl relative">
-          <KSlider.Fill />
-          <KSlider.Thumb class="block w-4 h-4 -top-1 rounded-4xl">
-            <KSlider.Input />
-          </KSlider.Thumb>
-        </KSlider.Track>
-        <KSlider.ValueLabel class="ml-3" />
-      </div>
-    </KSlider>
+    <label class="flex flex-col gap-1">
+      <Show when={props.label}>
+        <span class={label({ size: props.size, class: props.labelClass })}>{props.label}</span>
+      </Show>
+      <input
+        class={slider({ appearance: props.appearance, size: props.size, class: props.class })}
+        type="range"
+        min={props.min}
+        max={props.max}
+        value={props.value}
+        step={props.step}
+        onInput={(e) => {
+          handleChange([e.currentTarget.valueAsNumber]);
+        }}
+      />
+    </label>
   );
 };
 

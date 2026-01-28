@@ -11,12 +11,24 @@ type Story = StoryObj<typeof DropdownMenu>;
 
 export const Default: Story = {
   render: () => (
-    <DropdownMenu
-      items={[
-        { label: "Item 1", onSelect: () => {} },
-        { label: "Item 2", onSelect: () => {} },
-      ]}
-      trigger={<Button appearance="neutral">Open Menu</Button>}
-    />
+    <div>
+      {" "}
+      <DropdownMenu
+        items={[
+          { label: "Item 1", onSelect: () => {} },
+          { label: "Item 2", onSelect: () => {} },
+        ]}
+        size="xs"
+        trigger={<Button appearance="neutral">Open Menu</Button>}
+      />
+      <DropdownMenu
+        items={[
+          { label: "Item 1", onSelect: () => {} },
+          { label: "Item 2", onSelect: () => {} },
+        ]}
+        size="lg"
+        trigger={<Button appearance="neutral">Open Menu</Button>}
+      />
+    </div>
   ),
 };

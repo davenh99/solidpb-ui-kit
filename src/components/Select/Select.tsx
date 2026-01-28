@@ -16,15 +16,62 @@ export interface SelectProps {
   onChange: (value: string | null) => void;
   placeholder?: string;
   class?: string;
+  variant?: "ghost" | "none";
+  appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
 }
 
-const base = tv({
-  base: "floating-label",
+const trigger = tv({
+  base: "input outline-offset-0 flex justify-between items-center",
+  variants: {
+    variant: {
+      ghost: "input-ghost",
+      none: "",
+    },
+    appearance: {
+      neutral: "input-neutral",
+      primary: "input-primary",
+      secondary: "input-secondary",
+      accent: "input-accent",
+      info: "input-info",
+      success: "input-success",
+      warning: "input-warning",
+      error: "input-error",
+    },
+    size: {
+      xs: "input-xs",
+      sm: "input-sm",
+      md: "input-md",
+      lg: "input-lg",
+      xl: "input-xl",
+    },
+  },
+  defaultVariants: {
+    variant: "none",
+    appearance: "neutral",
+    size: "md",
+  },
+});
+
+const menu = tv({
+  base: "menu w-full",
+  variants: {
+    size: {
+      xs: "menu-xs",
+      sm: "menu-sm",
+      md: "menu-base",
+      lg: "menu-lg",
+      xl: "menu-xl",
+    },
+  },
+  defaultVariants: {
+    size: "md",
+  },
 });
 
 export const Select: Component<SelectProps> = (props) => {
   return (
-    <label class={base({ class: props.class })}>
+    <label class="floating-label">
       {props.label && <span>{props.label}</span>}
       <KobalteSelect
         multiple={false}
@@ -46,11 +93,18 @@ export const Select: Component<SelectProps> = (props) => {
           );
         }}
       >
-        <KobalteSelect.Trigger class="input outline-offset-0 flex justify-between items-center">
+        <KobalteSelect.Trigger
+          class={trigger({
+            variant: props.variant,
+            appearance: props.appearance,
+            size: props.size,
+            class: props.class,
+          })}
+        >
           <KobalteSelect.Value<string>>
             {(state) => {
               const selected = props.options.find((o) => o.value === state.selectedOption());
-              return selected ? selected.label : props.placeholder || "Select...";
+              return selected ? selected.label : props.placeholder || "Select";
             }}
           </KobalteSelect.Value>
           <KobalteSelect.Icon>
@@ -59,7 +113,7 @@ export const Select: Component<SelectProps> = (props) => {
         </KobalteSelect.Trigger>
         <KobalteSelect.Portal>
           <KobalteSelect.Content class="rounded-box bg-base-200 shadow-md z-50">
-            <KobalteSelect.Listbox class="menu w-full" />
+            <KobalteSelect.Listbox class={menu({ size: props.size })} />
           </KobalteSelect.Content>
         </KobalteSelect.Portal>
       </KobalteSelect>

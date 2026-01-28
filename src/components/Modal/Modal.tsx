@@ -7,7 +7,6 @@ import { ModalContext } from "./modalContext";
 
 interface Props {
   setModalVisible?: (v: boolean) => void;
-  saveFunc?: () => Promise<void>;
   zIndexClass?: string;
   title?: string;
 }

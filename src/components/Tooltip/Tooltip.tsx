@@ -1,24 +1,39 @@
-import { Tooltip as KTooltip } from "@kobalte/core/tooltip";
-import { Component, JSX } from "solid-js";
+import { Component, JSXElement } from "solid-js";
 import { tv } from "tailwind-variants";
 
 interface TooltipProps {
-  content: JSX.Element;
-  children: JSX.Element;
+  content: JSXElement;
+  children: JSXElement;
   class?: string;
+  appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
 }
 
 const tooltip = tv({
-  base: "bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] text-[var(--color-text-light-primary)] dark:text-[var(--color-text-dark-primary)] px-2 py-1 rounded shadow",
+  base: "tooltip tooltip-bottom",
+  variants: {
+    appearance: {
+      neutral: "tooltip-neutral",
+      primary: "tooltip-primary",
+      secondary: "tooltip-secondary",
+      accent: "tooltip-accent",
+      info: "tooltip-info",
+      success: "tooltip-success",
+      warning: "tooltip-warning",
+      error: "tooltip-error",
+    },
+  },
+  defaultVariants: {
+    appearance: "neutral",
+  },
 });
 
-export const Tooltip: Component<TooltipProps> = (props) => (
-  <KTooltip>
-    <KTooltip.Trigger>{props.children}</KTooltip.Trigger>
-    <KTooltip.Portal>
-      <KTooltip.Content class={tooltip()}>{props.content}</KTooltip.Content>
-    </KTooltip.Portal>
-  </KTooltip>
-);
+export const Tooltip: Component<TooltipProps> = (props) => {
+  return (
+    <div class={tooltip({ class: props.class, appearance: props.appearance })}>
+      {props.children}
+      <div class="tooltip-content">{props.content}</div>
+    </div>
+  );
+};
 
 export default Tooltip;

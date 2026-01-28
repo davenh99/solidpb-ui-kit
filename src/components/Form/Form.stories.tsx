@@ -11,6 +11,7 @@ interface MockProduct {
   category: "electronics" | "clothing" | "books";
   sellable: boolean;
   description: string;
+  percentageDiscount: number;
 }
 
 const productData: MockProduct = {
@@ -20,6 +21,7 @@ const productData: MockProduct = {
   category: "electronics",
   sellable: true,
   description: "This is a sample product used for demonstrating the Form component.",
+  percentageDiscount: 10,
 };
 
 const ProductForm = createForm<MockProduct>();
@@ -68,6 +70,7 @@ export const Default: Story = {
               textareaProps={{ autoResize: true }}
             />
             <ProductForm.SwitchField field="sellable" label="Sellable" />
+            <ProductForm.SliderField field="percentageDiscount" min={0} max={100} label="random slider" />
           </ProductForm>
         </Card>
       </Container>

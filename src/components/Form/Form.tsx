@@ -9,6 +9,7 @@ import { Checkbox, CheckboxProps } from "../Checkbox";
 import { InternalFormContext, useInternalFormContext } from "./formContext";
 import { NumberInputRootProps, NumberInput } from "../NumberInput";
 import { Button } from "../Button";
+import Slider, { SliderProps } from "../Slider/Slider";
 
 export interface FormProps<T> {
   data: T;
@@ -140,7 +141,17 @@ export function createForm<T>() {
 
   const ImageField = () => {};
 
-  const RelationField = () => {};
+  const SliderField = (props: SliderProps & BaseFieldProps<T>) => {
+    const form = useInternalFormContext() as Ctx;
+
+    return (
+      <Slider
+        {...props}
+        value={form.getValue(props.field) as any}
+        onChange={(v) => form.setValue(props.field, v as any)}
+      />
+    );
+  };
 
   Form.TextField = TextField;
   Form.NumberField = NumberField;
@@ -150,7 +161,7 @@ export function createForm<T>() {
   Form.SelectField = SelectField;
   Form.FileField = FileField;
   Form.ImageField = ImageField;
-  Form.RelationField = RelationField;
+  Form.SliderField = SliderField;
 
   return Form;
 }

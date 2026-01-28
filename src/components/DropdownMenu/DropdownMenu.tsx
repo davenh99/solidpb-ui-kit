@@ -5,10 +5,23 @@ import { tv } from "tailwind-variants";
 interface DropdownMenuProps {
   items: { label: string; onSelect: () => void }[];
   trigger: JSXElement;
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
 }
 
 const menu = tv({
   base: "dropdown-content menu bg-base-200 min-w-30 shadow-sm mt-2 p-2 rounded-box",
+  variants: {
+    size: {
+      xs: "menu-xs",
+      sm: "menu-sm",
+      md: "menu-base",
+      lg: "menu-lg",
+      xl: "menu-xl",
+    },
+  },
+  defaultVariants: {
+    size: "md",
+  },
 });
 
 const item = tv({
@@ -19,7 +32,7 @@ export const DropdownMenu: Component<DropdownMenuProps> = (props) => (
   <KDropdownMenu>
     <KDropdownMenu.Trigger>{props.trigger}</KDropdownMenu.Trigger>
     <KDropdownMenu.Portal>
-      <KDropdownMenu.Content class={menu()}>
+      <KDropdownMenu.Content class={menu({ size: props.size })}>
         <ul>
           <For each={props.items}>
             {(itemObj) => (
