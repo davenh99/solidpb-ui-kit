@@ -1,15 +1,16 @@
-import { Component, Show, splitProps } from "solid-js";
+import { Component, JSX, Show, splitProps } from "solid-js";
 import { tv } from "tailwind-variants";
 
-interface FileInputProps {
+export interface FileInputProps extends Omit<JSX.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   label?: string;
-  onChange: (files: FileList | null) => void;
+  onChange?: (files: FileList | null) => void;
   accept?: string;
   multiple?: boolean;
   class?: string;
   variant?: "ghost";
   appearance?: "primary" | "secondary" | "success" | "warning" | "neutral" | "error" | "accent" | "info";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
+  saveFunc?: (files: FileList | null) => Promise<void>;
 }
 
 const root = tv({ base: "flex flex-col gap-1" });
@@ -40,7 +41,12 @@ const input = tv({
 });
 
 export const FileInput: Component<FileInputProps> = (props) => {
-  const [local, others] = splitProps(props, ["label", "class", "onChange"]);
+  const [local, others] = splitProps(props, ["label", "class", "onChange", "saveFunc"]);
+
+  const handleChange = (files: FileList | null) => {
+    local.onChange?.(files);
+    local.saveFunc?.(files);
+  };
 
   return (
     <label class={root()}>
@@ -53,7 +59,7 @@ export const FileInput: Component<FileInputProps> = (props) => {
         class={input({ class: local.class })}
         accept={props.accept}
         multiple={props.multiple}
-        onChange={(e) => local.onChange(e.currentTarget.files)}
+        onChange={(e) => handleChange(e.currentTarget.files)}
       />
     </label>
   );

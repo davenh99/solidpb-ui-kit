@@ -27,8 +27,8 @@ Also to index.css (refer daisyui docs):
 - [x] Container
 - [x] DateInput
 - [x] DropdownMenu
-- [ ] FileInput
-- [ ] Form
+- [x] FileInput
+- [x] Form
 - [x] Image
 - [x] Input
 - [x] Link

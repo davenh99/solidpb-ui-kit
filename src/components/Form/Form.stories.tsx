@@ -13,6 +13,7 @@ interface MockProduct {
   description: string;
   percentageDiscount: number;
   imageUrl: string;
+  file: string;
 }
 
 const productData: MockProduct = {
@@ -24,6 +25,7 @@ const productData: MockProduct = {
   description: "This is a sample product used for demonstrating the Form component.",
   percentageDiscount: 10,
   imageUrl: "https://placehold.co/128x128",
+  file: "data.pdf",
 };
 
 const ProductForm = createForm<MockProduct>();
@@ -41,7 +43,7 @@ export const Default: Story = {
 
     return (
       <Container class="bg-base-200 flex items-center justify-center">
-        <Card class="min-w-120">
+        <Card class="min-w-150">
           <ProductForm
             data={productData}
             title="Edit Product"
@@ -74,6 +76,7 @@ export const Default: Story = {
             />
             <ProductForm.SwitchField field="sellable" label="Sellable" />
             <ProductForm.SliderField field="percentageDiscount" min={0} max={100} label="random slider" />
+            <ProductForm.FileField field="file" label="Product data" />
           </ProductForm>
         </Card>
       </Container>

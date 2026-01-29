@@ -11,6 +11,7 @@ import { NumberInput, type NumberInputRootProps } from "../NumberInput";
 import { Slider, type SliderProps } from "../Slider";
 import { Image, type ImageProps } from "../Image";
 import { Button } from "../Button";
+import { FileInput, type FileInputProps } from "../FileInput";
 
 export interface FormProps<T> {
   data: T;
@@ -138,7 +139,11 @@ export function createForm<T>() {
     );
   };
 
-  const FileField = () => {};
+  const FileField = (props: FileInputProps & BaseFieldProps<T>) => {
+    const form = useInternalFormContext() as Ctx;
+
+    return <FileInput {...props} onChange={(files) => form.setValue(props.field, files as any)} />;
+  };
 
   const ImageField = (props: ImageProps & BaseFieldProps<T>) => {
     const form = useInternalFormContext() as Ctx;
