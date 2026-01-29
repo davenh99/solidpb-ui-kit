@@ -37,10 +37,6 @@ const slider = tv({
       xl: "range-xl",
     },
   },
-  defaultVariants: {
-    appearance: "neutral",
-    size: "md",
-  },
 });
 
 const label = tv({
@@ -53,9 +49,6 @@ const label = tv({
       lg: "text-sm",
       xl: "text-sm",
     },
-  },
-  defaultVariants: {
-    size: "md",
   },
 });
 

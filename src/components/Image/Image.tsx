@@ -22,9 +22,6 @@ const image = tv({
       xl: "w-64 h-64",
     },
   },
-  defaultVariants: {
-    size: "md",
-  },
 });
 
 const label = tv({
@@ -37,9 +34,6 @@ const label = tv({
       lg: "text-sm",
       xl: "text-sm",
     },
-  },
-  defaultVariants: {
-    size: "md",
   },
 });
 

@@ -21,9 +21,6 @@ const toast = tv({
       neutral: "border-gray-500",
     },
   },
-  defaultVariants: {
-    variant: "neutral",
-  },
 });
 
 export const Toast: Component<Props> = (props) => {

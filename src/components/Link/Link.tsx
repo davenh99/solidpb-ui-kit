@@ -17,9 +17,6 @@ const link = tv({
       error: "link-error",
     },
   },
-  defaultVariants: {
-    appearance: "neutral",
-  },
 });
 
 type LinkProps<T extends ValidComponent = "a"> = PolymorphicProps<

@@ -40,21 +40,13 @@ const button = tv({
       soft: "btn-soft",
       ghost: "btn-ghost",
       link: "btn-link",
-      none: "",
     },
     modifier: {
       wide: "btn-wide",
       block: "btn-block",
       square: "btn-square",
       circle: "btn-circle",
-      none: "",
     },
-  },
-  defaultVariants: {
-    variant: "none",
-    appearance: "neutral",
-    size: "md",
-    modifier: "none",
   },
 });
 

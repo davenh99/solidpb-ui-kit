@@ -22,9 +22,6 @@ const tagArea = tv({
       false: "cursor-pointer",
     },
   },
-  defaultVariants: {
-    editing: false,
-  },
 });
 
 const menu = tv({
@@ -37,9 +34,6 @@ const menu = tv({
       lg: "menu-lg",
       xl: "menu-xl",
     },
-  },
-  defaultVariants: {
-    size: "md",
   },
 });
 

@@ -7,7 +7,7 @@ export interface TagProps {
   title: string;
   colorHex?: string;
   onDelete?: () => void;
-  variant?: "none" | "ghost" | "outline" | "dash" | "soft";
+  variant?: "ghost" | "outline" | "dash" | "soft";
   appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   class?: string;
@@ -40,11 +40,6 @@ const tag = tv({
       soft: "badge-soft",
       none: "",
     },
-  },
-  defaultVariants: {
-    size: "md",
-    appearance: "neutral",
-    variant: "none",
   },
 });
 

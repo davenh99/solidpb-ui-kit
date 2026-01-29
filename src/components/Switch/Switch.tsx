@@ -29,10 +29,6 @@ const toggle = tv({
       neutral: "toggle-neutral",
     },
   },
-  defaultVariants: {
-    size: "md",
-    appearance: "neutral",
-  },
 });
 
 export const Switch: Component<SwitchProps> = (props) => {

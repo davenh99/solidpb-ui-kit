@@ -5,7 +5,7 @@ interface DateInputProps {
   label?: string;
   value: Date | null;
   onChange: (date: Date | null) => void;
-  variant?: "ghost" | "none";
+  variant?: "ghost";
   appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   class?: string;
@@ -36,11 +36,6 @@ const dateInput = tv({
       xl: "input-xl",
     },
   },
-  defaultVariants: {
-    variant: "none",
-    appearance: "neutral",
-    size: "md",
-  },
 });
 
 const label = tv({
@@ -53,9 +48,6 @@ const label = tv({
       lg: "text-sm",
       xl: "text-md",
     },
-  },
-  defaultVariants: {
-    size: "md",
   },
 });
 

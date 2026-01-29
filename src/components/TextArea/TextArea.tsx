@@ -13,7 +13,7 @@ export interface TextAreaExtraProps {
   label?: string;
   saveFunc?: (v: string) => Promise<any>;
   textareaProps?: TextAreaProps;
-  variant?: "none" | "ghost";
+  variant?: "ghost";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   appearance?: "primary" | "secondary" | "success" | "warning" | "neutral" | "error" | "accent" | "info";
 }
@@ -28,9 +28,6 @@ const root = tv({
       yes: "mt-3",
       no: "",
     },
-  },
-  defaultVariants: {
-    marginTop: "no",
   },
 });
 
@@ -58,11 +55,6 @@ const textarea = tv({
       accent: "textarea-accent",
       info: "textarea-info",
     },
-  },
-  defaultVariants: {
-    variant: "none",
-    size: "md",
-    appearance: "neutral",
   },
 });
 

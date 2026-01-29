@@ -15,7 +15,7 @@ export const Default: Story = {
     return (
       <div>
         <FileInput label="Upload file" onChange={(files) => setFileName(files?.[0]?.name || "")} />
-        <div class="mt-2">Selected: {fileName()}</div>
+        <div class="mt-10">Selected: {fileName()}</div>
       </div>
     );
   },

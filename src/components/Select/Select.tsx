@@ -16,7 +16,7 @@ export interface SelectProps {
   onChange: (value: string | null) => void;
   placeholder?: string;
   class?: string;
-  variant?: "ghost" | "none";
+  variant?: "ghost";
   appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
 }
@@ -46,11 +46,6 @@ const trigger = tv({
       xl: "input-xl",
     },
   },
-  defaultVariants: {
-    variant: "none",
-    appearance: "neutral",
-    size: "md",
-  },
 });
 
 const menu = tv({
@@ -63,9 +58,6 @@ const menu = tv({
       lg: "menu-lg",
       xl: "menu-xl",
     },
-  },
-  defaultVariants: {
-    size: "md",
   },
 });
 

@@ -19,9 +19,6 @@ const menu = tv({
       xl: "menu-xl",
     },
   },
-  defaultVariants: {
-    size: "md",
-  },
 });
 
 const item = tv({

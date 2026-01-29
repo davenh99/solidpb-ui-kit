@@ -25,10 +25,6 @@ const avatar = tv({
       false: "",
     },
   },
-  defaultVariants: {
-    size: "md",
-    fallback: false,
-  },
 });
 
 export const Avatar: Component<AvatarProps> = (props) => {

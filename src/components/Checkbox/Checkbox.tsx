@@ -29,10 +29,6 @@ const checkbox = tv({
       neutral: "checkbox-neutral",
     },
   },
-  defaultVariants: {
-    size: "md",
-    appearance: "neutral",
-  },
 });
 
 export const Checkbox: Component<CheckboxProps> = (props) => {

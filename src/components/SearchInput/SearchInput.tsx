@@ -8,7 +8,7 @@ interface SearchInputProps {
   onChange: (v: string) => void;
   placeholder?: string;
   class?: string;
-  variant?: "ghost" | "none";
+  variant?: "ghost";
   appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
 }
@@ -37,11 +37,6 @@ const search = tv({
       warning: "input-warning",
       error: "input-error",
     },
-  },
-  defaultVariants: {
-    variant: "none",
-    size: "md",
-    appearance: "neutral",
   },
 });
 

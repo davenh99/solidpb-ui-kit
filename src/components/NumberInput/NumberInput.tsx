@@ -15,7 +15,7 @@ export type NumberInputProps<T extends ValidComponent = "input"> = PolymorphicPr
 
 export interface NumberInputExtraProps {
   label?: string;
-  variant?: "ghost" | "none";
+  variant?: "ghost";
   appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   inputProps?: NumberInputProps;
@@ -32,9 +32,6 @@ const inputRoot = tv({
       yes: "mt-2",
       no: "",
     },
-  },
-  defaultVariants: {
-    marginTop: "no",
   },
 });
 
@@ -62,11 +59,6 @@ const inputField = tv({
       warning: "input-warning",
       error: "input-error",
     },
-  },
-  defaultVariants: {
-    variant: "none",
-    size: "md",
-    appearance: "neutral",
   },
 });
 

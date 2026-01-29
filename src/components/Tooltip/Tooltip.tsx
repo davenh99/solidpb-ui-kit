@@ -22,9 +22,6 @@ const tooltip = tv({
       error: "tooltip-error",
     },
   },
-  defaultVariants: {
-    appearance: "neutral",
-  },
 });
 
 export const Tooltip: Component<TooltipProps> = (props) => {
