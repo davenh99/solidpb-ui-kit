@@ -13,7 +13,7 @@ export type NumberInputProps<T extends ValidComponent = "input"> = PolymorphicPr
   NumberFieldInputProps<T>
 >;
 
-export interface ExtraProps {
+export interface NumberInputExtraProps {
   label?: string;
   variant?: "ghost" | "none";
   appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
@@ -22,7 +22,7 @@ export interface ExtraProps {
   saveFunc?: (v: number) => Promise<any>;
 }
 
-export type NumberInputRootProps<T extends ValidComponent = "div"> = ExtraProps &
+export type NumberInputRootProps<T extends ValidComponent = "div"> = NumberInputExtraProps &
   PolymorphicProps<T, NumberFieldRootProps<T>>;
 
 const inputRoot = tv({

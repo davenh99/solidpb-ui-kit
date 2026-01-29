@@ -12,7 +12,6 @@ export * from "./components/Link";
 export * from "./components/List";
 export * from "./components/Modal";
 export * from "./components/NumberInput";
-export * from "./components/RelationPicker";
 export * from "./components/SearchInput";
 export * from "./components/Select";
 export * from "./components/Switch";

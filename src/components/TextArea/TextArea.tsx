@@ -4,21 +4,21 @@ import type { PolymorphicProps } from "@kobalte/core";
 import { tv } from "tailwind-variants";
 import { debounce } from "../../methods/debounce";
 
-export type InputProps<T extends ValidComponent = "textarea"> = PolymorphicProps<
+export type TextAreaProps<T extends ValidComponent = "textarea"> = PolymorphicProps<
   T,
   TextFieldTextAreaProps<T>
 >;
 
-export interface ExtraProps {
+export interface TextAreaExtraProps {
   label?: string;
   saveFunc?: (v: string) => Promise<any>;
-  textareaProps?: InputProps;
+  textareaProps?: TextAreaProps;
   variant?: "none" | "ghost";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   appearance?: "primary" | "secondary" | "success" | "warning" | "neutral" | "error" | "accent" | "info";
 }
 
-export type TextAreaRootProps<T extends ValidComponent = "div"> = ExtraProps &
+export type TextAreaRootProps<T extends ValidComponent = "div"> = TextAreaExtraProps &
   PolymorphicProps<T, TextFieldRootProps<T>>;
 
 const root = tv({

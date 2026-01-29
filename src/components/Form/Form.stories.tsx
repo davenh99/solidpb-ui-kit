@@ -12,6 +12,7 @@ interface MockProduct {
   sellable: boolean;
   description: string;
   percentageDiscount: number;
+  imageUrl: string;
 }
 
 const productData: MockProduct = {
@@ -22,6 +23,7 @@ const productData: MockProduct = {
   sellable: true,
   description: "This is a sample product used for demonstrating the Form component.",
   percentageDiscount: 10,
+  imageUrl: "https://placehold.co/128x128",
 };
 
 const ProductForm = createForm<MockProduct>();
@@ -45,6 +47,7 @@ export const Default: Story = {
             title="Edit Product"
             onSave={async (vals) => alert(JSON.stringify(vals))}
           >
+            <ProductForm.ImageField field="imageUrl" label="Product Image" size="lg" />
             <ProductForm.TextField field="name" label="Name" />
             <ProductForm.NumberField
               field="price"

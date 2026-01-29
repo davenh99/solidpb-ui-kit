@@ -1,15 +1,16 @@
 import { JSXElement } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { Switch, SwitchProps } from "../Switch";
-import { Select, SelectProps } from "../Select";
-import { Input, InputRootProps } from "../Input";
-import { TextArea, TextAreaRootProps } from "../TextArea";
-import { Checkbox, CheckboxProps } from "../Checkbox";
 import { InternalFormContext, useInternalFormContext } from "./formContext";
-import { NumberInputRootProps, NumberInput } from "../NumberInput";
+import { Switch, type SwitchProps } from "../Switch";
+import { Select, type SelectProps } from "../Select";
+import { Input, type InputRootProps } from "../Input";
+import { TextArea, type TextAreaRootProps } from "../TextArea";
+import { Checkbox, type CheckboxProps } from "../Checkbox";
+import { NumberInput, type NumberInputRootProps } from "../NumberInput";
+import { Slider, type SliderProps } from "../Slider";
+import { Image, type ImageProps } from "../Image";
 import { Button } from "../Button";
-import Slider, { SliderProps } from "../Slider/Slider";
 
 export interface FormProps<T> {
   data: T;
@@ -45,7 +46,7 @@ export function createForm<T>() {
 
     return (
       <InternalFormContext.Provider value={contextValue}>
-        <div class="space-y-4">
+        <div class="space-y-4 space-x-4">
           {props.title && <h2 class="text-lg font-semibold">{props.title}</h2>}
 
           {props.children}
@@ -139,7 +140,21 @@ export function createForm<T>() {
 
   const FileField = () => {};
 
-  const ImageField = () => {};
+  const ImageField = (props: ImageProps & BaseFieldProps<T>) => {
+    const form = useInternalFormContext() as Ctx;
+
+    return (
+      <Image
+        {...props}
+        editable
+        src={form.getValue(props.field) as any}
+        onChange={(file) => {
+          const fileURL = URL.createObjectURL(file);
+          form.setValue(props.field, fileURL as any);
+        }}
+      />
+    );
+  };
 
   const SliderField = (props: SliderProps & BaseFieldProps<T>) => {
     const form = useInternalFormContext() as Ctx;

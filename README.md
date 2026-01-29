@@ -29,7 +29,7 @@ Also to index.css (refer daisyui docs):
 - [x] DropdownMenu
 - [ ] FileInput
 - [ ] Form
-- [ ] Image
+- [x] Image
 - [x] Input
 - [x] Link
 - [ ] List
