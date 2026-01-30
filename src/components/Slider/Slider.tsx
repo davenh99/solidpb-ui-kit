@@ -62,7 +62,7 @@ export const Slider: Component<SliderProps> = (props) => {
   };
 
   return (
-    <label class="flex flex-col gap-1">
+    <label class="flex flex-col gap-1 w-fit">
       <Show when={props.label}>
         <span class={label({ size: props.size, class: props.labelClass })}>{props.label}</span>
       </Show>

@@ -35,7 +35,7 @@ export const Switch: Component<SwitchProps> = (props) => {
   const [local, inputProps] = splitProps(props, ["label", "size", "appearance", "class", "onChange"]);
 
   return (
-    <label class="flex items-center gap-3">
+    <label class="flex items-center gap-3 w-fit">
       <input
         {...inputProps}
         type="checkbox"

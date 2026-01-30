@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "storybook-solidjs";
+import type { Meta, StoryObj } from "storybook-solidjs-vite";
 import { ColorPicker } from "./ColorPicker";
 import { createSignal } from "solid-js";
 
@@ -15,9 +15,9 @@ export const Basic: Story = {
     const [color, setColor] = createSignal("#ff0000");
     return (
       <div>
-        <ColorPicker value={color()} onChange={setColor} />
-        <div style={{ marginTop: "1rem" }}>
-          Selected: <span style={{ color: color() }}>{color()}</span>
+        <ColorPicker value={color()} onChange={setColor} label="favourite color" />
+        <div>
+          Selected: <span>{color()}</span>
         </div>
       </div>
     );

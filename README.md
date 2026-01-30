@@ -47,7 +47,7 @@ Also to index.css (refer daisyui docs):
 - [x] Tooltip
 - [ ] Kanban
 - [ ] ThemeSwitch
-- [ ] ColorPicker
+- [x] ColorPicker
 
 ### TODO dark theme
 

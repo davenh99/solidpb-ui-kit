@@ -13,7 +13,6 @@ export interface FileInputProps extends Omit<JSX.InputHTMLAttributes<HTMLInputEl
   saveFunc?: (files: FileList | null) => Promise<void>;
 }
 
-const root = tv({ base: "flex flex-col gap-1" });
 const input = tv({
   base: "file-input outline-offset-0",
   variants: {
@@ -49,7 +48,7 @@ export const FileInput: Component<FileInputProps> = (props) => {
   };
 
   return (
-    <label class={root()}>
+    <label class="flex flex-col gap-1 w-fit">
       <Show when={local.label}>
         <span class="label">{local.label}</span>
       </Show>

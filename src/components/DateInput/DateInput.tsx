@@ -38,19 +38,6 @@ const dateInput = tv({
   },
 });
 
-const label = tv({
-  base: "block mb-1 text-xs font-medium",
-  variants: {
-    size: {
-      xs: "text-xs",
-      sm: "text-xs",
-      md: "text-sm",
-      lg: "text-sm",
-      xl: "text-md",
-    },
-  },
-});
-
 export const DateInput: Component<DateInputProps> = (props) => {
   // Convert Date to yyyy-mm-dd string for input value
   const valueStr = () => (props.value ? props.value.toISOString().slice(0, 10) : "");
@@ -58,10 +45,11 @@ export const DateInput: Component<DateInputProps> = (props) => {
     const val = (e.target as HTMLInputElement).value;
     props.onChange(val ? new Date(val) : null);
   };
+
   return (
-    <div class={props.class}>
+    <label class="floating-label">
       <Show when={props.label}>
-        <label class={label({ size: props.size })}>{props.label}</label>
+        <span>{props.label}</span>
       </Show>
       <input
         type="date"
@@ -69,7 +57,7 @@ export const DateInput: Component<DateInputProps> = (props) => {
         value={valueStr()}
         onInput={handleChange}
       />
-    </div>
+    </label>
   );
 };
 
