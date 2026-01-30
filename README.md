@@ -48,6 +48,8 @@ Also to index.css (refer daisyui docs):
 - [ ] Kanban
 - [ ] ThemeSwitch
 - [x] ColorPicker
+- [ ] Navbar
+- [ ] Drawer
 
 ### TODO dark theme
 
@@ -80,6 +82,8 @@ Also to index.css (refer daisyui docs):
 - [ ] Kanban
 - [ ] ThemeSwitch
 - [ ] ColorPicker
+- [ ] Navbar
+- [ ] Drawer
 
 ### TODO (more thorough/complex implementation)
 
