@@ -43,7 +43,7 @@ Also to index.css (refer daisyui docs):
 - [x] Tag
 - [x] TagArea
 - [x] TextArea
-- [ ] Toast
+- [x] Toast
 - [x] Tooltip
 - [ ] Kanban
 - [ ] ThemeSwitch
