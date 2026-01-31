@@ -4,7 +4,7 @@ import { Container } from "../Container";
 import { Card } from "../Card";
 import { createSignal } from "solid-js";
 
-interface MockProduct {
+export interface MockProduct {
   name: string;
   price: number;
   inStock: boolean;
@@ -16,7 +16,7 @@ interface MockProduct {
   file: string;
 }
 
-const productData: MockProduct = {
+export const productData: MockProduct = {
   name: "Sample Product",
   price: 29.99,
   inStock: true,
@@ -28,7 +28,7 @@ const productData: MockProduct = {
   file: "data.pdf",
 };
 
-const ProductForm = createForm<MockProduct>();
+export const ProductForm = createForm<MockProduct>();
 
 const meta: Meta<typeof ProductForm> = {
   title: "Components/Form",

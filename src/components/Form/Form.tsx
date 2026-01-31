@@ -53,9 +53,11 @@ export function createForm<T>() {
           {props.children}
 
           <div class="flex justify-end gap-2">
-            <Button appearance="neutral" onClick={props.onCancel} size="sm">
-              Cancel
-            </Button>
+            {props.onCancel && (
+              <Button appearance="neutral" onClick={props.onCancel} size="sm">
+                Cancel
+              </Button>
+            )}
             {props.onSave && (
               <Button appearance="success" onClick={() => props.onSave?.(values)} size="sm">
                 Save

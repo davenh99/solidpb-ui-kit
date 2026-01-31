@@ -1,75 +1,77 @@
-import { createSignal, ParentComponent, Show, useContext } from "solid-js";
-import { Portal } from "solid-js/web";
-import Loader from "lucide-solid/icons/loader";
+import { ParentComponent, useContext, createSignal } from "solid-js";
+import Close from "lucide-solid/icons/x";
 
 import { Button } from "../Button";
 import { ModalContext } from "./modalContext";
 
-interface Props {
-  setModalVisible?: (v: boolean) => void;
-  zIndexClass?: string;
+interface ModalProps {
+  id: string;
   title?: string;
 }
 
-export const Modal: ParentComponent<Props> = (props) => {
-  const [loading, setLoading] = createSignal(false);
+interface ModalComponents {
+  Trigger: ParentComponent;
+  Modal: ParentComponent;
+}
 
-  const containerStyle = `${
-    props.zIndexClass !== undefined ? props.zIndexClass : "z-50"
-  } fixed inset-0 flex items-center justify-center bg-black/50`;
+export const Modal: ParentComponent<ModalProps> & ModalComponents = (props) => {
+  const [open, setOpen] = createSignal(false);
+
+  const handleOpen = (v: boolean) => {
+    if (v) {
+      const dialog = document.getElementById(props.id) as HTMLDialogElement;
+      dialog.showModal();
+    } else {
+      const dialog = document.getElementById(props.id) as HTMLDialogElement;
+      dialog.close();
+    }
+    setOpen(v);
+  };
 
   return (
-    <Portal>
-      <Show when={loading()}>
-        <div class="fixed inset-0 z-100 flex items-center justify-center bg-gray-800/25">
-          <Loader class="w-9 h-9 animate-spin text-gray-700" />
-        </div>
-      </Show>
-      <div class={containerStyle} onClick={() => props.setModalVisible?.(false)}>
-        <div
-          class={`bg-charcoal-500 text-dark-slate-gray-900 rounded-xl shadow-lg p-4 md:p-6
-              w-full mx-3 sm:w-[50vw] lg:w-[35vw] flex flex-col`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Show when={props.title}>
-            <h2 class="pb-2">{props.title}</h2>
-          </Show>
-          <div class="max-h-[55vh] overflow-y-hidden flex flex-col h-full">
-            <ModalContext.Provider value={{ loading, setLoading }}>{props.children}</ModalContext.Provider>
-          </div>
-          <div class="w-full flex justify-end space-x-2">
-            <Button onClick={() => props.setModalVisible?.(false)} class="mt-3">
-              Cancel
-            </Button>
-
-            <Show when={props.saveFunc}>
-              <Button
-                appearance="success"
-                onClick={() => {
-                  setLoading(true);
-                  props.saveFunc!()
-                    .then(() => props.setModalVisible?.(false))
-                    .finally(() => setLoading(false));
-                }}
-                class="mt-3"
-              >
-                Save
-              </Button>
-            </Show>
-          </div>
-        </div>
-      </div>
-    </Portal>
+    <ModalContext.Provider value={{ id: props.id, open, setOpen: handleOpen, title: props.title }}>
+      {props.children}
+    </ModalContext.Provider>
   );
 };
 
+export const ModalTrigger: ParentComponent = (props) => {
+  const { setOpen } = useContext(ModalContext)!;
+
+  return <Button onClick={() => setOpen(true)}>{props.children}</Button>;
+};
+
+export const ModalContent: ParentComponent = (props) => {
+  const { id, title, setOpen } = useContext(ModalContext)!;
+
+  return (
+    <dialog id={id} class="modal">
+      <div class="modal-box">
+        <div class="flex justify-between items-start">
+          {title && <h3 class="font-bold text-lg mb-2">{title}</h3>}
+          <Button variant="ghost" modifier="square" size="xs" onClick={() => setOpen(false)}>
+            <Close size={20} />
+          </Button>
+        </div>
+        {props.children}
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button class="cursor-auto">close</button>
+      </form>
+    </dialog>
+  );
+};
+
+Modal.Trigger = ModalTrigger;
+Modal.Modal = ModalContent;
+
 export default Modal;
 
-export function useModalLoading() {
+export function useModal() {
   const context = useContext(ModalContext);
 
   if (!context) {
-    throw new Error("useModalLoading must be used within a Modal");
+    throw new Error("useModal must be used within a Modal");
   }
 
   return context;

@@ -1,6 +1,7 @@
 import { Show, createSignal } from "solid-js";
 import type { Component, JSX } from "solid-js";
 import { tv } from "tailwind-variants";
+import Pencil from "lucide-solid/icons/pencil";
 
 import { Button } from "../Button";
 
@@ -66,8 +67,8 @@ export const Image: Component<ImageProps> = (props) => {
         <img {...imgProps} src={preview() || props.src} alt={props.alt} class={image({ size: props.size })} />
         <Show when={editable}>
           <div class="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-            <Button size="sm" appearance="primary" onClick={handleEditClick}>
-              Edit
+            <Button size="sm" modifier="square" variant="ghost" onClick={handleEditClick}>
+              <Pencil class="w-4 h-4" />
             </Button>
           </div>
           <input

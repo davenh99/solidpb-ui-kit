@@ -33,13 +33,13 @@ Also to index.css (refer daisyui docs):
 - [x] Input
 - [x] Link
 - [ ] List
-- [ ] Modal
+- [x] Modal
 - [x] NumberInput
 - [x] SearchInput
 - [x] Select
 - [x] Slider
 - [x] Switch
-- [ ] Tabs
+- [x] Tabs
 - [x] Tag
 - [x] TagArea
 - [x] TextArea
