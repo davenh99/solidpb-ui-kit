@@ -11,7 +11,7 @@ const container = tv({
   variants: {
     noPadding: {
       true: "",
-      false: "py-4 px-[3vw]",
+      false: "py-4 px-[2vw]",
     },
   },
 });

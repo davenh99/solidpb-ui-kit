@@ -45,9 +45,14 @@ export function createForm<T>() {
 
     const contextValue: Ctx = { setValue, getValue, values };
 
+    const handleSubmit = (e: any) => {
+      e.preventDefault();
+      props.onSave?.(values);
+    };
+
     return (
       <InternalFormContext.Provider value={contextValue}>
-        <div class="space-y-4 space-x-4">
+        <form onSubmit={handleSubmit} class="space-y-4 space-x-4">
           {props.title && <h2 class="text-lg font-semibold">{props.title}</h2>}
 
           {props.children}
@@ -59,12 +64,12 @@ export function createForm<T>() {
               </Button>
             )}
             {props.onSave && (
-              <Button appearance="success" onClick={() => props.onSave?.(values)} size="sm">
+              <Button appearance="success" type="submit" size="sm">
                 Save
               </Button>
             )}
           </div>
-        </div>
+        </form>
       </InternalFormContext.Provider>
     );
   };

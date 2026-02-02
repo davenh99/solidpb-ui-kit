@@ -1,23 +1,37 @@
 import { AlertDialog as KAlertDialog } from "@kobalte/core/alert-dialog";
-import { JSX, ParentComponent, Setter } from "solid-js";
+import { createSignal, JSXElement, ParentComponent, Setter } from "solid-js";
 import Delete from "lucide-solid/icons/x";
 import { Button, ButtonProps } from "../Button";
 
 interface Props {
+  id: string;
   title: string;
   description: string;
-  buttons?: JSX.Element;
+  buttons?: JSXElement;
   open?: boolean;
   defaultOpen?: boolean;
-  onOpenChange?: Setter<boolean>;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const AlertDialog: ParentComponent<Props> & { Button: typeof AlertDialogButton } = (props) => {
+  const [open, setOpen] = createSignal(false);
+
+  const handleOpen = (v: boolean) => {
+    if (v) {
+      const dialog = document.getElementById(props.id) as HTMLDialogElement;
+      dialog.showModal();
+    } else {
+      const dialog = document.getElementById(props.id) as HTMLDialogElement;
+      dialog.close();
+    }
+    setOpen(v);
+  };
+
   return (
     <KAlertDialog open={props.open} onOpenChange={props.onOpenChange} modal defaultOpen={props.defaultOpen}>
-      <KAlertDialog.Trigger class="w-full">{props.children}</KAlertDialog.Trigger>
+      <KAlertDialog.Trigger>{props.children}</KAlertDialog.Trigger>
       <KAlertDialog.Portal>
-        <KAlertDialog.Overlay class="fixed inset-0 z-50 bg-black/20 opacity-0 transition-all duration-1000 data-expanded:opacity-100" />
+        <KAlertDialog.Overlay class="fixed inset-0 z-50 bg-black/20" />
         <div class="flex justify-center items-center fixed inset-0 z-50">
           <KAlertDialog.Content class="card bg-base-100">
             <div class="card-body p-4">

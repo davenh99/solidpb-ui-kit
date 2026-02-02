@@ -17,7 +17,6 @@ export const Default: Story = {
 
     return (
       <div>
-        <Button onClick={() => setOpen(true)}>Open AlertDialog</Button>
         <AlertDialog
           open={open()}
           onOpenChange={setOpen}
@@ -31,7 +30,9 @@ export const Default: Story = {
               <AlertDialog.Button appearance="success">Confirm</AlertDialog.Button>
             </>
           }
-        />
+        >
+          <Button>Open AlertDialog</Button>
+        </AlertDialog>
       </div>
     );
   },

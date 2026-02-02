@@ -10,42 +10,35 @@ const meta: Meta<typeof Tabs> = {
 export default meta;
 type Story = StoryObj<typeof Tabs>;
 
-const tabs = [
-  {
-    value: "tab1",
-    trigger: "Tab 1",
-    content: "Content for Tab 1",
-  },
-  {
-    value: "tab2",
-    trigger: "Tab 2",
-    content: "Content for Tab 2",
-  },
-  {
-    value: "tab3",
-    trigger: (
-      <span class="flex items-center gap-1">
-        <Chart /> hello
-      </span>
-    ),
-    content: (
-      <ProductForm data={productData}>
-        <ProductForm.ImageField field="imageUrl" label="Product Image" size="lg" />
-        <ProductForm.TextField field="name" label="Name" />
-        <ProductForm.NumberField
-          field="price"
-          label="Price"
-          inputProps={{ class: "w-40" }}
-          formatOptions={{ style: "currency", currency: "AUD" }}
-        />
-        <ProductForm.CheckboxField field="inStock" label="In Stock" />
-      </ProductForm>
-    ),
-  },
-];
-
 export const Default: Story = {
   render: () => {
-    return <Tabs tabs={tabs} />;
+    return (
+      <Tabs>
+        <Tabs.List>
+          <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
+          <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
+          <Tabs.Trigger value="tab3">
+            <span class="flex items-center gap-1">
+              <Chart /> hello
+            </span>
+          </Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="tab1">Content for Tab 1</Tabs.Content>
+        <Tabs.Content value="tab2">Content for Tab 2</Tabs.Content>
+        <Tabs.Content value="tab3">
+          <ProductForm data={productData}>
+            <ProductForm.ImageField field="imageUrl" label="Product Image" size="lg" />
+            <ProductForm.TextField field="name" label="Name" />
+            <ProductForm.NumberField
+              field="price"
+              label="Price"
+              inputProps={{ class: "w-40" }}
+              formatOptions={{ style: "currency", currency: "AUD" }}
+            />
+            <ProductForm.CheckboxField field="inStock" label="In Stock" />
+          </ProductForm>
+        </Tabs.Content>
+      </Tabs>
+    );
   },
 };

@@ -64,7 +64,12 @@ export const Image: Component<ImageProps> = (props) => {
         <span class={label({ size: props.size })}>{props.label}</span>
       </Show>
       <div class="relative inline-block group w-fit">
-        <img {...imgProps} src={preview() || props.src} alt={props.alt} class={image({ size: props.size })} />
+        <img
+          {...imgProps}
+          src={preview() || props.src}
+          alt={props.alt}
+          class={image({ size: props.size, class: props.class })}
+        />
         <Show when={editable}>
           <div class="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity z-10">
             <Button size="sm" modifier="square" variant="ghost" onClick={handleEditClick}>

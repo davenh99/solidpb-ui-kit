@@ -45,12 +45,12 @@ export const DefaultRowRenderer = <T,>(props: {
 }): JSXElement => {
   return (
     <div
-      class="flex justify-between items-center cursor-pointer text-sm border-b border-[var(--color-light-muted)] dark:border-[var(--color-dark-muted)] py-2 hover:bg-[var(--color-light-muted)] dark:hover:bg-[var(--color-dark-muted)]"
+      class="flex justify-between items-center cursor-pointer text-sm border-b py-2"
       onClick={() => props.onClick(props.row.original)}
     >
       <For each={props.row.getVisibleCells()}>
         {(cell) => (
-          <div class="flex-1 overflow-hidden truncate">
+          <div class="flex-1 overflow-hidden truncate p-1">
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </div>
         )}
@@ -110,8 +110,8 @@ export const List = <T,>(props: ListProps<T>): JSXElement => {
         when={dataExists()}
         fallback={
           props.loadingFallback || (
-            <div class="fixed inset-0 z-100 flex items-center justify-center bg-[var(--color-dark-background)]/25 dark:bg-[var(--color-light-background)]/25">
-              <Loader class="w-9 h-9 animate-spin text-[var(--color-light-muted)] dark:text-[var(--color-dark-muted)]" />
+            <div class="fixed inset-0 z-10 flex items-center justify-center">
+              <Loader class="w-9 h-9 animate-spin" />
             </div>
           )
         }
@@ -157,7 +157,7 @@ export const List = <T,>(props: ListProps<T>): JSXElement => {
         <Show when={props.headers}>
           <For each={table.getHeaderGroups()}>
             {(headerGroup) => (
-              <div class="flex flex-row w-full justify-between sticky top-0 bg-[var(--color-light-surface)]/95 dark:bg-[var(--color-dark-surface)]/95 text-[var(--color-text-light-primary)] dark:text-[var(--color-dark-primary)] backdrop-blur-sm p-2 z-10">
+              <div class="flex flex-row w-full justify-between sticky top-0 backdrop-blur-sm p-2 z-10">
                 <For each={headerGroup.headers}>
                   {(header) => (
                     <div class="text-left font-bold">

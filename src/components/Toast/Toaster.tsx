@@ -6,7 +6,7 @@ export const Toaster: Component = () => {
   return (
     <Portal>
       <Toast.Region>
-        <Toast.List class="toast toast-top w-80 max-w-[100vw] m-0" />
+        <Toast.List class="z-1000000 toast toast-top w-80 max-w-[100vw] m-0" />
       </Toast.Region>
     </Portal>
   );

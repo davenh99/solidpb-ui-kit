@@ -1,4 +1,10 @@
-import { createSignal, onMount } from "solid-js";
+import { createSignal, JSXElement, onMount } from "solid-js";
+import Sun from "lucide-solid/icons/sun";
+import Moon from "lucide-solid/icons/moon";
+import Monitor from "lucide-solid/icons/monitor";
+
+import { DropdownMenu } from "../DropdownMenu";
+import { Button } from "../Button";
 
 const THEME_KEY = "theme";
 type Theme = "light" | "dark" | "system";
@@ -17,6 +23,31 @@ function applyTheme(theme: Theme) {
   html.setAttribute("data-theme", applied);
 }
 
+const labelClass = "flex items-center gap-1";
+
+const getThemeValue = (theme: Theme): JSXElement => {
+  switch (theme) {
+    case "light":
+      return (
+        <span class={labelClass}>
+          <Sun size="20" /> Light
+        </span>
+      );
+    case "dark":
+      return (
+        <span class={labelClass}>
+          <Moon size="20" /> Dark
+        </span>
+      );
+    case "system":
+      return (
+        <span class={labelClass}>
+          <Monitor size="20" /> System
+        </span>
+      );
+  }
+};
+
 export function ThemeSwitch() {
   const [theme, setTheme] = createSignal<Theme>("system");
 
@@ -30,19 +61,29 @@ export function ThemeSwitch() {
     }
   });
 
-  const handleChange = (e: Event) => {
-    const value = (e.target as HTMLSelectElement).value as Theme;
-    setTheme(value);
-    localStorage.setItem(THEME_KEY, value);
-    applyTheme(value);
+  const handleChange = (val: Theme) => {
+    setTheme(val);
+    localStorage.setItem(THEME_KEY, val);
+    applyTheme(val);
   };
 
   return (
-    <select value={theme()} onInput={handleChange} aria-label="Theme switcher">
-      <option value="light">Light</option>
-      <option value="dark">Dark</option>
-      <option value="system">System</option>
-    </select>
+    <DropdownMenu>
+      <DropdownMenu.Trigger>
+        <Button>{getThemeValue(theme())}</Button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content>
+        <DropdownMenu.MenuItem onSelect={() => handleChange("light")}>
+          {getThemeValue("light")}
+        </DropdownMenu.MenuItem>
+        <DropdownMenu.MenuItem onSelect={() => handleChange("dark")}>
+          {getThemeValue("dark")}
+        </DropdownMenu.MenuItem>
+        <DropdownMenu.MenuItem onSelect={() => handleChange("system")}>
+          {getThemeValue("system")}
+        </DropdownMenu.MenuItem>
+      </DropdownMenu.Content>
+    </DropdownMenu>
   );
 }
 

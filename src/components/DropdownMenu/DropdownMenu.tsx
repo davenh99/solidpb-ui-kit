@@ -1,15 +1,20 @@
 import { DropdownMenu as KDropdownMenu } from "@kobalte/core/dropdown-menu";
-import { Component, For, JSXElement } from "solid-js";
+import { ParentComponent } from "solid-js";
 import { tv } from "tailwind-variants";
 
 interface DropdownMenuProps {
-  items: { label: string; onSelect: () => void }[];
-  trigger: JSXElement;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
+  class?: string;
+}
+
+interface DropdownMenuComponents {
+  MenuItem: ParentComponent<{ onSelect: () => void }>;
+  Trigger: ParentComponent;
+  Content: ParentComponent<DropdownMenuProps>;
 }
 
 const menu = tv({
-  base: "dropdown-content menu bg-base-200 min-w-30 shadow-sm mt-2 p-2 rounded-box",
+  base: "dropdown-content menu bg-base-100 shadow-sm mt-2 rounded-box",
   variants: {
     size: {
       xs: "menu-xs",
@@ -22,28 +27,37 @@ const menu = tv({
 });
 
 const item = tv({
-  base: "px-3 py-2 cursor-pointer rounded",
+  base: "cursor-pointer rounded w-full",
 });
 
-export const DropdownMenu: Component<DropdownMenuProps> = (props) => (
-  <KDropdownMenu>
-    <KDropdownMenu.Trigger>{props.trigger}</KDropdownMenu.Trigger>
+export const DropdownMenu: ParentComponent & DropdownMenuComponents = (props) => (
+  <KDropdownMenu>{props.children}</KDropdownMenu>
+);
+
+export const DropdownMenuTrigger: ParentComponent = (props) => (
+  <KDropdownMenu.Trigger>{props.children}</KDropdownMenu.Trigger>
+);
+
+export const DropdownMenuContent: ParentComponent<DropdownMenuProps> = (props) => {
+  return (
     <KDropdownMenu.Portal>
-      <KDropdownMenu.Content class={menu({ size: props.size })}>
-        <ul>
-          <For each={props.items}>
-            {(itemObj) => (
-              <li>
-                <KDropdownMenu.Item class={item()} onSelect={itemObj.onSelect}>
-                  {itemObj.label}
-                </KDropdownMenu.Item>
-              </li>
-            )}
-          </For>
-        </ul>
+      <KDropdownMenu.Content as="ul" class={menu({ size: props.size, class: props.class })}>
+        {props.children}
       </KDropdownMenu.Content>
     </KDropdownMenu.Portal>
-  </KDropdownMenu>
-);
+  );
+};
+
+export const DropdownMenuItem: ParentComponent<{ onSelect: () => void }> = (props) => {
+  return (
+    <KDropdownMenu.Item as="li" class={item()} onSelect={props.onSelect}>
+      {props.children}
+    </KDropdownMenu.Item>
+  );
+};
+
+DropdownMenu.Trigger = DropdownMenuTrigger;
+DropdownMenu.Content = DropdownMenuContent;
+DropdownMenu.MenuItem = DropdownMenuItem;
 
 export default DropdownMenu;

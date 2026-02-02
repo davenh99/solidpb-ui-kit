@@ -46,10 +46,11 @@ Also to index.css (refer daisyui docs):
 - [x] Toast
 - [x] Tooltip
 - [ ] Kanban
-- [ ] ThemeSwitch
+- [x] ThemeSwitch
 - [x] ColorPicker
-- [ ] Navbar
-- [ ] Drawer
+- [x] Navbar
+- [x] Drawer
+- [ ] Table
 
 ### TODO dark theme
 
@@ -84,6 +85,7 @@ Also to index.css (refer daisyui docs):
 - [ ] ColorPicker
 - [ ] Navbar
 - [ ] Drawer
+- [ ] Table
 
 ### TODO (more thorough/complex implementation)
 
