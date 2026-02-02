@@ -13,25 +13,17 @@ type Story = StoryObj<typeof AlertDialog>;
 
 export const Default: Story = {
   render: () => {
-    const [open, setOpen] = createSignal(false);
-
     return (
       <div>
-        <AlertDialog
-          open={open()}
-          onOpenChange={setOpen}
-          title="Delete item"
-          description="Are you sure you want to delete this item?"
-          buttons={
-            <>
-              <AlertDialog.Button appearance="neutral" onClick={() => setOpen(false)}>
-                Cancel
-              </AlertDialog.Button>
+        <AlertDialog id="alert123">
+          <AlertDialog.Trigger>Open alert</AlertDialog.Trigger>
+          <AlertDialog.Content title="Delete Item">
+            <span>Are you sure you want to delete this item?</span>
+            <AlertDialog.Buttons>
+              <AlertDialog.Trigger appearance="neutral">Cancel</AlertDialog.Trigger>
               <AlertDialog.Button appearance="success">Confirm</AlertDialog.Button>
-            </>
-          }
-        >
-          <Button>Open AlertDialog</Button>
+            </AlertDialog.Buttons>
+          </AlertDialog.Content>
         </AlertDialog>
       </div>
     );

@@ -36,13 +36,13 @@ export const Modal: ParentComponent<ModalProps> & ModalComponents = (props) => {
 };
 
 export const ModalTrigger: ParentComponent = (props) => {
-  const { setOpen } = useContext(ModalContext)!;
+  const { setOpen } = useModal();
 
   return <Button onClick={() => setOpen(true)}>{props.children}</Button>;
 };
 
 export const ModalContent: ParentComponent = (props) => {
-  const { id, title, setOpen } = useContext(ModalContext)!;
+  const { id, title, setOpen } = useModal();
 
   return (
     <dialog id={id} class="modal">

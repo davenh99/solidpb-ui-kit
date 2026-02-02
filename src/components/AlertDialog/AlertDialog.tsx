@@ -1,19 +1,26 @@
-import { AlertDialog as KAlertDialog } from "@kobalte/core/alert-dialog";
-import { createSignal, JSXElement, ParentComponent, Setter } from "solid-js";
-import Delete from "lucide-solid/icons/x";
-import { Button, ButtonProps } from "../Button";
+import { createSignal, JSXElement, ParentComponent, useContext } from "solid-js";
+import Close from "lucide-solid/icons/x";
 
-interface Props {
+import { Button, ButtonProps } from "../Button";
+import { AlertDialogContext } from "./alertDialogContext";
+
+interface AlertDialogProps {
   id: string;
-  title: string;
-  description: string;
-  buttons?: JSXElement;
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  actions?: JSXElement;
 }
 
-export const AlertDialog: ParentComponent<Props> & { Button: typeof AlertDialogButton } = (props) => {
+interface AlertDialogContentProps {
+  title: string;
+}
+
+interface AlertDialogComponents {
+  Button: ParentComponent<ButtonProps>;
+  Buttons: ParentComponent;
+  Content: ParentComponent<AlertDialogContentProps>;
+  Trigger: ParentComponent<ButtonProps>;
+}
+
+export const AlertDialog: ParentComponent<AlertDialogProps> & AlertDialogComponents = (props) => {
   const [open, setOpen] = createSignal(false);
 
   const handleOpen = (v: boolean) => {
@@ -28,33 +35,64 @@ export const AlertDialog: ParentComponent<Props> & { Button: typeof AlertDialogB
   };
 
   return (
-    <KAlertDialog open={props.open} onOpenChange={props.onOpenChange} modal defaultOpen={props.defaultOpen}>
-      <KAlertDialog.Trigger>{props.children}</KAlertDialog.Trigger>
-      <KAlertDialog.Portal>
-        <KAlertDialog.Overlay class="fixed inset-0 z-50 bg-black/20" />
-        <div class="flex justify-center items-center fixed inset-0 z-50">
-          <KAlertDialog.Content class="card bg-base-100">
-            <div class="card-body p-4">
-              <div class="flex items-center justify-between mb-2">
-                <KAlertDialog.Title class="font-bold">{props.title}</KAlertDialog.Title>
-                <KAlertDialog.CloseButton class="btn btn-ghost btn-square btn-xs">
-                  <Delete size={20} />
-                </KAlertDialog.CloseButton>
-              </div>
-              <KAlertDialog.Description>{props.description}</KAlertDialog.Description>
-              <div class="flex justify-end space-x-2 mt-4">{props.buttons}</div>
-            </div>
-          </KAlertDialog.Content>
-        </div>
-      </KAlertDialog.Portal>
-    </KAlertDialog>
+    <AlertDialogContext.Provider value={{ id: props.id, open, setOpen: handleOpen }}>
+      {props.children}
+    </AlertDialogContext.Provider>
   );
 };
 
-const AlertDialogButton: ParentComponent<ButtonProps> = (props) => {
+export const AlertDialogButton: ParentComponent<ButtonProps> = (props) => {
   return <Button {...props} size="sm"></Button>;
 };
 
+export const AlertDialogButtons: ParentComponent = (props) => {
+  return <div class="flex justify-end gap-2">{props.children}</div>;
+};
+
+export const AlertDialogTrigger: ParentComponent<ButtonProps> = (props) => {
+  const { open, setOpen } = useAlertDialog();
+
+  return (
+    <Button {...props} size="sm" onClick={() => setOpen(!open())}>
+      {props.children}
+    </Button>
+  );
+};
+
+export const AlertDialogContent: ParentComponent<AlertDialogContentProps> = (props) => {
+  const { id, setOpen } = useAlertDialog();
+
+  return (
+    <dialog id={id} class="modal">
+      <div class="modal-box">
+        <div class="flex justify-between items-start">
+          {props.title && <h3 class="font-bold text-lg mb-2">{props.title}</h3>}
+          <Button variant="ghost" modifier="square" size="xs" onClick={() => setOpen(false)}>
+            <Close size={20} />
+          </Button>
+        </div>
+        <div class="flex flex-col gap-2">{props.children}</div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button class="cursor-auto">close</button>
+      </form>
+    </dialog>
+  );
+};
+
 AlertDialog.Button = AlertDialogButton;
+AlertDialog.Buttons = AlertDialogButtons;
+AlertDialog.Trigger = AlertDialogTrigger;
+AlertDialog.Content = AlertDialogContent;
 
 export default AlertDialog;
+
+export function useAlertDialog() {
+  const context = useContext(AlertDialogContext);
+
+  if (!context) {
+    throw new Error("useModal must be used within a Modal");
+  }
+
+  return context;
+}
