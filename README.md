@@ -51,7 +51,7 @@ Also to index.css (refer daisyui docs):
 - [x] Navbar
 - [x] Drawer
 - [ ] Table
-- [ ] BreadCrumbs
+- [x] BreadCrumbs
 - [ ] FilterBar
 - [ ] ActivityFeed
 
