@@ -51,6 +51,9 @@ Also to index.css (refer daisyui docs):
 - [x] Navbar
 - [x] Drawer
 - [ ] Table
+- [ ] BreadCrumbs
+- [ ] FilterBar
+- [ ] ActivityFeed
 
 ### TODO dark theme
 
@@ -86,6 +89,9 @@ Also to index.css (refer daisyui docs):
 - [ ] Navbar
 - [ ] Drawer
 - [ ] Table
+- [ ] BreadCrumbs
+- [ ] FilterBar
+- [ ] ActivityFeed
 
 ### TODO (more thorough/complex implementation)
 
