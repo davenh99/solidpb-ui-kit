@@ -9,7 +9,7 @@ const meta: Meta<typeof Input> = {
 export default meta;
 type Story = StoryObj<typeof Input>;
 
-const variants = ["none", "ghost"] as const;
+const variants = [undefined, "ghost"] as const;
 const appearances = [
   "primary",
   "secondary",

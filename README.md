@@ -32,7 +32,6 @@ Also to index.css (refer daisyui docs):
 - [x] Image
 - [x] Input
 - [x] Link
-- [ ] List
 - [x] Modal
 - [x] NumberInput
 - [x] SearchInput
@@ -53,7 +52,7 @@ Also to index.css (refer daisyui docs):
 - [ ] Table
 - [x] BreadCrumbs
 - [ ] FilterBar
-- [ ] ActivityFeed
+- [x] ActivityFeed
 
 ### TODO dark theme
 
@@ -70,7 +69,6 @@ Also to index.css (refer daisyui docs):
 - [ ] Image
 - [ ] Input
 - [ ] Link
-- [ ] List
 - [ ] Modal
 - [ ] NumberInput
 - [ ] SearchInput

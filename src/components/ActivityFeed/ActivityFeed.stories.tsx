@@ -12,6 +12,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
+    username: "John Doe",
+    profileUrl: "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
     feed: [
       {
         id: "1",
@@ -41,6 +43,8 @@ export const Default: Story = {
 export const SingleActivity: Story = {
   args: {
     class: "",
+    username: "John Doe",
+    profileUrl: "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
     feed: [
       {
         id: "1",
@@ -56,6 +60,8 @@ export const SingleActivity: Story = {
 export const EmptyFeed: Story = {
   args: {
     class: "",
+    username: "John Doe",
+    profileUrl: "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
     feed: [],
   },
 };
@@ -63,6 +69,8 @@ export const EmptyFeed: Story = {
 export const LongMessages: Story = {
   args: {
     class: "",
+    username: "John Doe",
+    profileUrl: "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
     feed: [
       {
         id: "1",

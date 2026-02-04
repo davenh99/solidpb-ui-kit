@@ -8,7 +8,6 @@ import {
   Row,
 } from "@tanstack/solid-table";
 import { Accessor, For, JSXElement, Show, createMemo, createSignal } from "solid-js";
-import { createVirtualizer } from "@tanstack/solid-virtual";
 import { tv } from "tailwind-variants";
 import Loader from "lucide-solid/icons/loader";
 import Plus from "lucide-solid/icons/plus";
@@ -16,7 +15,7 @@ import Plus from "lucide-solid/icons/plus";
 import { Button } from "../Button";
 import { Input } from "../Input";
 
-interface ListProps<T> {
+interface TableProps<T> {
   data?: Accessor<T[]>;
   filters?: Accessor<ColumnFiltersState>;
   createFunc?: () => Promise<void>; // if not set, don't show 'new' button
@@ -59,7 +58,7 @@ const DefaultRowRenderer = <T,>(props: {
   );
 };
 
-export const Table = <T,>(props: ListProps<T>): JSXElement => {
+export const Table = <T,>(props: TableProps<T>): JSXElement => {
   const [globalFilter, setGlobalFilter] = createSignal<string>();
   let parentRef!: HTMLDivElement;
 
@@ -83,24 +82,6 @@ export const Table = <T,>(props: ListProps<T>): JSXElement => {
   const rowCount = createMemo(() => table.getRowModel().rows.length);
   const dataExists = createMemo(() => props.data?.() || props.loading);
   const rows = createMemo(() => table.getRowModel().rows);
-
-  const virtualizer = createMemo(() =>
-    createVirtualizer({
-      get count() {
-        return rows().length;
-      },
-      getScrollElement: () => {
-        return parentRef;
-      },
-      estimateSize: () => 41,
-      get getItemKey() {
-        return (index: number) => rows()[index].id;
-      },
-    }),
-  );
-
-  const virtualRows = createMemo(() => virtualizer().getVirtualItems());
-  const totalSize = createMemo(() => virtualizer().getTotalSize());
 
   const containerStyle = createMemo(() => containerClass({ class: props.containerClass }));
 
@@ -175,24 +156,13 @@ export const Table = <T,>(props: ListProps<T>): JSXElement => {
             when={rowCount() > 0}
             fallback={props.emptyState || <div class="text-center py-4">No results found.</div>}
           >
-            <div
-              class="w-full"
-              style={{
-                height: `${totalSize()}px`,
-                position: "relative",
-              }}
-            >
-              <For each={virtualRows()}>
+            <div class="w-full">
+              <For each={rows()}>
                 {(virtualRow) => {
                   const row = rows()[virtualRow.index];
 
                   return (
-                    <div
-                      data-index={virtualRow.index}
-                      ref={(el) => queueMicrotask(() => virtualizer().measureElement(el))}
-                      class="absolute w-full"
-                      style={{ transform: `translateY(${virtualRow.start}px)` }}
-                    >
+                    <div class="absolute w-full">
                       <Show
                         when={props.renderRow}
                         fallback={

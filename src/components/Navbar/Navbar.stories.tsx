@@ -17,6 +17,7 @@ import { Card } from "../Card";
 import { BreadCrumbs } from "../BreadCrumbs";
 import { ProductForm, productData } from "../Form/Form.stories";
 import { ActivityFeed } from "../ActivityFeed";
+import { Kanban } from "../Kanban";
 
 const meta: Meta<typeof Navbar> = {
   title: "Full examples",
@@ -185,23 +186,22 @@ export const FormPageWithActivityFeed: Story = {
               </Card>
             </Container>
             <ActivityFeed
+              username="John Doe"
+              profileUrl="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
               feed={[
                 {
-                  id: "1",
                   username: "John Doe",
                   profileUrl: "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
                   message: "Just shared a new project update!",
                   timeStamp: "12:45 PM",
                 },
                 {
-                  id: "2",
                   username: "Jane Smith",
                   profileUrl: "https://img.daisyui.com/images/stock/photo-1534890812127-a8ba63d9d3ab.webp",
                   message: "Thanks for the feedback on the design!",
                   timeStamp: "1:20 PM",
                 },
                 {
-                  id: "3",
                   username: "Mike Johnson",
                   profileUrl: "https://img.daisyui.com/images/stock/photo-1535713624532-430d66e9e0e5.webp",
                   message: "Working on the new features for next release.",
@@ -210,6 +210,86 @@ export const FormPageWithActivityFeed: Story = {
               ]}
             />
           </div>
+        </Drawer.Content>
+        <Drawer.Drawer>
+          <Drawer.Trigger class="btn btn-ghost btn-square btn-sm hidden lg:flex mx-2 mt-2 w-12">
+            <DrawOpen size="24" class="is-drawer-open:hidden" />
+            <DrawClose size="24" class="is-drawer-close:hidden" />
+          </Drawer.Trigger>
+          <Drawer.Menu>
+            <Drawer.MenuItem icon={<Activity />} label="Item 1" />
+            <Drawer.MenuItem icon={<Ambulance />} label="Item 2" />
+            <Drawer.MenuItem icon={<ThumbsDown />} label="Item 3" />
+          </Drawer.Menu>
+        </Drawer.Drawer>
+      </Drawer>
+    );
+  },
+};
+
+export const KanbanPageWithNavbar: Story = {
+  render: () => {
+    return (
+      <Drawer id="drawer-2">
+        <Drawer.Content>
+          <Navbar>
+            <div class="flex items-center">
+              <Drawer.Trigger class="btn btn-ghost btn-square btn-sm lg:hidden">
+                <DrawOpen size="24" />
+              </Drawer.Trigger>
+              <Navbar.Brand>
+                <a>My App</a>
+              </Navbar.Brand>
+              <Navbar.Menu>
+                <Navbar.MenuItem>
+                  <a>Configuration</a>
+                </Navbar.MenuItem>
+                <Navbar.MenuItem>
+                  <Navbar.Submenu title="Settings">
+                    <Navbar.MenuItem>
+                      <a class="text-nowrap">Setting 1</a>
+                    </Navbar.MenuItem>
+                    <Navbar.MenuItem>
+                      <a class="text-nowrap">Setting 2</a>
+                    </Navbar.MenuItem>
+                    <Navbar.MenuItem>
+                      <a class="text-nowrap">Setting 3</a>
+                    </Navbar.MenuItem>
+                  </Navbar.Submenu>
+                </Navbar.MenuItem>
+                <Navbar.MenuItem>
+                  <a>Data</a>
+                </Navbar.MenuItem>
+              </Navbar.Menu>
+            </div>
+            <Navbar.Profile>
+              <DropdownMenu>
+                <DropdownMenu.Trigger>
+                  <Avatar fallback="DH" alt="Placeholder" size="md" class="btn btn-round" />
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content size="sm" class="min-w-50">
+                  <DropdownMenu.MenuItem onSelect={() => {}}>
+                    <a class={linkClass}>
+                      <span>Profile</span> <User size="16" />
+                    </a>
+                  </DropdownMenu.MenuItem>
+                  <DropdownMenu.MenuItem onSelect={() => {}}>
+                    <a class={linkClass}>
+                      <span>Settings</span> <Settings size="16" />
+                    </a>
+                  </DropdownMenu.MenuItem>
+                  <DropdownMenu.MenuItem onSelect={() => {}}>
+                    <a class={linkClass}>
+                      <span>Logout</span> <LogOut size="16" />
+                    </a>
+                  </DropdownMenu.MenuItem>
+                </DropdownMenu.Content>
+              </DropdownMenu>
+            </Navbar.Profile>
+          </Navbar>
+          <Container>
+            <Card>{/* <Kanban /> */}</Card>
+          </Container>
         </Drawer.Content>
         <Drawer.Drawer>
           <Drawer.Trigger class="btn btn-ghost btn-square btn-sm hidden lg:flex mx-2 mt-2 w-12">

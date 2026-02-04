@@ -17,7 +17,6 @@ export * from "./components/Image";
 export * from "./components/Input";
 export * from "./components/Kanban";
 export * from "./components/Link";
-export * from "./components/List";
 export * from "./components/Modal";
 export * from "./components/Navbar";
 export * from "./components/NumberInput";
