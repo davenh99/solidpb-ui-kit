@@ -20,6 +20,7 @@ export * from "./components/Link";
 export * from "./components/Modal";
 export * from "./components/Navbar";
 export * from "./components/NumberInput";
+export * from "./components/Pagination";
 export * from "./components/SearchInput";
 export * from "./components/Select";
 export * from "./components/Slider";

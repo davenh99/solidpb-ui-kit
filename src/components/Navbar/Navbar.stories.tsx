@@ -7,6 +7,7 @@ import DrawClose from "lucide-solid/icons/panel-left-close";
 import Activity from "lucide-solid/icons/activity";
 import Ambulance from "lucide-solid/icons/ambulance";
 import ThumbsDown from "lucide-solid/icons/thumbs-down";
+import { ColumnDef } from "@tanstack/solid-table";
 
 import Navbar from "./Navbar";
 import { Drawer } from "../Drawer";
@@ -18,6 +19,10 @@ import { BreadCrumbs } from "../BreadCrumbs";
 import { ProductForm, productData } from "../Form/Form.stories";
 import { ActivityFeed } from "../ActivityFeed";
 import { Kanban } from "../Kanban";
+import { defaultColumns, defaultTasks, type Task } from "../Kanban/Kanban.stories";
+import { Table } from "../Table";
+import { Checkbox } from "../Checkbox";
+import { createMemo } from "solid-js";
 
 const meta: Meta<typeof Navbar> = {
   title: "Full examples",
@@ -27,6 +32,61 @@ export default meta;
 type Story = StoryObj<typeof Navbar>;
 
 const linkClass = "justify-between";
+
+interface MockItem {
+  name: string;
+  description: string;
+  sellable: boolean;
+}
+
+const columns: ColumnDef<MockItem>[] = [
+  {
+    accessorKey: "name",
+    header: "Name",
+  },
+  {
+    accessorKey: "description",
+    header: "Description",
+  },
+  {
+    accessorKey: "inStock",
+    header: "In Stock",
+    cell: (ctx) => <Checkbox checked={ctx.getValue<boolean>()} appearance="neutral" />,
+  },
+];
+
+const tableData: MockItem[] = [
+  { name: "Laptop", description: "High-performance 15-inch laptop", sellable: true },
+  { name: "Mouse", description: "Wireless ergonomic mouse", sellable: true },
+  { name: "Keyboard", description: "Mechanical keyboard with RGB lighting", sellable: true },
+  { name: "Monitor", description: "27-inch 4K display", sellable: true },
+  { name: "Headphones", description: "Noise-canceling Bluetooth headphones", sellable: true },
+  { name: "Desk Lamp", description: "LED desk lamp with adjustable brightness", sellable: true },
+  { name: "USB Hub", description: "7-port USB 3.0 hub", sellable: true },
+  { name: "External SSD", description: "1TB portable SSD", sellable: true },
+  { name: "Cable Kit", description: "HDMI, USB-C, and DisplayPort cables", sellable: true },
+  { name: "Webcam", description: "1080p HD webcam with microphone", sellable: true },
+  { name: "Phone Stand", description: "Adjustable phone stand for desk", sellable: true },
+  { name: "Desk Organizer", description: "Multi-compartment desk organizer", sellable: true },
+  { name: "Power Bank", description: "20000mAh portable charger", sellable: true },
+  { name: "Cable Clips", description: "Cable management clips (pack of 10)", sellable: true },
+  { name: "Screen Protector", description: "Anti-glare screen protector", sellable: true },
+  { name: "Laptop Stand", description: "Adjustable aluminum laptop stand", sellable: true },
+  { name: "Phone Case", description: "Protective silicone phone case", sellable: true },
+  { name: "Screen Cleaner", description: "Microfiber cloth and cleaning solution", sellable: true },
+  { name: "Air Purifier", description: "Desktop air purifier with HEPA filter", sellable: true },
+  { name: "Desk Fan", description: "Quiet desktop fan with USB power", sellable: true },
+  { name: "Coffee Maker", description: "Personal coffee maker for office", sellable: true },
+  { name: "Water Bottle", description: "Insulated water bottle (32oz)", sellable: true },
+  { name: "Notebook", description: "Premium leather-bound notebook", sellable: true },
+  { name: "Pen Set", description: "Set of 5 premium ballpoint pens", sellable: true },
+  { name: "Desk Mat", description: "Large mousepad and desk mat", sellable: true },
+  { name: "Speaker", description: "Portable Bluetooth speaker", sellable: true },
+  { name: "Docking Station", description: "USB-C docking station for laptops", sellable: true },
+  { name: "Monitor Light", description: "Monitor glow light bar", sellable: true },
+  { name: "Cooling Pad", description: "Laptop cooling pad with dual fans", sellable: true },
+  { name: "Desk Shelf", description: "Floating shelf for desk organization", sellable: true },
+];
 
 export const TablePageWithNavbar: Story = {
   render: () => {
@@ -89,7 +149,15 @@ export const TablePageWithNavbar: Story = {
             </Navbar.Profile>
           </Navbar>
           <Container>
-            <Card>Content</Card>
+            <Card>
+              <Table<MockItem>
+                headers
+                columns={createMemo(() => columns)}
+                data={createMemo(() => tableData)}
+                onRowClick={(r) => {}}
+                size="xs"
+              />
+            </Card>
           </Container>
         </Drawer.Content>
         <Drawer.Drawer>
@@ -287,8 +355,8 @@ export const KanbanPageWithNavbar: Story = {
               </DropdownMenu>
             </Navbar.Profile>
           </Navbar>
-          <Container>
-            <Card>{/* <Kanban /> */}</Card>
+          <Container class="bg-base-200">
+            <Kanban<Task> items={defaultTasks} columns={defaultColumns} />
           </Container>
         </Drawer.Content>
         <Drawer.Drawer>

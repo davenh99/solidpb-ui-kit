@@ -14,6 +14,9 @@ export interface MockProduct {
   percentageDiscount: number;
   imageUrl: string;
   file: string;
+  id: string;
+  collectionId: string;
+  tablePosition?: number;
 }
 
 export const productData: MockProduct = {
@@ -26,6 +29,8 @@ export const productData: MockProduct = {
   percentageDiscount: 10,
   imageUrl: "https://placehold.co/128x128",
   file: "data.pdf",
+  id: "0",
+  collectionId: "0",
 };
 
 export const ProductForm = createForm<MockProduct>();

@@ -15,7 +15,7 @@ export interface NavbarComponents {
 }
 
 const navbar = tv({
-  base: "navbar bg-base-100 shadow-sm flex justify-between",
+  base: "navbar bg-base-100 shadow-sm flex justify-between sticky top-0 z-10",
 });
 
 export const Navbar: ParentComponent<NavbarProps> & NavbarComponents = (props) => {

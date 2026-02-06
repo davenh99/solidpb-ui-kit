@@ -52,7 +52,7 @@ export const DrawerContent: ParentComponent = (props) => {
 };
 
 const drawer = tv({
-  base: "flex bg-base-200 min-h-full flex-col is-drawer-close:w-16 is-drawer-open:w-50",
+  base: "flex bg-base-200 min-h-full flex-col is-drawer-close:w-16 is-drawer-open:w-50 border-base-300 border-r pt-2",
 });
 
 export const DrawerDrawer: ParentComponent<{ class?: string }> = (props) => {

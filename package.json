@@ -20,6 +20,8 @@
     "vite-plugin-solid": "^2.11.10"
   },
   "dependencies": {
+    "@atlaskit/pragmatic-drag-and-drop": "^1.7.7",
+    "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.1.0",
     "@kobalte/core": "^0.13.11",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/solid-table": "^8.21.3",

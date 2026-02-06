@@ -1,23 +1,27 @@
+import { Accessor, For, JSXElement, Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  createSolidTable,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  Row,
-} from "@tanstack/solid-table";
-import { Accessor, For, JSXElement, Show, createMemo, createSignal } from "solid-js";
+  attachClosestEdge,
+  extractClosestEdge,
+  type Edge,
+} from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import { draggable, dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import invariant from "tiny-invariant";
+import { ColumnDef, createSolidTable, flexRender, getCoreRowModel, Row } from "@tanstack/solid-table";
 import { tv } from "tailwind-variants";
 import Loader from "lucide-solid/icons/loader";
-import Plus from "lucide-solid/icons/plus";
+import GripVertical from "lucide-solid/icons/grip-vertical";
 
-import { Button } from "../Button";
-import { Input } from "../Input";
+import { iconSize } from "../../constants";
 
-interface TableProps<T> {
+interface TableItem {
+  id: string;
+  collectionId: string;
+  tablePosition?: number;
+}
+
+interface TableProps<T extends TableItem> {
   data?: Accessor<T[]>;
-  filters?: Accessor<ColumnFiltersState>;
   createFunc?: () => Promise<void>; // if not set, don't show 'new' button
   headerActions?: JSXElement;
   columns: Accessor<ColumnDef<T>[]>;
@@ -28,67 +32,212 @@ interface TableProps<T> {
   searchPlaceholder?: string;
   renderRow?: (row: Row<T>, onRowClick: (item: T) => void) => JSXElement;
   showItemCount?: boolean;
-  containerClass?: string;
+  class?: string;
   search?: boolean;
   headers?: boolean;
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  onReorderRow?: (oldInd: number, newInd: number) => void;
 }
 
-const containerClass = tv({
-  base: "overflow-y-auto relative flex-1",
+const tableClass = tv({
+  base: "table table-pin-rows",
+  variants: {
+    size: {
+      xs: "table-xs",
+      sm: "table-sm",
+      md: "table-md",
+      lg: "table-lg",
+      xl: "table-xl",
+    },
+  },
 });
 
-const DefaultRowRenderer = <T,>(props: {
+type DraggingState = "idle" | "dragging" | "dragging-over";
+
+interface TableRowProps<T extends TableItem> {
   row: Row<T>;
-  columns: Accessor<ColumnDef<T>[]>;
-  onClick: (item: T) => void;
-}): JSXElement => {
+  ind: number;
+  onRowClick: (item: T) => void;
+  dragEnabled: Accessor<boolean>;
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  flashSignal?: Accessor<string | null>;
+}
+
+const TableRow = <T extends TableItem>(props: TableRowProps<T>) => {
+  let ref!: HTMLTableRowElement;
+  let handleRef!: HTMLTableCellElement;
+  const [dragging, setDragging] = createSignal<DraggingState>("idle");
+  const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
+
+  // Trigger flash animation when this row is targeted
+  createEffect(() => {
+    if (props.flashSignal?.() === props.row.original.id && ref) {
+      ref.animate([{ backgroundColor: "color-mix(in srgb, var(--color-primary) 10%, transparent)" }, {}], {
+        duration: 700,
+        easing: "cubic-bezier(0.25, 0.1, 0.25, 1.0)",
+        iterations: 1,
+      });
+    }
+  });
+
+  createEffect(() => {
+    if (!props.dragEnabled()) return;
+
+    const element = ref;
+    invariant(element);
+
+    const dispose = dropTargetForElements({
+      element,
+      canDrop({ source }) {
+        // not allowing dropping on yourself
+        if (source.element === element) {
+          return false;
+        }
+        // only allowing same collection for now to be dropped on me
+        return source.data.collectionId == props.row.original.collectionId;
+      },
+      getIsSticky() {
+        return true;
+      },
+      getData({ input }) {
+        return attachClosestEdge(
+          { id: props.row.original.id, ind: props.row.index, collectionId: props.row.original.collectionId },
+          { element, input, allowedEdges: ["top", "bottom"] },
+        );
+      },
+      onDragEnter({ self }) {
+        const _closestEdge = extractClosestEdge(self.data);
+        setDragging("dragging-over");
+        setClosestEdge(_closestEdge);
+      },
+      onDrag({ self }) {
+        const _closestEdge = extractClosestEdge(self.data);
+        // Only need to update state if nothing has changed.
+        if (dragging() !== "dragging-over" || _closestEdge !== closestEdge()) {
+          setDragging("dragging-over");
+          setClosestEdge(_closestEdge);
+        }
+      },
+      onDragLeave() {
+        setDragging("idle");
+      },
+      onDrop() {
+        setDragging("idle");
+      },
+    });
+
+    onCleanup(dispose);
+  });
+
+  createEffect(() => {
+    if (!props.dragEnabled()) return;
+
+    const element = ref;
+    const elementHandle = handleRef;
+    invariant(element);
+    invariant(elementHandle);
+
+    const dispose = draggable({
+      element,
+      dragHandle: elementHandle,
+      getInitialData() {
+        return {
+          id: props.row.original.id,
+          ind: props.row.index,
+          collectionId: props.row.original.collectionId,
+        };
+      },
+      onDragStart() {
+        setDragging("dragging");
+      },
+      onDrop() {
+        setDragging("idle");
+      },
+    });
+
+    onCleanup(dispose);
+  });
+
   return (
-    <div
-      class="flex justify-between items-center cursor-pointer text-sm border-b py-2"
-      onClick={() => props.onClick(props.row.original)}
+    <tr
+      ref={ref}
+      data-drop-edge={dragging() === "dragging-over" ? (closestEdge() ?? undefined) : undefined}
+      class="row-hover relative"
+      style={{ opacity: dragging() == "dragging" ? 0.2 : 1 }}
+      onClick={() => props.onRowClick(props.row.original)}
     >
+      <Show when={props.row.original.tablePosition !== undefined}>
+        <th ref={handleRef} class="cursor-pointer">
+          <GripVertical size={iconSize[props.size ?? "md"]} />
+        </th>
+      </Show>
       <For each={props.row.getVisibleCells()}>
-        {(cell) => (
-          <div class="flex-1 overflow-hidden truncate p-1">
-            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-          </div>
-        )}
+        {(cell) => <td>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>}
       </For>
-    </div>
+    </tr>
   );
 };
 
-export const Table = <T,>(props: TableProps<T>): JSXElement => {
-  const [globalFilter, setGlobalFilter] = createSignal<string>();
-  let parentRef!: HTMLDivElement;
-
+export const Table = <T extends TableItem>(props: TableProps<T>): JSXElement => {
   const table = createSolidTable({
     get data() {
       return props.data?.() || [];
     },
     columns: props.columns(),
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      get globalFilter() {
-        return globalFilter();
+  });
+  const rowCount = createMemo(() => table.getRowModel().rows.length);
+  const rows = createMemo(() => table.getRowModel().rows);
+  const dragEnabled = createMemo(() => {
+    return props.data?.()[0].tablePosition !== undefined;
+  });
+  const [flashedRowId, setFlashedRowId] = createSignal<string | null>(null);
+
+  createEffect(() => {
+    if (!rows().length || !dragEnabled()) return;
+
+    const dispose = monitorForElements({
+      canMonitor({ source }) {
+        return source.data.collectionId == props.data?.()[0].collectionId;
       },
-      get columnFilters() {
-        return props.filters?.();
+      onDrop({ location, source }) {
+        const target = location.current.dropTargets[0];
+        if (!target) {
+          return;
+        }
+
+        const sourceData = source.data;
+        const targetData = target.data;
+
+        if (sourceData.collectionId !== targetData.collectionId) {
+          return;
+        }
+
+        if ((sourceData.ind as number) < 0 || (targetData.ind as number) < 0) {
+          return;
+        }
+
+        const closestEdgeOfTarget = extractClosestEdge(targetData);
+
+        const newInd =
+          closestEdgeOfTarget === "top" ? (targetData.ind as number) : (targetData.ind as number) + 1;
+
+        if ((sourceData.ind as number) !== newInd) {
+          setFlashedRowId(sourceData.id as string);
+          setTimeout(() => setFlashedRowId(null), 10);
+        }
+
+        props.onReorderRow?.(sourceData.ind as number, newInd);
       },
-    },
+    });
+
+    onCleanup(dispose);
   });
 
-  const rowCount = createMemo(() => table.getRowModel().rows.length);
-  const dataExists = createMemo(() => props.data?.() || props.loading);
-  const rows = createMemo(() => table.getRowModel().rows);
-
-  const containerStyle = createMemo(() => containerClass({ class: props.containerClass }));
-
   return (
-    <div class="flex flex-col h-full max-h-[inherit]">
+    <div class="overflow-x-auto">
       <Show
-        when={dataExists()}
+        when={!props.loading}
         fallback={
           props.loadingFallback || (
             <div class="fixed inset-0 z-10 flex items-center justify-center">
@@ -97,87 +246,45 @@ export const Table = <T,>(props: TableProps<T>): JSXElement => {
           )
         }
       >
-        <div class="sticky top-0 bg-charcoal-500/95 backdrop-blur-xs">
-          <Show when={props.search}>
-            <div class="flex items-center space-x-2 mt-3 mb-1">
-              <Show when={props.createFunc}>
-                <Button
-                  class="flex text-sm items-center pl-1 pr-2"
-                  appearance="success"
-                  onClick={props.createFunc}
-                >
-                  <Plus size={20} />
-                  New
-                </Button>
-              </Show>
-
-              <div class="w-full relative">
-                <Input
-                  class="w-full"
-                  value={globalFilter()}
-                  onChange={setGlobalFilter}
-                  inputProps={{ placeholder: props.searchPlaceholder ?? "Search", class: "p-1" }}
-                />
-                {props.loading && (
-                  <Loader
-                    size={16}
-                    class="absolute animate-spin top-1/2 transform -translate-y-1/2 right-2"
-                  />
-                )}
-              </div>
-            </div>
-          </Show>
-
-          <Show when={props.headerActions}>{props.headerActions}</Show>
-
-          <Show when={props.showItemCount}>
-            <p class="text-xs italic mb-1">{rowCount()} items</p>
-          </Show>
-        </div>
-
-        <Show when={props.headers}>
-          <For each={table.getHeaderGroups()}>
-            {(headerGroup) => (
-              <div class="flex flex-row w-full justify-between sticky top-0 backdrop-blur-sm p-2 z-10">
-                <For each={headerGroup.headers}>
-                  {(header) => (
-                    <div class="text-left font-bold">
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                    </div>
+        <Show
+          when={rowCount() > 0}
+          fallback={props.emptyState || <div class="text-center py-4">No results found.</div>}
+        >
+          <table class={tableClass({ class: props.class })}>
+            <Show when={props.headers}>
+              <thead>
+                <For each={table.getHeaderGroups()}>
+                  {(headerGroup) => (
+                    <tr>
+                      <Show when={props.data?.()[0].tablePosition !== undefined}>
+                        <th></th>
+                      </Show>
+                      <For each={headerGroup.headers}>
+                        {(header) => (
+                          <th>{flexRender(header.column.columnDef.header, header.getContext())}</th>
+                        )}
+                      </For>
+                    </tr>
                   )}
                 </For>
-              </div>
-            )}
-          </For>
-        </Show>
+              </thead>
+            </Show>
 
-        <div ref={parentRef} class={containerStyle()}>
-          <Show
-            when={rowCount() > 0}
-            fallback={props.emptyState || <div class="text-center py-4">No results found.</div>}
-          >
-            <div class="w-full">
+            <tbody>
               <For each={rows()}>
-                {(virtualRow) => {
-                  const row = rows()[virtualRow.index];
-
-                  return (
-                    <div class="absolute w-full">
-                      <Show
-                        when={props.renderRow}
-                        fallback={
-                          <DefaultRowRenderer row={row} columns={props.columns} onClick={props.onRowClick} />
-                        }
-                      >
-                        {props.renderRow!(row, props.onRowClick)}
-                      </Show>
-                    </div>
-                  );
-                }}
+                {(row, ind) => (
+                  <TableRow<T>
+                    row={row}
+                    ind={ind()}
+                    onRowClick={() => props.onRowClick(row.original)}
+                    dragEnabled={dragEnabled}
+                    flashSignal={() => flashedRowId()}
+                  />
+                )}
               </For>
-            </div>
-          </Show>
-        </div>
+            </tbody>
+          </table>
+        </Show>
       </Show>
     </div>
   );

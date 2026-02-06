@@ -66,3 +66,22 @@
 .animate-fade-in-up {
   animation: fade-in-up 120ms ease-out;
 }
+
+tr[data-drop-edge="top"] > * {
+  box-shadow:
+    0 -1px 0 0 var(--color-primary),
+    inset 0 1px 0 0 var(--color-primary);
+}
+
+tbody tr:first-child[data-drop-edge="top"] > * {
+  box-shadow: inset 0 2px 0 0 var(--color-primary);
+}
+
+tr[data-drop-edge="bottom"] > * {
+  box-shadow: 0 1px 0 0 var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+tbody tr:last-child[data-drop-edge="bottom"] > * {
+  box-shadow: inset 0 -2px 0 0 var(--color-primary);
+}
