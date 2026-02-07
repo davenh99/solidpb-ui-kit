@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
-import { Kanban, type KanbanItem, type KanbanColumn } from ".";
+import { Kanban } from ".";
 import { createSignal } from "solid-js";
 
 const meta: Meta<typeof Kanban> = {
@@ -13,13 +13,14 @@ type Story = StoryObj<typeof Kanban>;
 export interface Task extends KanbanItem {
   priority?: "low" | "medium" | "high";
   assignee?: string;
+  description?: string;
 }
 
-export const defaultColumns: KanbanColumn[] = [
-  { id: "todo", title: "To Do", description: "Tasks to be started" },
-  { id: "in-progress", title: "In Progress", description: "Currently being worked on" },
-  { id: "review", title: "In Review", description: "Awaiting review" },
-  { id: "done", title: "Done", description: "Completed tasks" },
+export const defaultColumns: KanbanState[] = [
+  { id: "todo", title: "To Do", collectionId: "0", statePosition: 0 },
+  { id: "in-progress", title: "In Progress", collectionId: "0", statePosition: 1 },
+  { id: "review", title: "In Review", collectionId: "0", statePosition: 2 },
+  { id: "done", title: "Done", collectionId: "0", statePosition: 3 },
 ];
 
 export const defaultTasks: Task[] = [
@@ -27,55 +28,67 @@ export const defaultTasks: Task[] = [
     id: "1",
     title: "Design homepage",
     description: "Create mockups and wireframes",
-    status: "todo",
+    kanbanState: "todo",
     priority: "high",
     assignee: "Alice",
+    kanbanPosition: 0,
+    collectionId: "0",
   },
   {
     id: "2",
     title: "Setup database",
     description: "Configure PostgreSQL and migrations",
-    status: "todo",
+    kanbanState: "todo",
     priority: "high",
     assignee: "Bob",
+    kanbanPosition: 1,
+    collectionId: "0",
   },
   {
     id: "3",
     title: "Implement auth",
     description: "JWT-based authentication",
-    status: "in-progress",
+    kanbanState: "in-progress",
     priority: "high",
     assignee: "Charlie",
+    kanbanPosition: 0,
+    collectionId: "0",
   },
   {
     id: "4",
     title: "Create API endpoints",
     description: "REST API for user management",
-    status: "in-progress",
+    kanbanState: "in-progress",
     priority: "medium",
     assignee: "Alice",
+    kanbanPosition: 1,
+    collectionId: "0",
   },
   {
     id: "5",
     title: "Unit tests",
     description: "Test coverage for core modules",
-    status: "review",
+    kanbanState: "review",
     priority: "medium",
     assignee: "Bob",
+    kanbanPosition: 0,
+    collectionId: "0",
   },
   {
     id: "6",
     title: "Deploy staging",
     description: "Deploy to staging environment",
-    status: "done",
+    kanbanState: "done",
     priority: "low",
     assignee: "Charlie",
+    kanbanPosition: 0,
+    collectionId: "0",
   },
 ];
 
 export const Default: Story = {
   render: () => (
-    <Kanban<Task>
+    <Kanban<Task, KanbanState>
       items={defaultTasks}
       columns={defaultColumns}
       onCardClick={(item) => console.log("Clicked:", item)}
@@ -85,7 +98,7 @@ export const Default: Story = {
 
 export const CustomRendering: Story = {
   render: () => (
-    <Kanban<Task>
+    <Kanban<Task, KanbanState>
       items={defaultTasks}
       columns={defaultColumns}
       renderItem={(item) => (
@@ -116,14 +129,14 @@ export const CustomRendering: Story = {
 export const MinimalCards: Story = {
   render: () => {
     const minimalTasks: Task[] = [
-      { id: "1", title: "Task One", status: "todo" },
-      { id: "2", title: "Task Two", status: "todo" },
-      { id: "3", title: "Task Three", status: "in-progress" },
-      { id: "4", title: "Task Four", status: "done" },
+      { id: "1", title: "Task One", kanbanState: "todo", collectionId: "0" },
+      { id: "2", title: "Task Two", kanbanState: "todo", collectionId: "0" },
+      { id: "3", title: "Task Three", kanbanState: "in-progress", collectionId: "0" },
+      { id: "4", title: "Task Four", kanbanState: "done", collectionId: "0" },
     ];
 
     return (
-      <Kanban<Task>
+      <Kanban<Task, KanbanState>
         items={minimalTasks}
         columns={defaultColumns}
         renderItem={(item) => <span class="font-medium">{item.title}</span>}
@@ -134,7 +147,11 @@ export const MinimalCards: Story = {
 
 export const EmptyColumns: Story = {
   render: () => (
-    <Kanban<Task> items={[]} columns={defaultColumns} onCardClick={(item) => console.log("Clicked:", item)} />
+    <Kanban<Task, KanbanState>
+      items={[]}
+      columns={defaultColumns}
+      onCardClick={(item) => console.log("Clicked:", item)}
+    />
   ),
 };
 
@@ -147,7 +164,7 @@ export const Interactive: Story = {
         <div>
           <p class="text-sm text-base-content/60 mb-4">Click on cards to log to console</p>
         </div>
-        <Kanban<Task>
+        <Kanban<Task, KanbanState>
           items={tasks()}
           columns={defaultColumns}
           renderItem={(item) => (

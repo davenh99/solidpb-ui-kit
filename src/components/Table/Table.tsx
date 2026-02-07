@@ -12,6 +12,7 @@ import { tv } from "tailwind-variants";
 import Loader from "lucide-solid/icons/loader";
 import GripVertical from "lucide-solid/icons/grip-vertical";
 
+import { triggerFlash } from "../../methods/triggerFlash";
 import { iconSize } from "../../constants";
 
 interface TableItem {
@@ -21,7 +22,7 @@ interface TableItem {
 }
 
 interface TableProps<T extends TableItem> {
-  data?: Accessor<T[]>;
+  data: T[];
   createFunc?: () => Promise<void>; // if not set, don't show 'new' button
   headerActions?: JSXElement;
   columns: Accessor<ColumnDef<T>[]>;
@@ -36,7 +37,7 @@ interface TableProps<T extends TableItem> {
   search?: boolean;
   headers?: boolean;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
-  onReorderRow?: (oldInd: number, newInd: number) => void;
+  onReorderRow?: (item: T, oldInd: number, newInd: number) => void;
 }
 
 const tableClass = tv({
@@ -51,8 +52,6 @@ const tableClass = tv({
     },
   },
 });
-
-type DraggingState = "idle" | "dragging" | "dragging-over";
 
 interface TableRowProps<T extends TableItem> {
   row: Row<T>;
@@ -69,14 +68,9 @@ const TableRow = <T extends TableItem>(props: TableRowProps<T>) => {
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
 
-  // Trigger flash animation when this row is targeted
   createEffect(() => {
     if (props.flashSignal?.() === props.row.original.id && ref) {
-      ref.animate([{ backgroundColor: "color-mix(in srgb, var(--color-primary) 10%, transparent)" }, {}], {
-        duration: 700,
-        easing: "cubic-bezier(0.25, 0.1, 0.25, 1.0)",
-        iterations: 1,
-      });
+      triggerFlash(ref);
     }
   });
 
@@ -181,7 +175,7 @@ const TableRow = <T extends TableItem>(props: TableRowProps<T>) => {
 export const Table = <T extends TableItem>(props: TableProps<T>): JSXElement => {
   const table = createSolidTable({
     get data() {
-      return props.data?.() || [];
+      return props.data || [];
     },
     columns: props.columns(),
     getCoreRowModel: getCoreRowModel(),
@@ -189,7 +183,7 @@ export const Table = <T extends TableItem>(props: TableProps<T>): JSXElement => 
   const rowCount = createMemo(() => table.getRowModel().rows.length);
   const rows = createMemo(() => table.getRowModel().rows);
   const dragEnabled = createMemo(() => {
-    return props.data?.()[0].tablePosition !== undefined;
+    return props.data.length > 0 && "tablePosition" in props.data[0];
   });
   const [flashedRowId, setFlashedRowId] = createSignal<string | null>(null);
 
@@ -198,7 +192,7 @@ export const Table = <T extends TableItem>(props: TableProps<T>): JSXElement => 
 
     const dispose = monitorForElements({
       canMonitor({ source }) {
-        return source.data.collectionId == props.data?.()[0].collectionId;
+        return source.data.collectionId == props.data[0].collectionId;
       },
       onDrop({ location, source }) {
         const target = location.current.dropTargets[0];
@@ -227,7 +221,7 @@ export const Table = <T extends TableItem>(props: TableProps<T>): JSXElement => 
           setTimeout(() => setFlashedRowId(null), 10);
         }
 
-        props.onReorderRow?.(sourceData.ind as number, newInd);
+        props.onReorderRow?.(props.data[sourceData.ind as number], sourceData.ind as number, newInd);
       },
     });
 
@@ -256,7 +250,7 @@ export const Table = <T extends TableItem>(props: TableProps<T>): JSXElement => 
                 <For each={table.getHeaderGroups()}>
                   {(headerGroup) => (
                     <tr>
-                      <Show when={props.data?.()[0].tablePosition !== undefined}>
+                      <Show when={dragEnabled()}>
                         <th></th>
                       </Show>
                       <For each={headerGroup.headers}>

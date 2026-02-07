@@ -37,6 +37,8 @@ interface MockItem {
   name: string;
   description: string;
   sellable: boolean;
+  id: string;
+  collectionId: string;
 }
 
 const columns: ColumnDef<MockItem>[] = [
@@ -56,36 +58,186 @@ const columns: ColumnDef<MockItem>[] = [
 ];
 
 const tableData: MockItem[] = [
-  { name: "Laptop", description: "High-performance 15-inch laptop", sellable: true },
-  { name: "Mouse", description: "Wireless ergonomic mouse", sellable: true },
-  { name: "Keyboard", description: "Mechanical keyboard with RGB lighting", sellable: true },
-  { name: "Monitor", description: "27-inch 4K display", sellable: true },
-  { name: "Headphones", description: "Noise-canceling Bluetooth headphones", sellable: true },
-  { name: "Desk Lamp", description: "LED desk lamp with adjustable brightness", sellable: true },
-  { name: "USB Hub", description: "7-port USB 3.0 hub", sellable: true },
-  { name: "External SSD", description: "1TB portable SSD", sellable: true },
-  { name: "Cable Kit", description: "HDMI, USB-C, and DisplayPort cables", sellable: true },
-  { name: "Webcam", description: "1080p HD webcam with microphone", sellable: true },
-  { name: "Phone Stand", description: "Adjustable phone stand for desk", sellable: true },
-  { name: "Desk Organizer", description: "Multi-compartment desk organizer", sellable: true },
-  { name: "Power Bank", description: "20000mAh portable charger", sellable: true },
-  { name: "Cable Clips", description: "Cable management clips (pack of 10)", sellable: true },
-  { name: "Screen Protector", description: "Anti-glare screen protector", sellable: true },
-  { name: "Laptop Stand", description: "Adjustable aluminum laptop stand", sellable: true },
-  { name: "Phone Case", description: "Protective silicone phone case", sellable: true },
-  { name: "Screen Cleaner", description: "Microfiber cloth and cleaning solution", sellable: true },
-  { name: "Air Purifier", description: "Desktop air purifier with HEPA filter", sellable: true },
-  { name: "Desk Fan", description: "Quiet desktop fan with USB power", sellable: true },
-  { name: "Coffee Maker", description: "Personal coffee maker for office", sellable: true },
-  { name: "Water Bottle", description: "Insulated water bottle (32oz)", sellable: true },
-  { name: "Notebook", description: "Premium leather-bound notebook", sellable: true },
-  { name: "Pen Set", description: "Set of 5 premium ballpoint pens", sellable: true },
-  { name: "Desk Mat", description: "Large mousepad and desk mat", sellable: true },
-  { name: "Speaker", description: "Portable Bluetooth speaker", sellable: true },
-  { name: "Docking Station", description: "USB-C docking station for laptops", sellable: true },
-  { name: "Monitor Light", description: "Monitor glow light bar", sellable: true },
-  { name: "Cooling Pad", description: "Laptop cooling pad with dual fans", sellable: true },
-  { name: "Desk Shelf", description: "Floating shelf for desk organization", sellable: true },
+  {
+    collectionId: "0",
+    id: "0",
+    name: "Laptop",
+    description: "High-performance 15-inch laptop",
+    sellable: true,
+  },
+  { collectionId: "0", id: "0", name: "Mouse", description: "Wireless ergonomic mouse", sellable: true },
+  {
+    collectionId: "0",
+    id: "1",
+    name: "Keyboard",
+    description: "Mechanical keyboard with RGB lighting",
+    sellable: true,
+  },
+  { collectionId: "0", id: "0", name: "Monitor", description: "27-inch 4K display", sellable: true },
+  {
+    collectionId: "0",
+    id: "2",
+    name: "Headphones",
+    description: "Noise-canceling Bluetooth headphones",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "3",
+    name: "Desk Lamp",
+    description: "LED desk lamp with adjustable brightness",
+    sellable: true,
+  },
+  { collectionId: "0", id: "0", name: "USB Hub", description: "7-port USB 3.0 hub", sellable: true },
+  { collectionId: "0", id: "0", name: "External SSD", description: "1TB portable SSD", sellable: true },
+  {
+    collectionId: "0",
+    id: "4",
+    name: "Cable Kit",
+    description: "HDMI, USB-C, and DisplayPort cables",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "5",
+    name: "Webcam",
+    description: "1080p HD webcam with microphone",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "6",
+    name: "Phone Stand",
+    description: "Adjustable phone stand for desk",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "7",
+    name: "Desk Organizer",
+    description: "Multi-compartment desk organizer",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "8",
+    name: "Power Bank",
+    description: "20000mAh portable charger",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "9",
+    name: "Cable Clips",
+    description: "Cable management clips (pack of 10)",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "10",
+    name: "Screen Protector",
+    description: "Anti-glare screen protector",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "11",
+    name: "Laptop Stand",
+    description: "Adjustable aluminum laptop stand",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "12",
+    name: "Phone Case",
+    description: "Protective silicone phone case",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "13",
+    name: "Screen Cleaner",
+    description: "Microfiber cloth and cleaning solution",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "14",
+    name: "Air Purifier",
+    description: "Desktop air purifier with HEPA filter",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "15",
+    name: "Desk Fan",
+    description: "Quiet desktop fan with USB power",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "16",
+    name: "Coffee Maker",
+    description: "Personal coffee maker for office",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "17",
+    name: "Water Bottle",
+    description: "Insulated water bottle (32oz)",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "18",
+    name: "Notebook",
+    description: "Premium leather-bound notebook",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "19",
+    name: "Pen Set",
+    description: "Set of 5 premium ballpoint pens",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "20",
+    name: "Desk Mat",
+    description: "Large mousepad and desk mat",
+    sellable: true,
+  },
+  { collectionId: "0", id: "21", name: "Speaker", description: "Portable Bluetooth speaker", sellable: true },
+  {
+    collectionId: "0",
+    id: "22",
+    name: "Docking Station",
+    description: "USB-C docking station for laptops",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "23",
+    name: "Monitor Light",
+    description: "Monitor glow light bar",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "24",
+    name: "Cooling Pad",
+    description: "Laptop cooling pad with dual fans",
+    sellable: true,
+  },
+  {
+    collectionId: "0",
+    id: "25",
+    name: "Desk Shelf",
+    description: "Floating shelf for desk organization",
+    sellable: true,
+  },
 ];
 
 export const TablePageWithNavbar: Story = {
@@ -153,7 +305,7 @@ export const TablePageWithNavbar: Story = {
               <Table<MockItem>
                 headers
                 columns={createMemo(() => columns)}
-                data={createMemo(() => tableData)}
+                data={createMemo(() => tableData)()}
                 onRowClick={(r) => {}}
                 size="xs"
               />
@@ -356,7 +508,7 @@ export const KanbanPageWithNavbar: Story = {
             </Navbar.Profile>
           </Navbar>
           <Container class="bg-base-200">
-            <Kanban<Task> items={defaultTasks} columns={defaultColumns} />
+            <Kanban<Task, KanbanState> items={defaultTasks} columns={defaultColumns} />
           </Container>
         </Drawer.Content>
         <Drawer.Drawer>

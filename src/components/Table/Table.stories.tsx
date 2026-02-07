@@ -219,11 +219,11 @@ export const Default: Story = {
     const [perPage, setPerPage] = createSignal(2);
     const [page, setPage] = createSignal(0);
 
-    const reorder = (oldInd: number, newInd: number) => {
+    const reorder = (item: MockProduct, oldInd: number, newInd: number) => {
       const curData = [...data()];
-      const [movedItem] = curData.splice(oldInd, 1);
+      curData.splice(oldInd, 1);
       const adjustedNewInd = newInd > oldInd ? newInd - 1 : newInd;
-      curData.splice(adjustedNewInd, 0, movedItem);
+      curData.splice(adjustedNewInd, 0, item);
       setData(curData);
     };
 
@@ -280,7 +280,7 @@ export const Default: Story = {
               headers
               size="sm"
               columns={createMemo(() => columns)}
-              data={paginatedData}
+              data={paginatedData()}
               onRowClick={(r) =>
                 toaster.show((props) => (
                   <Toast {...props} title="Item clicked" msg={`You clicked on ${r.name}`} />

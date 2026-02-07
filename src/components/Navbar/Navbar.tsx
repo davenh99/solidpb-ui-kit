@@ -41,8 +41,8 @@ export const NavbarSubmenu: ParentComponent<{ title: string }> = (props) => {
         <summary>{props.title}</summary>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content>
-          <ul class="menu bg-base-100 shadow-sm rounded-box mt-2 z-100">{props.children}</ul>
+        <DropdownMenu.Content class="z-50">
+          <ul class="menu bg-base-100 shadow-sm rounded-box mt-2">{props.children}</ul>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu>
