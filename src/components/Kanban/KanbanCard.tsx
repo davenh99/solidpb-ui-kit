@@ -8,6 +8,8 @@ import { dropTargetForElements, draggable } from "@atlaskit/pragmatic-drag-and-d
 import invariant from "tiny-invariant";
 import { tv } from "tailwind-variants";
 
+import { triggerFlash } from "../../methods/triggerFlash";
+
 const itemCard = tv({
   base: "kanban-card card bg-base-100 p-2 rounded-md cursor-pointer hover:shadow-xs transition-shadow",
 });
@@ -19,6 +21,7 @@ const itemTitle = tv({
 export interface KanbanCardProps<T extends KanbanItem> {
   item: T;
   dragEnabled: Accessor<boolean>;
+  flashSignal: Accessor<string | null>;
   onCardClick?: () => void;
   renderItem?: (item: T) => JSXElement;
   class?: string;
@@ -28,6 +31,12 @@ export const KanbanCard = <T extends KanbanItem>(props: KanbanCardProps<T>) => {
   let ref!: HTMLDivElement;
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [closestEdge, setClosestEdge] = createSignal<Edge | null>();
+
+  createEffect(() => {
+    if (props.flashSignal?.() === props.item.id && ref) {
+      triggerFlash(ref);
+    }
+  });
 
   createEffect(() => {
     if (!props.dragEnabled()) return;
@@ -42,8 +51,11 @@ export const KanbanCard = <T extends KanbanItem>(props: KanbanCardProps<T>) => {
         if (source.element === element) {
           return false;
         }
+        if (!source.data.item) {
+          return false;
+        }
         // only allowing same collection for now to be dropped on me
-        return source.data.collectionId == props.item.collectionId && !!source.data.isKanbanCard;
+        return (source.data.item as T).collectionId == props.item.collectionId && !!source.data.isKanbanCard;
       },
       getIsSticky() {
         return true;
@@ -51,10 +63,7 @@ export const KanbanCard = <T extends KanbanItem>(props: KanbanCardProps<T>) => {
       getData({ input }) {
         return attachClosestEdge(
           {
-            id: props.item.id,
-            ind: props.item.kanbanPosition,
-            collectionId: props.item.collectionId,
-            state: props.item.kanbanState,
+            item: props.item,
             isKanbanCard: true,
           },
           { element, input, allowedEdges: ["top", "bottom"] },
@@ -94,10 +103,7 @@ export const KanbanCard = <T extends KanbanItem>(props: KanbanCardProps<T>) => {
       element,
       getInitialData() {
         return {
-          id: props.item.id,
-          ind: props.item.kanbanPosition,
-          collectionId: props.item.collectionId,
-          state: props.item.kanbanState,
+          item: props.item,
           isKanbanCard: true,
         };
       },
@@ -115,6 +121,7 @@ export const KanbanCard = <T extends KanbanItem>(props: KanbanCardProps<T>) => {
   return (
     <div
       data-drop-edge={dragging() === "dragging-over" ? (closestEdge() ?? undefined) : undefined}
+      style={{ opacity: dragging() == "dragging" ? 0.2 : 1 }}
       ref={ref}
       class={itemCard({ class: props.class })}
       onClick={props.onCardClick}

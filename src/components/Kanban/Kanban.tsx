@@ -1,13 +1,12 @@
-import { createEffect, createMemo, For, JSXElement, onCleanup } from "solid-js";
+import { createEffect, createMemo, createSignal, For, JSXElement, onCleanup } from "solid-js";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { tv } from "tailwind-variants";
 
-import { triggerFlash } from "../../methods/triggerFlash";
 import { KanbanColumn } from "./KanbanColumn";
 
 const container = tv({
-  base: "flex gap-2 overflow-x-auto",
+  base: "flex gap-2 overflow-x-auto p-2",
 });
 
 export interface KanbanProps<T extends KanbanItem, K extends KanbanState> {
@@ -18,27 +17,31 @@ export interface KanbanProps<T extends KanbanItem, K extends KanbanState> {
   containerClass?: string;
   columnClass?: string;
   cardClass?: string;
-  onCreateItem?: (item: T) => void;
+  onCreateItem?: (title: string, state: string) => void;
   onCollapseColumn?: (collapsed: boolean) => void;
   onReorderCard?: (item: T, oldPos: number, newPos: number, oldState: string, newState: string) => void;
   onReorderColumn?: (col: K, oldPos: number, newPos: number) => void;
 }
 
 export const Kanban = <T extends KanbanItem, K extends KanbanState>(props: KanbanProps<T, K>) => {
-  const getItemsByState = (state: string) => {
-    return props.items.filter((item) => item.kanbanState === state);
-  };
+  const sortedColumns = createMemo(() => {
+    return props.columns.toSorted((a, b) => (a.statePosition ?? 0) - (b.statePosition ?? 0));
+  });
   const colDragEnabled = createMemo(() => {
     const data = props.columns;
     return !!data && data.length > 0 && "statePosition" in data[0];
   });
+  const [flashedColId, setFlashedColId] = createSignal<string | null>(null);
 
   createEffect(() => {
     if (!props.items.length || !colDragEnabled()) return;
 
     const dispose = monitorForElements({
       canMonitor({ source }) {
-        return source.data.collectionId == props.items[0].collectionId && !!source.data.isKanbanColumn;
+        return (
+          (source.data.item as K | T).collectionId == props.items[0].collectionId &&
+          !!source.data.isKanbanColumn
+        );
       },
       onDrop({ location, source }) {
         const target = location.current.dropTargets[0];
@@ -48,26 +51,34 @@ export const Kanban = <T extends KanbanItem, K extends KanbanState>(props: Kanba
 
         const sourceData = source.data;
         const targetData = target.data;
+        const sourceItem = sourceData.item as K;
+        const targetItem = targetData.item as K;
 
-        if (sourceData.collectionId !== targetData.collectionId || !source.data.isKanbanColumn) {
+        if (sourceItem.collectionId !== targetItem.collectionId && source.data.isKanbanColumn) {
           return;
         }
 
-        if ((sourceData.ind as number) < 0 || (targetData.ind as number) < 0) {
+        if ((sourceItem.statePosition || 0) < 0 || (targetItem.statePosition || 0) < 0) {
           return;
         }
 
         const closestEdgeOfTarget = extractClosestEdge(targetData);
 
-        const newInd =
-          closestEdgeOfTarget === "top" ? (targetData.ind as number) : (targetData.ind as number) + 1;
+        let newInd =
+          closestEdgeOfTarget === "left"
+            ? targetItem.statePosition || 0
+            : (targetItem.statePosition || 0) + 1;
 
-        // if ((sourceData.ind as number) !== newInd) {
-        //   setFlashedRowId(sourceData.id as string);
-        //   setTimeout(() => setFlashedRowId(null), 10);
-        // }
+        if (newInd > (sourceItem.statePosition || 0)) {
+          newInd--;
+        }
 
-        props.onReorderColumn?.(props.columns[sourceData.ind as number], sourceData.ind as number, newInd);
+        if ((sourceItem.statePosition || 0) !== newInd) {
+          setFlashedColId(sourceItem.id);
+          setTimeout(() => setFlashedColId(null), 10);
+        }
+
+        props.onReorderColumn?.(sourceItem, sourceItem.statePosition || 0, newInd);
       },
     });
 
@@ -76,19 +87,20 @@ export const Kanban = <T extends KanbanItem, K extends KanbanState>(props: Kanba
 
   return (
     <div class={container({ class: props.containerClass })}>
-      <For each={props.columns}>
+      <For each={sortedColumns()}>
         {(col) => (
           <KanbanColumn<T, K>
             col={col}
             dragEnabled={colDragEnabled}
             cardClass={props.cardClass}
-            items={getItemsByState(col.id)}
+            items={props.items}
             class={props.columnClass}
             onCardClick={props.onCardClick}
             renderItem={props.renderItem}
             onCreateItem={props.onCreateItem}
             onReorderCard={props.onReorderCard}
             onCollapse={props.onCollapseColumn}
+            flashSignal={() => flashedColId()}
           />
         )}
       </For>

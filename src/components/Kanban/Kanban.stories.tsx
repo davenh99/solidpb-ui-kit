@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
 import { Kanban } from ".";
-import { createSignal } from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 
 const meta: Meta<typeof Kanban> = {
   title: "Components/Kanban",
@@ -87,13 +87,103 @@ export const defaultTasks: Task[] = [
 ];
 
 export const Default: Story = {
-  render: () => (
-    <Kanban<Task, KanbanState>
-      items={defaultTasks}
-      columns={defaultColumns}
-      onCardClick={(item) => console.log("Clicked:", item)}
-    />
-  ),
+  render: () => {
+    const [items, setItems] = createSignal(structuredClone(defaultTasks));
+    const [columns, setColumns] = createSignal(structuredClone(defaultColumns));
+
+    /* ----------------------------------------
+     * Card drag handling
+     * --------------------------------------*/
+    const handleCardReorder = (
+      item: Task,
+      oldPos: number,
+      newPos: number,
+      oldState: string,
+      newState: string,
+    ) => {
+      setItems((prev) => {
+        // console.log(item.title, oldPos, "->", newPos, oldState, "->", newState);
+        const next = [...prev];
+
+        // find the moving item (ensure we use the exact reference)
+        const moved = next.find((i) => i.id === item.id);
+        if (!moved) return prev;
+
+        // close gap in old column
+        for (const i of next) {
+          if (i.kanbanState === oldState && i.kanbanPosition! > oldPos) {
+            i.kanbanPosition!--;
+          }
+        }
+
+        // open gap in target column
+        for (const i of next) {
+          if (i.kanbanState === newState && i.kanbanPosition! >= newPos) {
+            i.kanbanPosition!++;
+          }
+        }
+
+        // move the card
+        moved.kanbanState = newState;
+        moved.kanbanPosition = newPos;
+
+        return next;
+      });
+    };
+
+    /* ----------------------------------------
+     * Column drag handling
+     * --------------------------------------*/
+    const handleColumnReorder = (col: KanbanState, oldPos: number, newPos: number) => {
+      setColumns((prev) => {
+        const next = [...prev];
+        const moved = next.find((c) => c.id === col.id);
+        if (!moved) return prev;
+
+        // shift other columns
+        for (const c of next) {
+          if (c.statePosition! > oldPos) c.statePosition!--;
+          if (c.statePosition! >= newPos) c.statePosition!++;
+        }
+
+        // move the column
+        moved.statePosition = newPos;
+        return next;
+      });
+    };
+
+    const createNew = (title: string, state: string) => {
+      setItems((prev) => {
+        const next = [...prev];
+        let minPos = 0;
+        for (const t of next) {
+          if (t.kanbanState === state) {
+            minPos = Math.min(minPos, t.kanbanPosition!);
+          }
+        }
+        next.push({
+          id: "haha",
+          collectionId: "0",
+          title: title,
+          kanbanPosition: minPos - 1,
+          kanbanState: state,
+        });
+        return next;
+      });
+    };
+
+    return (
+      <Kanban
+        items={items()}
+        columns={columns()}
+        onReorderCard={handleCardReorder}
+        onReorderColumn={handleColumnReorder}
+        onCreateItem={createNew}
+        columnClass="min-h-[80%]"
+        containerClass="h-[90vh]"
+      />
+    );
+  },
 };
 
 export const CustomRendering: Story = {

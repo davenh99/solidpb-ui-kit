@@ -213,8 +213,12 @@ export const Table = <T extends TableItem>(props: TableProps<T>): JSXElement => 
 
         const closestEdgeOfTarget = extractClosestEdge(targetData);
 
-        const newInd =
+        let newInd =
           closestEdgeOfTarget === "top" ? (targetData.ind as number) : (targetData.ind as number) + 1;
+
+        if (newInd > (sourceData.ind as number)) {
+          newInd--;
+        }
 
         if ((sourceData.ind as number) !== newInd) {
           setFlashedRowId(sourceData.id as string);

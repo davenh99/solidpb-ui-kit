@@ -44,7 +44,7 @@ Also to index.css (refer daisyui docs):
 - [x] TextArea
 - [x] Toast
 - [x] Tooltip
-- [ ] Kanban
+- [x] Kanban
 - [x] ThemeSwitch
 - [x] ColorPicker
 - [x] Navbar
@@ -92,9 +92,3 @@ Also to index.css (refer daisyui docs):
 - [ ] FilterBar
 - [ ] ActivityFeed
 - [ ] Pagination
-
-### TODO (more thorough/complex implementation)
-
-- [ ] DropdownMenu (complex groups etc check kobalte)
-- [ ] List (draggable, will be a challenge to integrate with virtualised)
-- [ ] Kanban (will be a bit of a beast)

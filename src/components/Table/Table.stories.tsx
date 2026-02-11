@@ -222,8 +222,7 @@ export const Default: Story = {
     const reorder = (item: MockProduct, oldInd: number, newInd: number) => {
       const curData = [...data()];
       curData.splice(oldInd, 1);
-      const adjustedNewInd = newInd > oldInd ? newInd - 1 : newInd;
-      curData.splice(adjustedNewInd, 0, item);
+      curData.splice(newInd, 0, item);
       setData(curData);
     };
 
