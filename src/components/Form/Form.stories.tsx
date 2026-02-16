@@ -44,7 +44,7 @@ type Story = StoryObj<typeof ProductForm>;
 
 export const Default: Story = {
   render: () => {
-    const [selected, setSelected] = createSignal<string | undefined>();
+    const [selected, setSelected] = createSignal<{ label: string; value: string } | null>(null);
 
     return (
       <Container class="bg-base-200 flex items-center justify-center">

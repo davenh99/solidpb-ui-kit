@@ -90,9 +90,6 @@ const TableRow = <T extends TableItem>(props: TableRowProps<T>) => {
         // only allowing same collection for now to be dropped on me
         return source.data.collectionId == props.row.original.collectionId;
       },
-      getIsSticky() {
-        return true;
-      },
       getData({ input }) {
         return attachClosestEdge(
           { id: props.row.original.id, ind: props.row.index, collectionId: props.row.original.collectionId },

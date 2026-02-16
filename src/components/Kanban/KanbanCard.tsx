@@ -57,9 +57,6 @@ export const KanbanCard = <T extends KanbanItem>(props: KanbanCardProps<T>) => {
         // only allowing same collection for now to be dropped on me
         return (source.data.item as T).collectionId == props.item.collectionId && !!source.data.isKanbanCard;
       },
-      getIsSticky() {
-        return true;
-      },
       getData({ input }) {
         return attachClosestEdge(
           {

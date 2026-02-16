@@ -23,7 +23,7 @@ const sizes = ["xs", "sm", "md", "lg", "xl"] as const;
 
 export const Default: Story = {
   render: () => {
-    const [value, setValue] = createSignal("");
+    const [value, setValue] = createSignal({ label: "", value: "" });
     return (
       <div class="flex flex-col space-y-4">
         <div class="space-y-1">
@@ -31,6 +31,8 @@ export const Default: Story = {
             {(a) => (
               <Select
                 label="Choose option"
+                labelKey="label"
+                valueKey="value"
                 options={[
                   { label: "Option 1", value: "1" },
                   { label: "Option 2", value: "2" },
@@ -47,6 +49,8 @@ export const Default: Story = {
             {(s) => (
               <Select
                 label="Choose option"
+                labelKey="label"
+                valueKey="value"
                 options={[
                   { label: "Option 1", value: "1" },
                   { label: "Option 2", value: "2" },

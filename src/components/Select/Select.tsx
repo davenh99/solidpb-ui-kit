@@ -1,24 +1,22 @@
-import { Component } from "solid-js";
-import { Select as KobalteSelect } from "@kobalte/core/select";
+import { Select as KSelect } from "@kobalte/core/select";
 import Check from "lucide-solid/icons/check";
 import Down from "lucide-solid/icons/chevron-down";
 import { tv } from "tailwind-variants";
 
-interface Option {
-  label: string;
-  value: string;
-}
-
-export interface SelectProps {
+export interface SelectProps<T> {
+  options: T[];
+  value: T | null;
+  onChange: (val: T | null) => void;
+  labelKey?: keyof T;
+  valueKey?: keyof T;
+  disabledKey?: keyof T;
   label?: string;
-  options: Option[];
-  value?: string;
-  onChange: (value: string | null) => void;
-  placeholder?: string;
-  class?: string;
   variant?: "ghost";
   appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
+  class?: string;
+  placeholder?: string;
+  disabled?: boolean;
 }
 
 const trigger = tv({
@@ -61,31 +59,34 @@ const menu = tv({
   },
 });
 
-export const Select: Component<SelectProps> = (props) => {
+export const Select = <T,>(props: SelectProps<T>) => {
   return (
     <label class="floating-label">
       {props.label && <span>{props.label}</span>}
-      <KobalteSelect
+      <KSelect
+        disabled={props.disabled}
         multiple={false}
         value={props.value}
         onChange={props.onChange}
-        options={props.options.map((o) => o.value)}
+        options={props.options}
+        optionValue={props.valueKey}
+        optionTextValue={props.labelKey}
+        optionDisabled={props.disabledKey}
         placeholder={props.placeholder}
         itemComponent={(itemProps) => {
-          const option = props.options.find((o) => o.value === itemProps.item.rawValue);
           return (
-            <KobalteSelect.Item item={itemProps.item}>
-              <KobalteSelect.ItemLabel class="flex flex-row justify-between items-center">
-                {option?.label ?? itemProps.item.textValue}
-                <KobalteSelect.ItemIndicator>
+            <KSelect.Item item={itemProps.item} class="outline-none">
+              <KSelect.ItemLabel class="flex flex-row justify-between items-center">
+                {props.labelKey ? String(itemProps.item.rawValue[props.labelKey]) : itemProps.item.textValue}
+                <KSelect.ItemIndicator>
                   <Check size={16} />
-                </KobalteSelect.ItemIndicator>
-              </KobalteSelect.ItemLabel>
-            </KobalteSelect.Item>
+                </KSelect.ItemIndicator>
+              </KSelect.ItemLabel>
+            </KSelect.Item>
           );
         }}
       >
-        <KobalteSelect.Trigger
+        <KSelect.Trigger
           class={trigger({
             variant: props.variant,
             appearance: props.appearance,
@@ -93,22 +94,19 @@ export const Select: Component<SelectProps> = (props) => {
             class: props.class,
           })}
         >
-          <KobalteSelect.Value<string>>
-            {(state) => {
-              const selected = props.options.find((o) => o.value === state.selectedOption());
-              return selected ? selected.label : props.placeholder || "Select";
-            }}
-          </KobalteSelect.Value>
-          <KobalteSelect.Icon>
+          <KSelect.Value<T>>
+            {(state) => String(props.labelKey ? state.selectedOption()[props.labelKey] : "")}
+          </KSelect.Value>
+          <KSelect.Icon>
             <Down size={16} />
-          </KobalteSelect.Icon>
-        </KobalteSelect.Trigger>
-        <KobalteSelect.Portal>
-          <KobalteSelect.Content class="rounded-box bg-base-200 shadow-md z-50">
-            <KobalteSelect.Listbox class={menu({ size: props.size })} />
-          </KobalteSelect.Content>
-        </KobalteSelect.Portal>
-      </KobalteSelect>
+          </KSelect.Icon>
+        </KSelect.Trigger>
+        <KSelect.Portal>
+          <KSelect.Content class="rounded-box bg-base-100 shadow-md z-50">
+            <KSelect.Listbox class={menu({ size: props.size })} />
+          </KSelect.Content>
+        </KSelect.Portal>
+      </KSelect>
     </label>
   );
 };

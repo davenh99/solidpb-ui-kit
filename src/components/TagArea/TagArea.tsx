@@ -94,7 +94,7 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
 
   return (
     <div
-      class={tagArea({ editing: editing() }).toString()}
+      class={tagArea({ editing: editing() })}
       onMouseDown={(e) => {
         if (props.editable === false) return;
         e.preventDefault();
@@ -144,7 +144,7 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
                         class="px-3 py-2 cursor-pointer rounded"
                         onMouseDown={() => handleSuggestionClick(s)}
                       >
-                        {s.name}
+                        <a>{s.name}</a>
                       </li>
                     )}
                   </For>

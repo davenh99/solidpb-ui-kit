@@ -106,9 +106,6 @@ export const KanbanColumn = <T extends KanbanItem, K extends KanbanState>(props:
         // only allowing same collection for now to be dropped on me
         return (source.data.item as K).collectionId == props.col.collectionId;
       },
-      getIsSticky() {
-        return true;
-      },
       getData({ input }) {
         return attachClosestEdge(
           {

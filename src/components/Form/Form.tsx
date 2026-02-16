@@ -134,12 +134,14 @@ export function createForm<T>() {
     );
   };
 
-  const SelectField = (props: SelectProps & BaseFieldProps<T>) => {
+  const SelectField = (props: SelectProps<{ label: string; value: string }> & BaseFieldProps<T>) => {
     const form = useInternalFormContext() as Ctx;
 
     return (
       <Select
         {...props}
+        labelKey="label"
+        valueKey="value"
         value={form.getValue(props.field) as any}
         onChange={(v) => form.setValue(props.field, v as any)}
       />

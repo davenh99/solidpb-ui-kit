@@ -65,7 +65,7 @@ export const Tag: Component<TagProps> = (props) => {
       <span>{props.title}</span>
       {props.onDelete && (
         <KobalteButton onClick={props.onDelete}>
-          <CloseIcon size={14} stroke-width={4} />
+          <CloseIcon class="w-[1em] h-[1em]" stroke-width={4} />
         </KobalteButton>
       )}
     </div>

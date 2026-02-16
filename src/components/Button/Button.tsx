@@ -1,5 +1,5 @@
 import { createMemo, ParentComponent, Show, splitProps, ValidComponent } from "solid-js";
-import { ButtonRootProps, Button as KButton } from "@kobalte/core/button";
+import { type ButtonRootProps, Button as KButton } from "@kobalte/core/button";
 import { PolymorphicProps } from "@kobalte/core/polymorphic";
 import { tv } from "tailwind-variants";
 import Loader from "lucide-solid/icons/loader";

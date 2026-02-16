@@ -1,47 +1,89 @@
-import { Component } from "solid-js";
-import { TextField, type TextFieldInputProps, type TextFieldRootProps } from "@kobalte/core/text-field";
+import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import { TextField } from "@kobalte/core/text-field";
+import { Popover } from "@kobalte/core/popover";
 import { tv } from "tailwind-variants";
 import Search from "lucide-solid/icons/search";
+import ListFilter from "lucide-solid/icons/list-filter";
+import ArrowDown from "lucide-solid/icons/arrow-down-narrow-wide";
 
-type FilterOperator =
-  // Text operators
+import FilterChip, { FilterGroupChip } from "./FilterChip";
+import { Button } from "../Button";
+import AddFilterDropdown from "./AddFilterDropdown";
+import AddSortingDropdown from "./AddSortingDropdown";
+
+export type FieldType = "text" | "number" | "date" | "select" | "bool";
+
+export type FilterOperator =
   | "loose_contains" // Default: splits by space, matches all words
-  | "strict_contains" // Treats as single string with spaces
   | "fuzzy_match" // Custom fuzzy matching
-  | "equals"
-  | "not_equals"
-  | "starts_with"
-  | "ends_with"
-  // Numeric/Date operators
+  | "is"
+  | "is_not"
   | "greater_than"
   | "less_than"
   | "between"
-  // General
   | "in"
   | "not_in"
   | "is_set"
   | "is_not_set";
 
-interface Filter {
+export type FilterOperatorOption = { value: FilterOperator; label: string; default?: boolean };
+
+export const filterOperators: { [k: string]: FilterOperatorOption[] } = {
+  text: [
+    { default: true, value: "loose_contains", label: "Contains" },
+    { value: "in", label: "Contains (strict)" },
+    { value: "not_in", label: "Doesn't contain" },
+    { value: "fuzzy_match", label: "Fuzzy contains" },
+    { value: "is", label: "Is" },
+    { value: "is_not", label: "Is not" },
+    { value: "is_set", label: "Is set" },
+    { value: "is_not_set", label: "Is not set" },
+  ],
+  bool: [{ default: true, value: "is", label: "Is" }],
+  number: [
+    { default: true, value: "is", label: "Is" },
+    { value: "greater_than", label: "Is greater than" },
+    { value: "less_than", label: "Is less than" },
+    { value: "between", label: "Is between" },
+    { value: "is_not", label: "Is not" },
+  ],
+  select: [
+    { default: true, value: "is", label: "Is" },
+    { value: "is_not", label: "Is not" },
+    { value: "in", label: "Contains" },
+    { value: "not_in", label: "Doesn't contain" },
+    { value: "is_set", label: "Is set" },
+    { value: "is_not_set", label: "Is not set" },
+  ],
+  date: [
+    { default: true, value: "greater_than", label: "Is after" },
+    { value: "less_than", label: "Is before" },
+    { value: "between", label: "Is between" },
+    { value: "is", label: "Is" },
+    { value: "is_not", label: "Is not" },
+    { value: "is_set", label: "Is set" },
+    { value: "is_not_set", label: "Is not set" },
+  ],
+};
+
+export interface Filter<T> {
   id: string;
-  field: string;
+  field: FilterField<T>;
   operator: FilterOperator;
   value: any;
-  label?: string; // Computed display label
 }
 
-interface FilterGroup {
+export interface FilterGroup<T> {
   id: string;
-  filters: Filter[]; // Combined with OR logic
-  label?: string; // Display label for the group chip
+  filters: Filter<T>[]; // Combined with OR logic
 }
 
-interface FilterField {
-  name: string;
+export interface FilterField<T> {
+  name: keyof T;
   label: string;
-  type: "text" | "number" | "date" | "select" | "multiselect" | "boolean";
+  type: FieldType;
   operators?: FilterOperator[]; // Available operators for this field type
-  options?: { label: string; value: any }[];
+  options?: { label?: string; value: any }[];
   searchable?: boolean; // Show in quick search text fields
 }
 
@@ -51,13 +93,20 @@ interface SortOption {
   label?: string;
 }
 
-interface FilterBarProps {
+// interface SavedFilterPreset {
+//   id: string;
+//   name: string;
+//   items: (Filter | FilterGroup)[];
+//   sortBy?: SortOption[];
+// }
+
+interface FilterBarProps<T> {
   // State - array of filters AND filter groups (combined with AND)
-  items?: (Filter | FilterGroup)[];
-  setItems?: (items: (Filter | FilterGroup)[]) => void;
+  items?: (Filter<T> | FilterGroup<T>)[];
+  setItems?: (items: (Filter<T> | FilterGroup<T>)[]) => void;
 
   // Configuration
-  availableFields?: FilterField[];
+  availableFields?: FilterField<T>[];
   textSearchFields?: string[]; // Fields to search when typing in main input
 
   // Sorting
@@ -66,17 +115,17 @@ interface FilterBarProps {
   sortableFields?: string[]; // Fields that can be sorted
 
   // Callbacks
-  onFilterAdd?: (filter: Filter) => void;
-  onFilterRemove?: (filter: Filter) => void;
-  onFilterUpdate?: (filter: Filter) => void;
-  onGroupCreate?: (group: FilterGroup) => void;
-  onGroupUpdate?: (group: FilterGroup) => void;
+  onFilterRemove: (filter: Filter<T>) => void;
+  onGroupCreate: (sourceFilter: Filter<T>, targetFilter: Filter<T>) => void;
+  onFilterAdd: (filter: Filter<T>) => void;
+  onFilterUpdate?: (filter: Filter<T>) => void;
+  onGroupUpdate?: (group: FilterGroup<T>) => void;
 
   // UI
+  value: string;
+  onChangeValue: (val: string) => void;
   placeholder?: string;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
-  value?: string;
-  onChangeValue?: (val: string) => void;
   class?: string;
 
   // Later
@@ -87,7 +136,7 @@ interface FilterBarProps {
 }
 
 const filterBar = tv({
-  base: "input outline-offset-0",
+  base: "textarea outline-offset-0 gap-1 flex items-start flex-wrap p-1 min-h-2",
   variants: {
     size: {
       xs: "input-xs",
@@ -99,11 +148,104 @@ const filterBar = tv({
   },
 });
 
-export const FilterBar: Component<FilterBarProps> = (props) => {
+export const FilterBar = <T,>(props: FilterBarProps<T>) => {
+  const [filterDropdownOpen, setFilterDropdownOpen] = createSignal(false);
+  const showFieldDropdown = createMemo(() => {
+    return !!props.value;
+  });
+  const textFields = createMemo(() => props.availableFields?.filter((f) => f.type === "text"));
+
+  const createTextFilter = (field: FilterField<T>) => {
+    const newFilter: Filter<T> = {
+      id: crypto.randomUUID(),
+      field,
+      operator: "loose_contains",
+      value: props.value,
+    };
+
+    props.onFilterAdd(newFilter);
+
+    props.onChangeValue("");
+  };
+
+  const isFilterGroup = (item: Filter<T> | FilterGroup<T>): item is FilterGroup<T> => {
+    return "filters" in item;
+  };
+
   return (
-    <TextField value={props.value} onChange={props.onChangeValue} class={filterBar({ size: props.size })}>
-      <Search class="w-[1em] h-[1em] shrink-0 opacity-70" />
-      <TextField.Input placeholder={props.placeholder || "Search"} class="grow" />
-    </TextField>
+    <div class="relative">
+      <div class="flex gap-1 items-start">
+        <TextField
+          value={props.value}
+          onChange={props.onChangeValue}
+          class={filterBar({ size: props.size, class: props.class })}
+        >
+          <Search class="w-[1em] h-[1em] opacity-70 m-1.5" />
+          <For each={props.items}>
+            {(item) => (
+              <Show
+                when={isFilterGroup(item)}
+                fallback={
+                  <FilterChip
+                    onDelete={() => props.onFilterRemove(item as Filter<T>)}
+                    filter={item as Filter<T>}
+                    size={props.size}
+                    onGroupCreate={props.onGroupCreate}
+                  />
+                }
+              >
+                <FilterGroupChip
+                  filterGroup={item as FilterGroup<T>}
+                  size={props.size}
+                  onGroupCreate={props.onGroupCreate}
+                />
+              </Show>
+            )}
+          </For>
+          <TextField.Input
+            placeholder={props.placeholder || "Search"}
+            class="grow focus:outline-none min-w-20 ml-1"
+          />
+        </TextField>
+        <Popover open={filterDropdownOpen()} onOpenChange={setFilterDropdownOpen}>
+          <Popover.Trigger>
+            <Button size={props.size} modifier="square">
+              <ListFilter class="w-[1em] h-[1em]" />
+            </Button>
+          </Popover.Trigger>
+          <AddFilterDropdown<T>
+            size={props.size}
+            fields={props.availableFields ?? []}
+            onFilterAdd={props.onFilterAdd}
+            setOpen={setFilterDropdownOpen}
+          />
+        </Popover>
+        <Popover>
+          <Popover.Trigger>
+            <Button size={props.size} modifier="square">
+              <ArrowDown class="w-[1em] h-[1em]" />
+            </Button>
+          </Popover.Trigger>
+          <AddSortingDropdown />
+        </Popover>
+      </div>
+      {showFieldDropdown() && (
+        <div class="absolute left-0 mt-1 w-full dropdown-content rounded-box bg-base-100 shadow-md z-20">
+          <ul class="menu w-full">
+            <For each={textFields()}>
+              {(item) => (
+                <li class="menu-item" onClick={() => createTextFilter(item)}>
+                  <p class="flex gap-1">
+                    <span class="font-bold">{item.label}</span>
+                    <span class="italic">Contains</span>
+                    <span>'{props.value}'</span>
+                  </p>
+                </li>
+              )}
+            </For>
+          </ul>
+        </div>
+      )}
+    </div>
   );
 };
