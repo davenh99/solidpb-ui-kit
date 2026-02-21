@@ -51,6 +51,9 @@ const tableClass = tv({
       xl: "table-xl",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 interface TableRowProps<T extends TableItem> {

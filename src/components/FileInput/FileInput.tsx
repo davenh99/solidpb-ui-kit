@@ -37,6 +37,9 @@ const input = tv({
       ghost: "file-input-ghost",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 export const FileInput: Component<FileInputProps> = (props) => {

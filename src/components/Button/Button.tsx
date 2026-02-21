@@ -48,6 +48,9 @@ const button = tv({
       circle: "btn-circle",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 const spinnerSizeMap: Record<NonNullable<ButtonProps["size"]>, number> = {

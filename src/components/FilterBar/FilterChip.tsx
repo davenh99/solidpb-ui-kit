@@ -5,7 +5,7 @@ import invariant from "tiny-invariant";
 import CloseIcon from "lucide-solid/icons/x";
 import { tv } from "tailwind-variants";
 
-import { Filter, FilterGroup, filterOperators } from "./FilterBar";
+import { Filter, FilterGroup, filterLabels } from "./FilterBar";
 import { Button } from "../Button";
 
 interface FilterChipOrGroupProps<T> {
@@ -37,14 +37,33 @@ const filterChip = tv({
 export const FilterChip = <T,>(props: FilterChipProps<T>) => {
   let ref!: HTMLDivElement;
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
+
   const filterOperator = createMemo(() => {
-    let operator = filterOperators[props.filter.field.type].find(
-      (item) => item.value === props.filter.operator,
-    );
-    if (operator) {
-      return operator.label;
+    return filterLabels[props.filter.field.type][props.filter.operator] || "has";
+  });
+
+  const valueLabel = createMemo(() => {
+    let val = props.filter.value;
+    if (val === null) return "";
+
+    switch (typeof val) {
+      case "boolean":
+        return val ? "True" : "False";
+      case "number":
+        return String(val);
+      case "string":
+        return val;
+      case "object":
+        if ("label" in val) {
+          return val.label;
+        } else {
+          let valText = val.startDate ? String(val.startDate.toLocaleDateString("en-GB")) : "";
+
+          if (val.endDate) valText += ` - ${val.endDate.toLocaleDateString("en-GB")}`;
+
+          return valText;
+        }
     }
-    return "has";
   });
 
   createEffect(() => {
@@ -136,7 +155,7 @@ export const FilterChip = <T,>(props: FilterChipProps<T>) => {
       <p>
         <span class="font-bold">{String(props.filter.field.label)}</span>
         <span class="mx-1">{filterOperator()}</span>
-        <span>{String(props.filter.value)}</span>
+        {valueLabel() && <span>{valueLabel()}</span>}
       </p>
       {props.onDelete && (
         <Button onClick={props.onDelete} size="xs" variant="ghost" class="p-0.5 m-0 h-min">

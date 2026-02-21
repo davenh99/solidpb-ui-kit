@@ -38,6 +38,9 @@ const search = tv({
       error: "input-error",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 export const SearchInput: Component<SearchInputProps> = (props) => (

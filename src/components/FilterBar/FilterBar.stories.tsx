@@ -26,7 +26,11 @@ const availableFields: FilterField<MockProductWithDate>[] = [
     type: "select",
     name: "category",
     label: "Category",
-    options: [{ value: "electronics" }, { value: "clothing" }, { value: "books" }],
+    options: [
+      { value: "electronics", label: "Electronics" },
+      { value: "clothing", label: "Clothes" },
+      { value: "books", label: "Buuk" },
+    ],
   },
   { type: "bool", name: "sellable", label: "Sellable" },
   { type: "text", name: "description", label: "Description" },
@@ -80,8 +84,18 @@ export const Default: Story = {
       setItems([...remainingItems, newGroup]);
     };
 
-    const handleAddFilter = (newFilter: Filter<MockProductWithDate>) => {
-      setItems?.([...(items() || []), newFilter]);
+    const handleAddFilterGroup = (newFilters: Filter<MockProductWithDate>[]) => {
+      if (newFilters.length === 1) {
+        setItems?.([...(items() || []), newFilters[0]]);
+        return;
+      }
+
+      const newGroup: FilterGroup<MockProductWithDate> = {
+        id: crypto.randomUUID(),
+        filters: newFilters,
+      };
+
+      setItems?.([...(items() || []), newGroup]);
     };
 
     return (
@@ -92,7 +106,7 @@ export const Default: Story = {
           </Button>
           <FilterBar<MockProductWithDate>
             size="md"
-            class="w-140"
+            class="w-160"
             availableFields={availableFields}
             value={searchValue()}
             onChangeValue={setSearchValue}
@@ -100,7 +114,7 @@ export const Default: Story = {
             setItems={setItems}
             onFilterRemove={(filter) => setItems((prev) => prev.filter((f) => f.id !== filter.id))}
             onGroupCreate={handleGroupCreate}
-            onFilterAdd={handleAddFilter}
+            onAddFilterGroup={handleAddFilterGroup}
           />
         </div>
       </Container>

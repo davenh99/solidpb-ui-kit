@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import { createMemo, createSignal, For, Show } from "solid-js";
 import { TextField } from "@kobalte/core/text-field";
 import { Popover } from "@kobalte/core/popover";
 import { tv } from "tailwind-variants";
@@ -26,55 +26,74 @@ export type FilterOperator =
   | "is_set"
   | "is_not_set";
 
-export type FilterOperatorOption = { value: FilterOperator; label: string; default?: boolean };
-
-export const filterOperators: { [k: string]: FilterOperatorOption[] } = {
-  text: [
-    { default: true, value: "loose_contains", label: "Contains" },
-    { value: "in", label: "Contains (strict)" },
-    { value: "not_in", label: "Doesn't contain" },
-    { value: "fuzzy_match", label: "Fuzzy contains" },
-    { value: "is", label: "Is" },
-    { value: "is_not", label: "Is not" },
-    { value: "is_set", label: "Is set" },
-    { value: "is_not_set", label: "Is not set" },
-  ],
-  bool: [{ default: true, value: "is", label: "Is" }],
-  number: [
-    { default: true, value: "is", label: "Is" },
-    { value: "greater_than", label: "Is greater than" },
-    { value: "less_than", label: "Is less than" },
-    { value: "between", label: "Is between" },
-    { value: "is_not", label: "Is not" },
-  ],
-  select: [
-    { default: true, value: "is", label: "Is" },
-    { value: "is_not", label: "Is not" },
-    { value: "in", label: "Contains" },
-    { value: "not_in", label: "Doesn't contain" },
-    { value: "is_set", label: "Is set" },
-    { value: "is_not_set", label: "Is not set" },
-  ],
-  date: [
-    { default: true, value: "greater_than", label: "Is after" },
-    { value: "less_than", label: "Is before" },
-    { value: "between", label: "Is between" },
-    { value: "is", label: "Is" },
-    { value: "is_not", label: "Is not" },
-    { value: "is_set", label: "Is set" },
-    { value: "is_not_set", label: "Is not set" },
-  ],
+export const filterDefaults: Record<FieldType, FilterOperator> = {
+  text: "loose_contains",
+  bool: "is",
+  number: "is",
+  select: "is",
+  date: "greater_than",
 };
 
+export const filterLabels: Record<FieldType, Partial<Record<FilterOperator, string>>> = {
+  text: {
+    loose_contains: "Contains",
+    in: "Contains (strict)",
+    not_in: "Doesn't contain",
+    fuzzy_match: "Fuzzy contains",
+    is: "Is",
+    is_not: "Is not",
+    is_set: "Is set",
+    is_not_set: "Is not set",
+  },
+  bool: {
+    is: "Is",
+  },
+  number: {
+    is: "Is",
+    greater_than: "Is greater than",
+    less_than: "Is less than",
+    between: "Is between",
+    is_not: "Is not",
+  },
+  select: {
+    is: "Is",
+    is_not: "Is not",
+    in: "Contains",
+    not_in: "Doesn't contain",
+    is_set: "Is set",
+    is_not_set: "Is not set",
+  },
+  date: {
+    greater_than: "Is after",
+    less_than: "Is before",
+    between: "Is between",
+    is: "Is",
+    is_not: "Is not",
+    is_set: "Is set",
+    is_not_set: "Is not set",
+  },
+};
+
+export type FilterValue =
+  | string
+  | number
+  | boolean
+  | { label: string; value: string }
+  | {
+      startDate: Date | null;
+      endDate: Date | null;
+    }
+  | null;
+
 export interface Filter<T> {
-  id: string;
+  id?: string;
   field: FilterField<T>;
   operator: FilterOperator;
-  value: any;
+  value: FilterValue;
 }
 
 export interface FilterGroup<T> {
-  id: string;
+  id?: string;
   filters: Filter<T>[]; // Combined with OR logic
 }
 
@@ -83,7 +102,7 @@ export interface FilterField<T> {
   label: string;
   type: FieldType;
   operators?: FilterOperator[]; // Available operators for this field type
-  options?: { label?: string; value: any }[];
+  options?: { label: string; value: string }[];
   searchable?: boolean; // Show in quick search text fields
 }
 
@@ -116,8 +135,9 @@ interface FilterBarProps<T> {
 
   // Callbacks
   onFilterRemove: (filter: Filter<T>) => void;
+  // onGroupCreate is inadequate, need to handle all drag cases
   onGroupCreate: (sourceFilter: Filter<T>, targetFilter: Filter<T>) => void;
-  onFilterAdd: (filter: Filter<T>) => void;
+  onAddFilterGroup: (filters: Filter<T>[]) => void;
   onFilterUpdate?: (filter: Filter<T>) => void;
   onGroupUpdate?: (group: FilterGroup<T>) => void;
 
@@ -146,6 +166,9 @@ const filterBar = tv({
       xl: "input-xl",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 export const FilterBar = <T,>(props: FilterBarProps<T>) => {
@@ -163,7 +186,7 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
       value: props.value,
     };
 
-    props.onFilterAdd(newFilter);
+    props.onAddFilterGroup([newFilter]);
 
     props.onChangeValue("");
   };
@@ -215,8 +238,8 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
           </Popover.Trigger>
           <AddFilterDropdown<T>
             size={props.size}
-            fields={props.availableFields ?? []}
-            onFilterAdd={props.onFilterAdd}
+            availableFields={props.availableFields ?? []}
+            onAddFilters={props.onAddFilterGroup}
             setOpen={setFilterDropdownOpen}
           />
         </Popover>

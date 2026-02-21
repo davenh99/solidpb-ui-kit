@@ -36,6 +36,9 @@ const label = tv({
       xl: "text-sm",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 export const Image: Component<ImageProps> = (props) => {

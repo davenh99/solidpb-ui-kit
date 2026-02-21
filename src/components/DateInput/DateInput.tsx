@@ -9,6 +9,8 @@ interface DateInputProps {
   appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   class?: string;
+  min?: string;
+  max?: string;
 }
 
 const dateInput = tv({
@@ -39,7 +41,7 @@ const dateInput = tv({
 });
 
 export const DateInput: Component<DateInputProps> = (props) => {
-  // Convert Date to yyyy-mm-dd string for input value
+  // yyyy-mm-dd for input value
   const valueStr = () => (props.value ? props.value.toISOString().slice(0, 10) : "");
   const handleChange = (e: Event) => {
     const val = (e.target as HTMLInputElement).value;
@@ -56,6 +58,8 @@ export const DateInput: Component<DateInputProps> = (props) => {
         class={dateInput({ size: props.size, variant: props.variant, appearance: props.appearance })}
         value={valueStr()}
         onInput={handleChange}
+        min={props.min}
+        max={props.max}
       />
     </label>
   );

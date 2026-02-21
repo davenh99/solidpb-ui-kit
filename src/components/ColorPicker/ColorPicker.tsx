@@ -21,6 +21,9 @@ const colorPicker = tv({
       xl: "w-16 h-16",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 const label = tv({
@@ -33,6 +36,9 @@ const label = tv({
       lg: "text-sm",
       xl: "text-sm",
     },
+  },
+  defaultVariants: {
+    size: "sm",
   },
 });
 

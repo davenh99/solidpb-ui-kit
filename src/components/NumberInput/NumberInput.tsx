@@ -27,12 +27,6 @@ export type NumberInputRootProps<T extends ValidComponent = "div"> = NumberInput
 
 const inputRoot = tv({
   base: "relative flex flex-col gap-1",
-  variants: {
-    marginTop: {
-      yes: "mt-2",
-      no: "",
-    },
-  },
 });
 
 const inputField = tv({
@@ -60,6 +54,9 @@ const inputField = tv({
       error: "input-error",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 export const NumberInput: Component<NumberInputRootProps> = (props) => {
@@ -80,11 +77,7 @@ export const NumberInput: Component<NumberInputRootProps> = (props) => {
   };
 
   return (
-    <NumberField
-      {...others}
-      onChange={handleChange}
-      class={inputRoot({ class: local.class, marginTop: local.label ? "yes" : "no" })}
-    >
+    <NumberField {...others} onChange={handleChange} class={inputRoot({ class: local.class })}>
       <NumberField.Label class="floating-label">
         <Show when={local.label}>
           <span>{local.label}</span>

@@ -35,6 +35,9 @@ const menu = tv({
       xl: "menu-xl",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {

@@ -56,6 +56,9 @@ const textarea = tv({
       info: "textarea-info",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 export const TextArea: Component<TextAreaRootProps> = (props) => {

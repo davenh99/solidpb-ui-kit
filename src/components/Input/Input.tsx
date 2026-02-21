@@ -21,12 +21,6 @@ export type InputRootProps<T extends ValidComponent = "div"> = ExtraProps &
 
 const inputRoot = tv({
   base: "relative flex flex-col gap-1",
-  variants: {
-    marginTop: {
-      yes: "mt-2",
-      no: "",
-    },
-  },
 });
 
 const inputField = tv({
@@ -54,6 +48,9 @@ const inputField = tv({
       error: "input-error",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 export const Input: Component<InputRootProps> = (props) => {
@@ -76,11 +73,7 @@ export const Input: Component<InputRootProps> = (props) => {
   };
 
   return (
-    <TextField
-      {...others}
-      class={inputRoot({ class: local.class, marginTop: local.label ? "yes" : "no" })}
-      onChange={handleChange}
-    >
+    <TextField {...others} class={inputRoot({ class: local.class })} onChange={handleChange}>
       <div class="relative w-full">
         <TextField.Label class="floating-label">
           <Show when={local.label}>

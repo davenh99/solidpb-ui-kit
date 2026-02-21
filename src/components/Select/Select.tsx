@@ -57,6 +57,9 @@ const menu = tv({
       xl: "menu-xl",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 export const Select = <T,>(props: SelectProps<T>) => {
@@ -95,7 +98,7 @@ export const Select = <T,>(props: SelectProps<T>) => {
           })}
         >
           <KSelect.Value<T>>
-            {(state) => String(props.labelKey ? state.selectedOption()[props.labelKey] : "")}
+            {(state) => String(props.labelKey ? state.selectedOption()?.[props.labelKey] : "")}
           </KSelect.Value>
           <KSelect.Icon>
             <Down size={16} />

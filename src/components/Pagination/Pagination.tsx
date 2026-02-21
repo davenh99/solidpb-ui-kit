@@ -37,6 +37,9 @@ const labelClass = tv({
       xl: "text-md",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 export const Pagination: Component<PaginationProps> = (props) => {

@@ -41,6 +41,9 @@ const tag = tv({
       none: "",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 export const Tag: Component<TagProps> = (props) => {

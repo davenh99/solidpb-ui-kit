@@ -24,6 +24,9 @@ const tabs = tv({
       xl: "tabs-xl",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 const tab = tv({

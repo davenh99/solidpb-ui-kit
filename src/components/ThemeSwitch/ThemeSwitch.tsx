@@ -30,19 +30,19 @@ const getThemeValue = (theme: Theme): JSXElement => {
     case "light":
       return (
         <span class={labelClass}>
-          <Sun size="20" /> Light
+          <Sun class="w-[1em] h-[1em]" /> Light
         </span>
       );
     case "dark":
       return (
         <span class={labelClass}>
-          <Moon size="20" /> Dark
+          <Moon class="w-[1em] h-[1em]" /> Dark
         </span>
       );
     case "system":
       return (
         <span class={labelClass}>
-          <Monitor size="20" /> System
+          <Monitor class="w-[1em] h-[1em]" /> System
         </span>
       );
   }
