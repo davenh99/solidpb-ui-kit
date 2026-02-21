@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, JSXElement, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, For, JSXElement, Show } from "solid-js";
 
 import { Filter, FilterField } from "./FilterBar";
 import { Button } from "../Button";
@@ -27,7 +27,7 @@ export const FiltersEdit = <T,>(props: FiltersEditProps<T>) => {
   };
 
   const addNewFilter = () => {
-    setFilters([...filters, {}]);
+    setFilters(filters.length, {});
     setFiltersReady([...filtersReady(), false]);
   };
 
@@ -46,9 +46,9 @@ export const FiltersEdit = <T,>(props: FiltersEditProps<T>) => {
             <FilterEdit<T>
               availableFields={props.availableFields}
               filter={f}
-              setField={(field) => setFilters([i()], "field", field)}
-              setOperator={(operator) => setFilters([i()], "operator", operator)}
-              setValue={(value) => setFilters([i()], "value", value)}
+              setField={(field) => setFilters(i(), { ...filters[i()], field })}
+              setOperator={(operator) => setFilters(i(), { ...filters[i()], operator })}
+              setValue={(value) => setFilters(i(), { ...filters[i()], value })}
               setCanConfirm={(v) =>
                 setFiltersReady((prev) => {
                   const next = [...prev];

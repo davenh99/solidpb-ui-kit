@@ -1,4 +1,4 @@
-import { createMemo, createSignal, Match, Setter, Show, Switch } from "solid-js";
+import { createMemo, createSignal, Match, Show, Switch, batch, createEffect } from "solid-js";
 import { createStore } from "solid-js/store";
 import X from "lucide-solid/icons/x";
 
@@ -21,9 +21,6 @@ interface FilterEditProps<T> {
 }
 
 export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
-  const selectedField = createMemo(() => props.filter.field);
-  const selectedOperator = createMemo(() => props.filter.operator);
-  const selectedValue = createMemo(() => props.filter.value);
   const [selectedBoolValue, setSelectedBoolValue] = createSignal<{ label: string; value: boolean } | null>(
     null,
   );
@@ -38,8 +35,8 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
   }>({ startDate: null, endDate: null });
 
   const availableOperators = createMemo(() =>
-    selectedField()
-      ? Object.entries(filterLabels[selectedField()!.type]).map(([value, label]) => ({
+    props.filter.field
+      ? Object.entries(filterLabels[props.filter.field!.type]).map(([value, label]) => ({
           label,
           value: value as FilterOperator,
         }))
@@ -50,11 +47,22 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
     props.setOperator(operator);
 
     if (["is_set", "is_not_set"].includes(operator ?? "")) {
-      props.setCanConfirm(true);
       props.setValue(null);
+      props.setCanConfirm(true);
     } else {
-      props.setValue(undefined);
-      // hmm, for ux I don't want to clear too much when switching operator. will see how this feels
+      switch (props.filter.field?.type) {
+        case "number":
+          props.setValue(0);
+          props.setCanConfirm(true);
+          return;
+        case "text":
+          props.setValue("");
+        default:
+          props.setValue(undefined);
+      }
+      props.setCanConfirm(false);
+      // hmm, for ux I don't want to clear too much when switching operator. will see how this feels.
+      // need to do this for canConfirm behaviour atm
       setSelectedDateValues("endDate", null);
     }
   };
@@ -65,13 +73,12 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
     handleOperatorChange(newOperator);
   };
 
-  const canConfirm = () => {
-    if (!selectedField() || !selectedOperator() || selectedValue() === undefined || selectedValue() === "")
-      return false;
+  const canConfirm = (val?: FilterValue) => {
+    if (!props.filter.field || !props.filter.operator || val === undefined || val === "") return false;
 
     if (
-      selectedField()?.type === "date" &&
-      selectedOperator() === "between" &&
+      props.filter.field?.type === "date" &&
+      props.filter.operator === "between" &&
       (selectedDateValues.endDate === null || selectedDateValues.startDate === null)
     ) {
       return false;
@@ -81,16 +88,20 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
   };
 
   const handleValueChange = (val?: FilterValue) => {
-    props.setValue(val);
-    props.setCanConfirm(canConfirm());
+    if (Number.isNaN(val)) {
+      props.setValue(0);
+    } else {
+      props.setValue(val);
+    }
+    props.setCanConfirm(canConfirm(val));
   };
 
   const selectValue = createMemo(() => {
-    if (!selectedOperator() || !selectedField()) return null;
+    if (!props.filter.operator || !props.filter.field) return null;
 
     return {
-      value: selectedOperator()!,
-      label: filterLabels[selectedField()!.type][selectedOperator()!] || "",
+      value: props.filter.operator!,
+      label: filterLabels[props.filter.field!.type][props.filter.operator!] || "",
     };
   });
 
@@ -106,7 +117,7 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
       <div class="flex flex-col lg:flex-row min-w-50 lg:min-w-150 gap-3">
         <Select<FilterField<T>>
           label="Field"
-          value={selectedField() ?? null}
+          value={props.filter.field ?? null}
           labelKey="label"
           valueKey="name"
           onChange={(f) => handleFieldChange(f ?? undefined)}
@@ -114,7 +125,7 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
           size={props.size}
           class="min-w-50"
         />
-        <Show when={selectedField()?.type !== "bool"}>
+        <Show when={props.filter.field?.type !== "bool"}>
           <Select<{ value: FilterOperator; label: string }>
             value={selectValue()}
             label="Operator"
@@ -122,13 +133,13 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
             valueKey="value"
             onChange={(v) => handleOperatorChange(v?.value)}
             options={availableOperators()}
-            disabled={!selectedField()}
+            disabled={!props.filter.field}
             size={props.size}
             class="min-w-50"
           />
         </Show>
         <Switch>
-          <Match when={selectedField()?.type === "bool"}>
+          <Match when={props.filter.field?.type === "bool"}>
             <Select<{ label: string; value: boolean }>
               label="Value"
               labelKey="label"
@@ -148,7 +159,8 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
           </Match>
           <Match
             when={
-              selectedField()?.type === "text" && !["is_set", "is_not_set"].includes(selectedOperator() ?? "")
+              props.filter.field?.type === "text" &&
+              !["is_set", "is_not_set"].includes(props.filter.operator ?? "")
             }
           >
             <Input
@@ -162,7 +174,7 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
               class="min-w-50"
             />
           </Match>
-          <Match when={selectedField()?.type === "number"}>
+          <Match when={props.filter.field?.type === "number"}>
             <NumberInput
               label="Value"
               rawValue={selectedNumberValue()}
@@ -177,12 +189,12 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
           </Match>
           <Match
             when={
-              selectedField()?.type === "select" &&
-              !["is_set", "is_not_set"].includes(selectedOperator() ?? "")
+              props.filter.field?.type === "select" &&
+              !["is_set", "is_not_set"].includes(props.filter.operator ?? "")
             }
           >
             <Show
-              when={["in", "not_in"].includes(selectedOperator() ?? "")}
+              when={["in", "not_in"].includes(props.filter.operator ?? "")}
               fallback={
                 <Select<{ label: string; value: string }>
                   value={selectedSelectValue()}
@@ -193,8 +205,8 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
                     setSelectedSelectValue(val);
                     handleValueChange(val);
                   }}
-                  options={selectedField()?.options ?? []}
-                  disabled={!selectedOperator() || !selectedField()?.options?.length}
+                  options={props.filter.field?.options ?? []}
+                  disabled={!props.filter.operator || !props.filter.field?.options?.length}
                   size={props.size}
                   class="min-w-50"
                 />
@@ -214,7 +226,8 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
           </Match>
           <Match
             when={
-              selectedField()?.type === "date" && !["is_set", "is_not_set"].includes(selectedOperator() ?? "")
+              props.filter.field?.type === "date" &&
+              !["is_set", "is_not_set"].includes(props.filter.operator ?? "")
             }
           >
             <DateInput
@@ -222,7 +235,7 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
               onChange={(val) => {
                 setSelectedDateValues("startDate", val);
                 let newVal = undefined;
-                if (val && !(selectedOperator() === "between" && selectedDateValues.endDate !== null)) {
+                if (val && !(props.filter.operator === "between" && selectedDateValues.endDate !== null)) {
                   newVal = { ...selectedDateValues };
                 }
                 handleValueChange(newVal);
@@ -230,11 +243,11 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
               max={
                 selectedDateValues.endDate ? selectedDateValues.endDate.toISOString().slice(0, 10) : undefined
               }
-              label={selectedOperator() === "between" ? "Start" : ""}
+              label={props.filter.operator === "between" ? "Start" : ""}
               size={props.size}
               class="min-w-50"
             />
-            <Show when={selectedOperator() === "between"}>
+            <Show when={props.filter.operator === "between"}>
               <DateInput
                 value={selectedDateValues.endDate}
                 label="End"

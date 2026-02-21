@@ -106,10 +106,9 @@ export interface FilterField<T> {
   searchable?: boolean; // Show in quick search text fields
 }
 
-interface SortOption {
-  field: string;
+export interface SortOption<T> {
+  field: keyof T;
   direction: "asc" | "desc";
-  label?: string;
 }
 
 // interface SavedFilterPreset {
@@ -129,8 +128,8 @@ interface FilterBarProps<T> {
   textSearchFields?: string[]; // Fields to search when typing in main input
 
   // Sorting
-  sortBy?: SortOption[];
-  setSortBy?: (sort: SortOption[]) => void;
+  sortBy?: SortOption<T>;
+  setSortBy?: (sort?: SortOption<T>) => void;
   sortableFields?: string[]; // Fields that can be sorted
 
   // Callbacks
@@ -231,10 +230,8 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
           />
         </TextField>
         <Popover open={filterDropdownOpen()} onOpenChange={setFilterDropdownOpen}>
-          <Popover.Trigger>
-            <Button size={props.size} modifier="square">
-              <ListFilter class="w-[1em] h-[1em]" />
-            </Button>
+          <Popover.Trigger as={Button} size={props.size} modifier="square">
+            <ListFilter class="w-[1em] h-[1em]" />
           </Popover.Trigger>
           <AddFilterDropdown<T>
             size={props.size}
@@ -243,14 +240,22 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
             setOpen={setFilterDropdownOpen}
           />
         </Popover>
-        <Popover>
-          <Popover.Trigger>
-            <Button size={props.size} modifier="square">
-              <ArrowDown class="w-[1em] h-[1em]" />
-            </Button>
-          </Popover.Trigger>
-          <AddSortingDropdown />
-        </Popover>
+        <Show when={props.setSortBy}>
+          <Popover>
+            <div class="indicator">
+              {props.sortBy && <span class="indicator-item status status-primary"></span>}
+              <Popover.Trigger as={Button} size={props.size} modifier="square">
+                <ArrowDown class="w-[1em] h-[1em]" />
+              </Popover.Trigger>
+            </div>
+            <AddSortingDropdown
+              size={props.size}
+              availableFields={props.availableFields ?? []}
+              sortBy={props.sortBy}
+              setSortBy={props.setSortBy!}
+            />
+          </Popover>
+        </Show>
       </div>
       {showFieldDropdown() && (
         <div class="absolute left-0 mt-1 w-full dropdown-content rounded-box bg-base-100 shadow-md z-20">

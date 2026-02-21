@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
-import { Filter, FilterBar, FilterField, FilterGroup } from "./FilterBar";
+import { Filter, FilterBar, FilterField, FilterGroup, SortOption } from "./FilterBar";
 import { Container } from "../Container";
 import { Button } from "../Button";
 import Plus from "lucide-solid/icons/plus";
@@ -60,6 +60,7 @@ export const Default: Story = {
       },
     ]);
     const [searchValue, setSearchValue] = createSignal("");
+    const [sortBy, setSortBy] = createSignal<SortOption<MockProductWithDate>>();
 
     const handleGroupCreate = (
       sourceFilter: Filter<MockProductWithDate>,
@@ -115,6 +116,8 @@ export const Default: Story = {
             onFilterRemove={(filter) => setItems((prev) => prev.filter((f) => f.id !== filter.id))}
             onGroupCreate={handleGroupCreate}
             onAddFilterGroup={handleAddFilterGroup}
+            sortBy={sortBy()}
+            setSortBy={setSortBy}
           />
         </div>
       </Container>
