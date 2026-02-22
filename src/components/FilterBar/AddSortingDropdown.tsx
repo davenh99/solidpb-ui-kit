@@ -29,17 +29,24 @@ export const AddSortingDropdown = <T,>(props: AddSortingDropDownProps<T>) => {
               const fieldActive = createMemo(() => field.name === props.sortBy?.field);
 
               const handleClick = () => {
-                if (props.sortBy?.direction === "asc") {
-                  // clear
-                  props.setSortBy();
-                  return;
-                }
+                const changingSameField = props.sortBy?.field === field.name;
 
-                props.setSortBy({
-                  // will also set to "desc" if no sortby exists
-                  direction: props.sortBy?.direction === "desc" ? "asc" : "desc",
-                  field: field.name,
-                });
+                if (!changingSameField) {
+                  props.setSortBy({
+                    direction: "desc",
+                    field: field.name,
+                  });
+                } else {
+                  props.setSortBy(
+                    props.sortBy?.direction === "asc"
+                      ? undefined
+                      : {
+                          // will also set to "desc" if no sortby exists
+                          direction: props.sortBy?.direction === "desc" ? "asc" : "desc",
+                          field: field.name,
+                        },
+                  );
+                }
               };
 
               return (

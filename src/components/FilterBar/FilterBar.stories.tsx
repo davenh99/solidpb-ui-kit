@@ -48,13 +48,11 @@ export const Default: Story = {
     >([
       {
         field: { type: "bool", name: "sellable", label: "Sellable" },
-        id: "123",
         operator: "is",
         value: "true",
       },
       {
         field: { type: "number", name: "percentageDiscount", label: "Discount" },
-        id: "34",
         operator: "greater_than",
         value: "12",
       },
@@ -77,7 +75,6 @@ export const Default: Story = {
 
       // Create new group
       const newGroup: FilterGroup<MockProductWithDate> = {
-        id: crypto.randomUUID(),
         filters: [targetFilter, sourceFilter],
       };
 
@@ -92,7 +89,6 @@ export const Default: Story = {
       }
 
       const newGroup: FilterGroup<MockProductWithDate> = {
-        id: crypto.randomUUID(),
         filters: newFilters,
       };
 

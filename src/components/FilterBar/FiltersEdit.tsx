@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, For, JSXElement, Show } from "solid-js";
+import { createMemo, createSignal, For, JSXElement, Show } from "solid-js";
 
 import { Filter, FilterField } from "./FilterBar";
 import { Button } from "../Button";

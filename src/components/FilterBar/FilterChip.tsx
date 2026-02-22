@@ -9,7 +9,7 @@ import { Filter, FilterGroup, filterLabels } from "./FilterBar";
 import { Button } from "../Button";
 
 interface FilterChipOrGroupProps<T> {
-  onGroupCreate: (sourceFilter: Filter<T>, targetFilter: Filter<T>) => void;
+  onGroupDrag: (sourceInd: number, targetInd: number, sourceFilterGroupInd?: number) => void;
   onDelete?: () => void;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   class?: string;
@@ -108,7 +108,7 @@ export const FilterChip = <T,>(props: FilterChipProps<T>) => {
         const targetFilter = props.filter;
 
         // Call the callback to create a group
-        props.onGroupCreate?.(sourceFilter, targetFilter);
+        props.onGroupDrag?.(sourceFilter, targetFilter);
       },
     });
 
@@ -191,9 +191,9 @@ export const FilterGroupChip = <T,>(props: FilterGroupProps<T>) => {
         {(filter, ind) => (
           <>
             {ind() > 0 && <span class="italic mx-0.5">Or</span>}
-            <FilterChip
+            <FilterChip<T>
               filter={filter}
-              onGroupCreate={props.onGroupCreate}
+              onGroupCreate={props.onGroupDrag}
               class="badge-primary"
               isInGroup={true}
             />

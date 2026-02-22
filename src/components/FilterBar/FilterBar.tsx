@@ -10,6 +10,7 @@ import FilterChip, { FilterGroupChip } from "./FilterChip";
 import { Button } from "../Button";
 import AddFilterDropdown from "./AddFilterDropdown";
 import AddSortingDropdown from "./AddSortingDropdown";
+import EditFiltersDropdown from "./EditFiltersDropdown";
 
 export type FieldType = "text" | "number" | "date" | "select" | "bool";
 
@@ -74,26 +75,25 @@ export const filterLabels: Record<FieldType, Partial<Record<FilterOperator, stri
   },
 };
 
-export type FilterValue =
-  | string
-  | number
-  | boolean
-  | { label: string; value: string }
-  | {
-      startDate: Date | null;
-      endDate: Date | null;
-    }
-  | null;
+export type FilterSelectValue = {
+  label: string;
+  value: string;
+};
+
+export type FilterDateValue = {
+  startDate: Date | null;
+  endDate: Date | null;
+};
+
+export type FilterValue = string | number | boolean | FilterSelectValue | FilterDateValue | null;
 
 export interface Filter<T> {
-  id?: string;
   field: FilterField<T>;
   operator: FilterOperator;
   value: FilterValue;
 }
 
 export interface FilterGroup<T> {
-  id?: string;
   filters: Filter<T>[]; // Combined with OR logic
 }
 
@@ -125,20 +125,19 @@ interface FilterBarProps<T> {
 
   // Configuration
   availableFields?: FilterField<T>[];
-  textSearchFields?: string[]; // Fields to search when typing in main input
 
   // Sorting
   sortBy?: SortOption<T>;
   setSortBy?: (sort?: SortOption<T>) => void;
-  sortableFields?: string[]; // Fields that can be sorted
 
   // Callbacks
-  onFilterRemove: (filter: Filter<T>) => void;
-  // onGroupCreate is inadequate, need to handle all drag cases
-  onGroupCreate: (sourceFilter: Filter<T>, targetFilter: Filter<T>) => void;
   onAddFilterGroup: (filters: Filter<T>[]) => void;
-  onFilterUpdate?: (filter: Filter<T>) => void;
-  onGroupUpdate?: (group: FilterGroup<T>) => void;
+  onUpdateFilterGroup: (ind: number, filters: Filter<T>[]) => void;
+  onFilterRemove: (ind: number, filter: Filter<T>) => void;
+
+  // Dragging
+  // if sourceFilterGroupInd exists, we are dragging an item from the group, not the group itself
+  onGroupDrag: (sourceInd: number, targetInd: number, sourceFilterGroupInd?: number) => void;
 
   // UI
   value: string;
@@ -179,7 +178,6 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
 
   const createTextFilter = (field: FilterField<T>) => {
     const newFilter: Filter<T> = {
-      id: crypto.randomUUID(),
       field,
       operator: "loose_contains",
       value: props.value,
@@ -204,25 +202,40 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
         >
           <Search class="w-[1em] h-[1em] opacity-70 m-1.5" />
           <For each={props.items}>
-            {(item) => (
-              <Show
-                when={isFilterGroup(item)}
-                fallback={
-                  <FilterChip
-                    onDelete={() => props.onFilterRemove(item as Filter<T>)}
-                    filter={item as Filter<T>}
+            {(item, i) => {
+              const [itemOpen, setItemOpen] = createSignal(false);
+
+              return (
+                <Popover open={itemOpen()} onOpenChange={setItemOpen}>
+                  <Popover.Trigger>
+                    <Show
+                      when={isFilterGroup(item)}
+                      fallback={
+                        <FilterChip<T>
+                          onDelete={() => props.onFilterRemove(i(), item as Filter<T>)}
+                          filter={item as Filter<T>}
+                          size={props.size}
+                          onGroupDrag={props.onGroupDrag}
+                        />
+                      }
+                    >
+                      <FilterGroupChip<T>
+                        filterGroup={item as FilterGroup<T>}
+                        size={props.size}
+                        onGroupDrag={props.onGroupDrag}
+                      />
+                    </Show>
+                  </Popover.Trigger>
+                  <EditFiltersDropdown
                     size={props.size}
-                    onGroupCreate={props.onGroupCreate}
+                    availableFields={props.availableFields ?? []}
+                    onSaveFilters={(filters) => props.onUpdateFilterGroup(i(), filters)}
+                    currentFilters={isFilterGroup(item) ? item.filters : [item]}
+                    setOpen={setItemOpen}
                   />
-                }
-              >
-                <FilterGroupChip
-                  filterGroup={item as FilterGroup<T>}
-                  size={props.size}
-                  onGroupCreate={props.onGroupCreate}
-                />
-              </Show>
-            )}
+                </Popover>
+              );
+            }}
           </For>
           <TextField.Input
             placeholder={props.placeholder || "Search"}
@@ -243,7 +256,7 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
         <Show when={props.setSortBy}>
           <Popover>
             <div class="indicator">
-              {props.sortBy && <span class="indicator-item status status-primary"></span>}
+              {props.sortBy && <span class="indicator-item status status-success"></span>}
               <Popover.Trigger as={Button} size={props.size} modifier="square">
                 <ArrowDown class="w-[1em] h-[1em]" />
               </Popover.Trigger>

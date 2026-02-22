@@ -1,8 +1,17 @@
-import { createMemo, createSignal, Match, Show, Switch, batch, createEffect } from "solid-js";
+import { createMemo, createSignal, Match, Show, Switch } from "solid-js";
 import { createStore } from "solid-js/store";
 import X from "lucide-solid/icons/x";
 
-import { Filter, FilterField, filterDefaults, filterLabels, FilterOperator, FilterValue } from "./FilterBar";
+import {
+  Filter,
+  FilterField,
+  filterDefaults,
+  filterLabels,
+  FilterOperator,
+  FilterValue,
+  FilterSelectValue,
+  FilterDateValue,
+} from "./FilterBar";
 import { Select } from "../Select";
 import { Input } from "../Input";
 import { NumberInput } from "../NumberInput";
@@ -22,17 +31,27 @@ interface FilterEditProps<T> {
 
 export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
   const [selectedBoolValue, setSelectedBoolValue] = createSignal<{ label: string; value: boolean } | null>(
-    null,
+    props.filter.field?.type === "bool"
+      ? {
+          label: (props.filter.value as boolean) ? "Is True" : "Is False",
+          value: props.filter.value as boolean,
+        }
+      : null,
   );
-  const [selectedTextValue, setSelectedTextValue] = createSignal("");
-  const [selectedNumberValue, setSelectedNumberValue] = createSignal(0);
-  const [selectedSelectValue, setSelectedSelectValue] = createSignal<{ label: string; value: string } | null>(
-    null,
+  const [selectedTextValue, setSelectedTextValue] = createSignal<string>(
+    props.filter.field?.type === "text" ? (props.filter.value as string) : "",
   );
-  const [selectedDateValues, setSelectedDateValues] = createStore<{
-    startDate: Date | null;
-    endDate: Date | null;
-  }>({ startDate: null, endDate: null });
+  const [selectedNumberValue, setSelectedNumberValue] = createSignal<number>(
+    props.filter.field?.type === "number" ? (props.filter.value as number) : 0,
+  );
+  const [selectedSelectValue, setSelectedSelectValue] = createSignal<FilterSelectValue | null>(
+    props.filter.field?.type === "select" ? (props.filter.value as FilterSelectValue | null) : null,
+  );
+  const [selectedDateValues, setSelectedDateValues] = createStore<FilterDateValue>(
+    props.filter.field?.type === "date"
+      ? (props.filter.value as FilterDateValue)
+      : { startDate: null, endDate: null },
+  );
 
   const availableOperators = createMemo(() =>
     props.filter.field
@@ -196,7 +215,7 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
             <Show
               when={["in", "not_in"].includes(props.filter.operator ?? "")}
               fallback={
-                <Select<{ label: string; value: string }>
+                <Select<FilterSelectValue>
                   value={selectedSelectValue()}
                   label="Value"
                   labelKey="label"
