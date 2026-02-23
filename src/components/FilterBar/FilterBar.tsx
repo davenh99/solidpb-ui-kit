@@ -12,6 +12,7 @@ import { FilterChip, FilterGroupChip } from "./FilterChip";
 import { Button } from "../Button";
 import AddFilterDropdown from "./AddFilterDropdown";
 import AddSortingDropdown from "./AddSortingDropdown";
+import EditFiltersDropdown from "./EditFiltersDropdown";
 
 export type FieldType = "text" | "number" | "date" | "select" | "bool";
 
@@ -187,7 +188,6 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
     };
 
     props.onAddFilterGroup([newFilter]);
-
     props.onChangeValue("");
   };
 
@@ -245,38 +245,46 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
 
               return (
                 <>
-                  {/* <Popover open={itemOpen()} onOpenChange={setItemOpen}>
-                   <Popover.Trigger> */}
-                  <Show
-                    when={isFilterGroup(item)}
-                    fallback={
-                      <FilterChip<T>
-                        onDelete={() => props.onFilterRemove(i(), item as Filter<T>)}
-                        filter={item as Filter<T>}
-                        size={props.size}
-                        onGroupDrag={(targetInd) => props.onGroupDrag(i(), targetInd)}
-                        index={i()}
-                      />
-                    }
-                  >
-                    <FilterGroupChip<T>
-                      filterGroup={item as FilterGroup<T>}
-                      size={props.size}
-                      onGroupDrag={(targetInd, sourceFilterGroupInd) =>
-                        props.onGroupDrag(i(), targetInd, sourceFilterGroupInd)
+                  <Popover open={itemOpen()} onOpenChange={setItemOpen}>
+                    <Show
+                      when={isFilterGroup(item)}
+                      fallback={
+                        <Popover.Anchor>
+                          <Popover.Trigger
+                            as={FilterChip<T>}
+                            onDelete={() => props.onFilterRemove(i(), item as Filter<T>)}
+                            filter={item as Filter<T>}
+                            size={props.size}
+                            onGroupDrag={(sourceInd, sourceFilterGroupInd) =>
+                              props.onGroupDrag(sourceInd, i(), sourceFilterGroupInd)
+                            }
+                            index={i()}
+                            setOpen={setItemOpen}
+                          />
+                        </Popover.Anchor>
                       }
-                      index={i()}
+                    >
+                      <Popover.Anchor>
+                        <Popover.Trigger
+                          as={FilterGroupChip<T>}
+                          filterGroup={item as FilterGroup<T>}
+                          size={props.size}
+                          onGroupDrag={(sourceInd, sourceFilterGroupInd) =>
+                            props.onGroupDrag(sourceInd, i(), sourceFilterGroupInd)
+                          }
+                          index={i()}
+                          setOpen={setItemOpen}
+                        />
+                      </Popover.Anchor>
+                    </Show>
+                    <EditFiltersDropdown
+                      size={props.size}
+                      availableFields={props.availableFields ?? []}
+                      onSaveFilters={(filters) => props.onUpdateFilterGroup(i(), filters)}
+                      currentFilters={isFilterGroup(item) ? item.filters : [item]}
+                      setOpen={setItemOpen}
                     />
-                  </Show>
-                  {/* </Popover.Trigger> 
-                  <EditFiltersDropdown
-                     size={props.size}
-                     availableFields={props.availableFields ?? []}
-                     onSaveFilters={(filters) => props.onUpdateFilterGroup(i(), filters)}
-                     currentFilters={isFilterGroup(item) ? item.filters : [item]}
-                     setOpen={setItemOpen}
-                   />
-                 </Popover> */}
+                  </Popover>
                 </>
               );
             }}
@@ -300,7 +308,7 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
         <Show when={props.setSortBy}>
           <Popover>
             <div class="indicator">
-              {props.sortBy && <span class="indicator-item status status-success"></span>}
+              {props.sortBy && <span class="indicator-item status status-neutral"></span>}
               <Popover.Trigger as={Button} size={props.size} modifier="square">
                 <ArrowDown class="w-[1em] h-[1em]" />
               </Popover.Trigger>

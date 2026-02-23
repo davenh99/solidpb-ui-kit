@@ -56,6 +56,20 @@ export const Default: Story = {
         operator: "greater_than",
         value: "12",
       },
+      {
+        filters: [
+          {
+            field: { type: "bool", name: "inStock", label: "In Stock" },
+            operator: "is",
+            value: "true",
+          },
+          {
+            field: { type: "number", name: "percentageDiscount", label: "Discount" },
+            operator: "is",
+            value: "120",
+          },
+        ],
+      },
     ]);
     const [searchValue, setSearchValue] = createSignal("");
     const [sortBy, setSortBy] = createSignal<SortOption<MockProductWithDate>>();
@@ -96,11 +110,68 @@ export const Default: Story = {
     };
 
     const handleUpdateFilterGroup = (ind: number, filters: Filter<MockProductWithDate>[]) => {
-      console.log(ind, filters);
+      setItems((prev) => {
+        const updated = [...prev];
+        if (filters.length === 1) {
+          // Collapse group back to single filter
+          updated[ind] = filters[0];
+        } else {
+          // just in case we do a spread
+          updated[ind] = { filters: [...filters] };
+        }
+        return updated;
+      });
     };
 
+    // AI generated could be convoluted, didn't even look at it
     const handleGroupDrag = (sourceInd: number, targetInd: number, sourceFilterGroupInd?: number) => {
-      console.log(sourceInd, targetInd, sourceFilterGroupInd);
+      setItems((prev) => {
+        const updated = [...prev];
+
+        // Extract the item being dragged
+        let draggedItem: Filter<MockProductWithDate> | FilterGroup<MockProductWithDate>;
+
+        if (sourceFilterGroupInd !== undefined) {
+          // Dragging a filter OUT of a group
+          const sourceGroup = updated[sourceInd] as FilterGroup<MockProductWithDate>;
+          draggedItem = sourceGroup.filters[sourceFilterGroupInd];
+
+          // Remove it from the group, or collapse group if only one left
+          const remainingFilters = sourceGroup.filters.filter((_, i) => i !== sourceFilterGroupInd);
+          if (remainingFilters.length === 1) {
+            updated[sourceInd] = remainingFilters[0];
+          } else {
+            updated[sourceInd] = { filters: remainingFilters };
+          }
+        } else {
+          // Dragging a whole filter/group
+          draggedItem = updated[sourceInd];
+          updated.splice(sourceInd, 1);
+
+          // Adjust targetInd if needed after splice
+          if (targetInd > sourceInd) targetInd--;
+        }
+
+        if (targetInd === -1) {
+          // Dropped on the bar itself - append to end
+          return [...updated, draggedItem];
+        }
+
+        // Dropped on another chip - merge into a group
+        const targetItem = updated[targetInd];
+
+        if ("filters" in targetItem) {
+          // Target is already a group - add to it
+          updated[targetInd] = {
+            filters: [...targetItem.filters, draggedItem as Filter<MockProductWithDate>],
+          };
+        } else {
+          // Merge source and target into a new group
+          updated[targetInd] = { filters: [targetItem, draggedItem as Filter<MockProductWithDate>] };
+        }
+
+        return updated;
+      });
     };
 
     return (

@@ -32,6 +32,7 @@ export const EditFiltersDropdown = <T,>(props: EditFiltersDropdownProps<T>) => {
           availableFields={props.availableFields}
           filters={props.currentFilters}
           onSaveFilters={handleSaveFilters}
+          filtersReady
         />
       </Popover.Content>
     </Popover.Portal>

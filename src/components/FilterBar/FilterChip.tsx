@@ -1,6 +1,5 @@
-import { createEffect, createMemo, createSignal, For, onCleanup } from "solid-js";
+import { createEffect, createMemo, createSignal, For, onCleanup, Setter } from "solid-js";
 import { dropTargetForElements, draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-import { Popover } from "@kobalte/core/popover";
 import invariant from "tiny-invariant";
 import CloseIcon from "lucide-solid/icons/x";
 import { tv } from "tailwind-variants";
@@ -9,11 +8,12 @@ import { Filter, FilterGroup, filterLabels } from "./FilterBar";
 import { Button } from "../Button";
 
 interface FilterChipOrGroupProps {
-  onGroupDrag: (targetInd: number, sourceFilterGroupInd?: number) => void;
+  onGroupDrag: (sourceInd: number, sourceFilterGroupInd?: number) => void;
   onDelete?: () => void;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   class?: string;
   index: number;
+  setOpen?: Setter<boolean>;
 }
 
 interface FilterChipProps<T> extends FilterChipOrGroupProps {
@@ -90,10 +90,13 @@ export const FilterChip = <T,>(props: FilterChipProps<T>) => {
       onDragLeave() {
         setDragging("idle");
       },
-      onDrop() {
+      onDrop({ source }) {
         setDragging("idle");
-        // add the target ind
-        props.onGroupDrag(props.index);
+
+        if ((source.data.index as number) === props.index) return;
+
+        // add the target ind and group source ind if it exists
+        props.onGroupDrag(source.data.index as number, source.data.groupIndex as number | undefined);
       },
     });
 
@@ -122,7 +125,7 @@ export const FilterChip = <T,>(props: FilterChipProps<T>) => {
       },
     });
 
-    onCleanup(dispose);
+    onCleanup(() => dispose());
   });
 
   const bgStyle = createMemo(() => {
@@ -137,6 +140,7 @@ export const FilterChip = <T,>(props: FilterChipProps<T>) => {
       class={filterChip({ size: props.size, class: props.class })}
       ref={ref}
       style={{ opacity: dragging() === "dragging" ? 0.2 : 1, ...bgStyle() }}
+      onClick={() => props.setOpen?.((prev) => !prev)}
     >
       <p>
         <span class="font-bold">{String(props.filter.field.label)}</span>
@@ -198,12 +202,12 @@ export const FilterGroupChip = <T,>(props: FilterGroupProps<T>) => {
       onDragLeave() {
         setDragging("idle");
       },
-      onDrop({ source }) {
+      onDrop({ source, location }) {
         setDragging("idle");
-        const sourceFilterGroupIndex = source.data.groupIndex as number | undefined;
+        if (location.current.dropTargets[0].element !== ref) return;
 
         // add the target ind and group source ind if it exists
-        props.onGroupDrag(props.index, sourceFilterGroupIndex);
+        props.onGroupDrag(source.data.index as number, source.data.groupIndex as number | undefined);
       },
     });
 
@@ -257,7 +261,7 @@ export const FilterGroupChip = <T,>(props: FilterGroupProps<T>) => {
               class="badge-primary"
               isInGroup={true}
               groupIndex={ind()}
-              index={-1}
+              index={props.index}
             />
           </>
         )}

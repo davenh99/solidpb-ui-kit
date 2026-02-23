@@ -12,11 +12,14 @@ interface FiltersEditProps<T> {
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   saveTrigger: JSXElement;
   addConditionTrigger?: JSXElement;
+  filtersReady?: boolean;
 }
 
 export const FiltersEdit = <T,>(props: FiltersEditProps<T>) => {
   const [filters, setFilters] = createStore<Partial<Filter<T>>[]>(props.filters);
-  const [filtersReady, setFiltersReady] = createSignal<boolean[]>(props.filters.map(() => false));
+  const [filtersReady, setFiltersReady] = createSignal<boolean[]>(
+    props.filters.map(() => props.filtersReady || false),
+  );
 
   const allFiltersReady = createMemo(() => [...filtersReady()].every(Boolean));
 
