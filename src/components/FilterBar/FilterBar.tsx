@@ -8,7 +8,7 @@ import ListFilter from "lucide-solid/icons/list-filter";
 import ArrowDown from "lucide-solid/icons/arrow-down-narrow-wide";
 import invariant from "tiny-invariant";
 
-import { DraggableChip } from "./FilterChip";
+import { FilterChip, FilterGroupChip } from "./FilterChip";
 import { Button } from "../Button";
 import AddFilterDropdown from "./AddFilterDropdown";
 import AddSortingDropdown from "./AddSortingDropdown";

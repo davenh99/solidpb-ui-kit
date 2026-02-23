@@ -1,13 +1,12 @@
-import { createEffect, createMemo, createSignal, For, onCleanup, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, For, onCleanup } from "solid-js";
 import { dropTargetForElements, draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { Popover } from "@kobalte/core/popover";
 import invariant from "tiny-invariant";
 import CloseIcon from "lucide-solid/icons/x";
 import { tv } from "tailwind-variants";
 
-import { Filter, FilterField, FilterGroup, filterLabels } from "./FilterBar";
+import { Filter, FilterGroup, filterLabels } from "./FilterBar";
 import { Button } from "../Button";
-import { EditFiltersDropdown } from "./EditFiltersDropdown";
 
 interface FilterChipOrGroupProps {
   onGroupDrag: (targetInd: number, sourceFilterGroupInd?: number) => void;
@@ -270,64 +269,4 @@ export const FilterGroupChip = <T,>(props: FilterGroupProps<T>) => {
   );
 };
 
-interface DraggableChipProps<T> extends FilterChipOrGroupProps {
-  item: Filter<T> | FilterGroup<T>;
-  availableFields: FilterField<T>[];
-  onSaveFilters: (filters: Filter<T>[]) => void;
-  isFilterGroup: boolean;
-  onDelete: () => void;
-}
-
-// this will have drag handlers, and dropdown here
-export const DraggableChip = <T,>(props: DraggableChipProps<T>) => {
-  let ref!: HTMLDivElement;
-  const [itemOpen, setItemOpen] = createSignal(false);
-  const [dragging, setDragging] = createSignal<DraggingState>("idle");
-
-  const bgStyle = createMemo(() => {
-    if (dragging() === "dragging-over") {
-      return { "background-color": "color-mix(in srgb, var(--color-primary) 10%, transparent)" };
-    }
-    return {};
-  });
-
-  return (
-    <Popover open={itemOpen()} onOpenChange={setItemOpen}>
-      <Popover.Trigger>
-        <Show
-          when={props.isFilterGroup}
-          fallback={
-            <FilterChip<T>
-              onDelete={props.onDelete}
-              filter={props.item as Filter<T>}
-              size={props.size}
-              // onGroupDrag={(targetInd) => props.onGroupDrag(props.index, targetInd)}
-              // index={props.index}
-            />
-          }
-        >
-          <FilterGroupChip<T>
-            filterGroup={props.item as FilterGroup<T>}
-            onDelete={props.onDelete}
-            size={props.size}
-            // onGroupDrag={(targetInd, sourceFilterGroupInd) =>
-            //   props.onGroupDrag(props.index, targetInd, sourceFilterGroupInd)
-            // }
-            // index={props.index}
-          />
-        </Show>
-      </Popover.Trigger>
-      <EditFiltersDropdown
-        size={props.size}
-        availableFields={props.availableFields}
-        onSaveFilters={props.onSaveFilters}
-        currentFilters={
-          props.isFilterGroup ? (props.item as FilterGroup<T>).filters : [props.item as Filter<T>]
-        }
-        setOpen={setItemOpen}
-      />
-    </Popover>
-  );
-};
-
-export default DraggableChip;
+export default FilterChip;
