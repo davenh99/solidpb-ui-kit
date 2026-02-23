@@ -60,27 +60,27 @@ export const Default: Story = {
     const [searchValue, setSearchValue] = createSignal("");
     const [sortBy, setSortBy] = createSignal<SortOption<MockProductWithDate>>();
 
-    const handleGroupCreate = (
-      sourceFilter: Filter<MockProductWithDate>,
-      targetFilter: Filter<MockProductWithDate>,
-    ) => {
-      // Remove both source and target filters from items
-      const remainingItems = items().filter((item) => {
-        // Check if it's a filter (not a group)
-        if ("filters" in item) return true;
+    // const handleGroupCreate = (
+    //   sourceFilter: Filter<MockProductWithDate>,
+    //   targetFilter: Filter<MockProductWithDate>,
+    // ) => {
+    //   // Remove both source and target filters from items
+    //   const remainingItems = items().filter((item) => {
+    //     // Check if it's a filter (not a group)
+    //     if ("filters" in item) return true;
 
-        // Keep items that aren't the source or target
-        return item.id !== sourceFilter.id && item.id !== targetFilter.id;
-      });
+    //     // Keep items that aren't the source or target
+    //     return item.id !== sourceFilter.id && item.id !== targetFilter.id;
+    //   });
 
-      // Create new group
-      const newGroup: FilterGroup<MockProductWithDate> = {
-        filters: [targetFilter, sourceFilter],
-      };
+    //   // Create new group
+    //   const newGroup: FilterGroup<MockProductWithDate> = {
+    //     filters: [targetFilter, sourceFilter],
+    //   };
 
-      // Update items with remaining filters + new group
-      setItems([...remainingItems, newGroup]);
-    };
+    //   // Update items with remaining filters + new group
+    //   setItems([...remainingItems, newGroup]);
+    // };
 
     const handleAddFilterGroup = (newFilters: Filter<MockProductWithDate>[]) => {
       if (newFilters.length === 1) {
@@ -93,6 +93,14 @@ export const Default: Story = {
       };
 
       setItems?.([...(items() || []), newGroup]);
+    };
+
+    const handleUpdateFilterGroup = (ind: number, filters: Filter<MockProductWithDate>[]) => {
+      console.log(ind, filters);
+    };
+
+    const handleGroupDrag = (sourceInd: number, targetInd: number, sourceFilterGroupInd?: number) => {
+      console.log(sourceInd, targetInd, sourceFilterGroupInd);
     };
 
     return (
@@ -109,9 +117,10 @@ export const Default: Story = {
             onChangeValue={setSearchValue}
             items={items()}
             setItems={setItems}
-            onFilterRemove={(filter) => setItems((prev) => prev.filter((f) => f.id !== filter.id))}
-            onGroupCreate={handleGroupCreate}
+            onFilterRemove={(ind) => setItems((prev) => prev.filter((_, i) => ind !== i))}
             onAddFilterGroup={handleAddFilterGroup}
+            onUpdateFilterGroup={handleUpdateFilterGroup}
+            onGroupDrag={handleGroupDrag}
             sortBy={sortBy()}
             setSortBy={setSortBy}
           />

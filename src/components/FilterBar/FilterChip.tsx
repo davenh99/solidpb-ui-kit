@@ -1,24 +1,27 @@
-import { createEffect, createMemo, createSignal, For, onCleanup } from "solid-js";
-import { attachClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+import { createEffect, createMemo, createSignal, For, onCleanup, Show } from "solid-js";
 import { dropTargetForElements, draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import { Popover } from "@kobalte/core/popover";
 import invariant from "tiny-invariant";
 import CloseIcon from "lucide-solid/icons/x";
 import { tv } from "tailwind-variants";
 
-import { Filter, FilterGroup, filterLabels } from "./FilterBar";
+import { Filter, FilterField, FilterGroup, filterLabels } from "./FilterBar";
 import { Button } from "../Button";
+import { EditFiltersDropdown } from "./EditFiltersDropdown";
 
-interface FilterChipOrGroupProps<T> {
-  onGroupDrag: (sourceInd: number, targetInd: number, sourceFilterGroupInd?: number) => void;
+interface FilterChipOrGroupProps {
+  onGroupDrag: (targetInd: number, sourceFilterGroupInd?: number) => void;
   onDelete?: () => void;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   class?: string;
+  index: number;
 }
 
-interface FilterChipProps<T> extends FilterChipOrGroupProps<T> {
+interface FilterChipProps<T> extends FilterChipOrGroupProps {
   onClick?: (filter: Filter<T>) => void;
   filter: Filter<T>;
   isInGroup?: boolean;
+  groupIndex?: number;
 }
 
 const filterChip = tv({
@@ -37,11 +40,9 @@ const filterChip = tv({
 export const FilterChip = <T,>(props: FilterChipProps<T>) => {
   let ref!: HTMLDivElement;
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
-
   const filterOperator = createMemo(() => {
     return filterLabels[props.filter.field.type][props.filter.operator] || "has";
   });
-
   const valueLabel = createMemo(() => {
     let val = props.filter.value;
     if (val === null) return "";
@@ -77,18 +78,7 @@ export const FilterChip = <T,>(props: FilterChipProps<T>) => {
         if (source.element === element) {
           return false;
         }
-        // only allowing filter chips to be dropped on me, and only if not in group
-        return !!source.data.isFilterChip && !props.isInGroup;
-      },
-      getData({ input }) {
-        return attachClosestEdge(
-          {
-            filter: props.filter,
-            isFilterChip: true,
-            isInGroup: props.isInGroup || false,
-          },
-          { element, input, allowedEdges: [] },
-        );
+        return !!source.data.isFilterChip || !!source.data.isFilterGroupChip;
       },
       onDragEnter() {
         setDragging("dragging-over");
@@ -101,14 +91,10 @@ export const FilterChip = <T,>(props: FilterChipProps<T>) => {
       onDragLeave() {
         setDragging("idle");
       },
-      onDrop({ source }) {
+      onDrop() {
         setDragging("idle");
-        // Extract the source filter from the dragged element
-        const sourceFilter = source.data.filter as Filter<T>;
-        const targetFilter = props.filter;
-
-        // Call the callback to create a group
-        props.onGroupDrag?.(sourceFilter, targetFilter);
+        // add the target ind
+        props.onGroupDrag(props.index);
       },
     });
 
@@ -123,9 +109,10 @@ export const FilterChip = <T,>(props: FilterChipProps<T>) => {
       element,
       getInitialData() {
         return {
-          filter: props.filter,
           isFilterChip: true,
+          index: props.index,
           isInGroup: props.isInGroup || false,
+          groupIndex: props.groupIndex,
         };
       },
       onDragStart() {
@@ -166,7 +153,7 @@ export const FilterChip = <T,>(props: FilterChipProps<T>) => {
   );
 };
 
-interface FilterGroupProps<T> extends FilterChipOrGroupProps<T> {
+interface FilterGroupProps<T> extends FilterChipOrGroupProps {
   filterGroup: FilterGroup<T>;
   onClick?: (filterGroup: FilterGroup<T>) => void;
 }
@@ -185,17 +172,93 @@ const filterGroupChip = tv({
 });
 
 export const FilterGroupChip = <T,>(props: FilterGroupProps<T>) => {
+  let ref!: HTMLDivElement;
+  const [dragging, setDragging] = createSignal<DraggingState>("idle");
+
+  createEffect(() => {
+    const element = ref;
+    invariant(element);
+
+    const dispose = dropTargetForElements({
+      element,
+      canDrop({ source }) {
+        // not allowing dropping on yourself
+        if (source.element === element) {
+          return false;
+        }
+        return !!source.data.isFilterChip || !!source.data.isFilterGroupChip;
+      },
+      onDragEnter() {
+        setDragging("dragging-over");
+      },
+      onDrag() {
+        if (dragging() !== "dragging-over") {
+          setDragging("dragging-over");
+        }
+      },
+      onDragLeave() {
+        setDragging("idle");
+      },
+      onDrop({ source }) {
+        setDragging("idle");
+        const sourceFilterGroupIndex = source.data.groupIndex as number | undefined;
+
+        // add the target ind and group source ind if it exists
+        props.onGroupDrag(props.index, sourceFilterGroupIndex);
+      },
+    });
+
+    onCleanup(dispose);
+  });
+
+  createEffect(() => {
+    const element = ref;
+    invariant(element);
+
+    const dispose = draggable({
+      element,
+      getInitialData() {
+        return {
+          isFilterGroupChip: true,
+          isInGroup: false,
+          index: props.index,
+        };
+      },
+      onDragStart() {
+        setDragging("dragging");
+      },
+      onDrop() {
+        setDragging("idle");
+      },
+    });
+
+    onCleanup(dispose);
+  });
+
+  const bgStyle = createMemo(() => {
+    if (dragging() === "dragging-over") {
+      return { "background-color": "color-mix(in srgb, var(--color-primary) 10%, transparent)" };
+    }
+    return {};
+  });
+
   return (
-    <div class={filterGroupChip({ size: props.size })}>
+    <div
+      ref={ref}
+      class={filterGroupChip({ size: props.size })}
+      style={{ opacity: dragging() === "dragging" ? 0.2 : 1, ...bgStyle() }}
+    >
       <For each={props.filterGroup.filters}>
         {(filter, ind) => (
           <>
             {ind() > 0 && <span class="italic mx-0.5">Or</span>}
             <FilterChip<T>
               filter={filter}
-              onGroupCreate={props.onGroupDrag}
+              onGroupDrag={props.onGroupDrag}
               class="badge-primary"
               isInGroup={true}
+              groupIndex={ind()}
+              index={-1}
             />
           </>
         )}
@@ -207,4 +270,64 @@ export const FilterGroupChip = <T,>(props: FilterGroupProps<T>) => {
   );
 };
 
-export default FilterChip;
+interface DraggableChipProps<T> extends FilterChipOrGroupProps {
+  item: Filter<T> | FilterGroup<T>;
+  availableFields: FilterField<T>[];
+  onSaveFilters: (filters: Filter<T>[]) => void;
+  isFilterGroup: boolean;
+  onDelete: () => void;
+}
+
+// this will have drag handlers, and dropdown here
+export const DraggableChip = <T,>(props: DraggableChipProps<T>) => {
+  let ref!: HTMLDivElement;
+  const [itemOpen, setItemOpen] = createSignal(false);
+  const [dragging, setDragging] = createSignal<DraggingState>("idle");
+
+  const bgStyle = createMemo(() => {
+    if (dragging() === "dragging-over") {
+      return { "background-color": "color-mix(in srgb, var(--color-primary) 10%, transparent)" };
+    }
+    return {};
+  });
+
+  return (
+    <Popover open={itemOpen()} onOpenChange={setItemOpen}>
+      <Popover.Trigger>
+        <Show
+          when={props.isFilterGroup}
+          fallback={
+            <FilterChip<T>
+              onDelete={props.onDelete}
+              filter={props.item as Filter<T>}
+              size={props.size}
+              // onGroupDrag={(targetInd) => props.onGroupDrag(props.index, targetInd)}
+              // index={props.index}
+            />
+          }
+        >
+          <FilterGroupChip<T>
+            filterGroup={props.item as FilterGroup<T>}
+            onDelete={props.onDelete}
+            size={props.size}
+            // onGroupDrag={(targetInd, sourceFilterGroupInd) =>
+            //   props.onGroupDrag(props.index, targetInd, sourceFilterGroupInd)
+            // }
+            // index={props.index}
+          />
+        </Show>
+      </Popover.Trigger>
+      <EditFiltersDropdown
+        size={props.size}
+        availableFields={props.availableFields}
+        onSaveFilters={props.onSaveFilters}
+        currentFilters={
+          props.isFilterGroup ? (props.item as FilterGroup<T>).filters : [props.item as Filter<T>]
+        }
+        setOpen={setItemOpen}
+      />
+    </Popover>
+  );
+};
+
+export default DraggableChip;

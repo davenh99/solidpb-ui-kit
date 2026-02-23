@@ -1,16 +1,17 @@
-import { createMemo, createSignal, For, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, For, onCleanup, Show } from "solid-js";
+import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { TextField } from "@kobalte/core/text-field";
 import { Popover } from "@kobalte/core/popover";
 import { tv } from "tailwind-variants";
 import Search from "lucide-solid/icons/search";
 import ListFilter from "lucide-solid/icons/list-filter";
 import ArrowDown from "lucide-solid/icons/arrow-down-narrow-wide";
+import invariant from "tiny-invariant";
 
-import FilterChip, { FilterGroupChip } from "./FilterChip";
+import { DraggableChip } from "./FilterChip";
 import { Button } from "../Button";
 import AddFilterDropdown from "./AddFilterDropdown";
 import AddSortingDropdown from "./AddSortingDropdown";
-import EditFiltersDropdown from "./EditFiltersDropdown";
 
 export type FieldType = "text" | "number" | "date" | "select" | "bool";
 
@@ -157,11 +158,11 @@ const filterBar = tv({
   base: "textarea outline-offset-0 gap-1 flex items-start flex-wrap p-1 min-h-2",
   variants: {
     size: {
-      xs: "input-xs",
-      sm: "input-sm",
-      md: "input-md",
-      lg: "input-lg",
-      xl: "input-xl",
+      xs: "textarea-xs",
+      sm: "textarea-sm",
+      md: "textarea-md",
+      lg: "textarea-lg",
+      xl: "textarea-xl",
     },
   },
   defaultVariants: {
@@ -170,6 +171,8 @@ const filterBar = tv({
 });
 
 export const FilterBar = <T,>(props: FilterBarProps<T>) => {
+  let ref!: HTMLDivElement;
+  const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [filterDropdownOpen, setFilterDropdownOpen] = createSignal(false);
   const showFieldDropdown = createMemo(() => {
     return !!props.value;
@@ -192,10 +195,45 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
     return "filters" in item;
   };
 
+  createEffect(() => {
+    const element = ref;
+    invariant(element);
+
+    const dispose = dropTargetForElements({
+      element,
+      canDrop({ source }) {
+        if (source.element === element) {
+          return false;
+        }
+        return !!source.data.isFilterChip || !!source.data.isFilterGroupChip;
+      },
+      onDragEnter() {
+        setDragging("dragging-over");
+      },
+      onDrag() {
+        if (dragging() !== "dragging-over") {
+          setDragging("dragging-over");
+        }
+      },
+      onDragLeave() {
+        setDragging("idle");
+      },
+      onDrop({ source, location }) {
+        setDragging("idle");
+        if (location.current.dropTargets[0].element !== ref) return;
+
+        props.onGroupDrag(source.data.index as number, -1, source.data.groupIndex as number | undefined);
+      },
+    });
+
+    onCleanup(dispose);
+  });
+
   return (
     <div class="relative">
       <div class="flex gap-1 items-start">
         <TextField
+          ref={ref}
           value={props.value}
           onChange={props.onChangeValue}
           class={filterBar({ size: props.size, class: props.class })}
@@ -206,34 +244,40 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
               const [itemOpen, setItemOpen] = createSignal(false);
 
               return (
-                <Popover open={itemOpen()} onOpenChange={setItemOpen}>
-                  <Popover.Trigger>
-                    <Show
-                      when={isFilterGroup(item)}
-                      fallback={
-                        <FilterChip<T>
-                          onDelete={() => props.onFilterRemove(i(), item as Filter<T>)}
-                          filter={item as Filter<T>}
-                          size={props.size}
-                          onGroupDrag={props.onGroupDrag}
-                        />
-                      }
-                    >
-                      <FilterGroupChip<T>
-                        filterGroup={item as FilterGroup<T>}
+                <>
+                  {/* <Popover open={itemOpen()} onOpenChange={setItemOpen}>
+                   <Popover.Trigger> */}
+                  <Show
+                    when={isFilterGroup(item)}
+                    fallback={
+                      <FilterChip<T>
+                        onDelete={() => props.onFilterRemove(i(), item as Filter<T>)}
+                        filter={item as Filter<T>}
                         size={props.size}
-                        onGroupDrag={props.onGroupDrag}
+                        onGroupDrag={(targetInd) => props.onGroupDrag(i(), targetInd)}
+                        index={i()}
                       />
-                    </Show>
-                  </Popover.Trigger>
+                    }
+                  >
+                    <FilterGroupChip<T>
+                      filterGroup={item as FilterGroup<T>}
+                      size={props.size}
+                      onGroupDrag={(targetInd, sourceFilterGroupInd) =>
+                        props.onGroupDrag(i(), targetInd, sourceFilterGroupInd)
+                      }
+                      index={i()}
+                    />
+                  </Show>
+                  {/* </Popover.Trigger> 
                   <EditFiltersDropdown
-                    size={props.size}
-                    availableFields={props.availableFields ?? []}
-                    onSaveFilters={(filters) => props.onUpdateFilterGroup(i(), filters)}
-                    currentFilters={isFilterGroup(item) ? item.filters : [item]}
-                    setOpen={setItemOpen}
-                  />
-                </Popover>
+                     size={props.size}
+                     availableFields={props.availableFields ?? []}
+                     onSaveFilters={(filters) => props.onUpdateFilterGroup(i(), filters)}
+                     currentFilters={isFilterGroup(item) ? item.filters : [item]}
+                     setOpen={setItemOpen}
+                   />
+                 </Popover> */}
+                </>
               );
             }}
           </For>
