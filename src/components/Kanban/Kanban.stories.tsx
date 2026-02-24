@@ -14,9 +14,15 @@ export interface Task extends KanbanItem {
   priority?: "low" | "medium" | "high";
   assignee?: string;
   description?: string;
+  kanbanState: string;
+  kanbanPosition?: number;
 }
 
-export const defaultColumns: KanbanState[] = [
+interface Column extends KanbanState {
+  statePosition: number;
+}
+
+export const defaultColumns: Column[] = [
   { id: "todo", title: "To Do", collectionId: "0", statePosition: 0 },
   { id: "in-progress", title: "In Progress", collectionId: "0", statePosition: 1 },
   { id: "review", title: "In Review", collectionId: "0", statePosition: 2 },
@@ -181,6 +187,9 @@ export const Default: Story = {
         onCreateItem={createNew}
         columnClass="min-h-[80%]"
         containerClass="h-[90vh]"
+        itemPositionKey="kanbanPosition"
+        itemStateKey="kanbanState"
+        statePositionKey="statePosition"
       />
     );
   },

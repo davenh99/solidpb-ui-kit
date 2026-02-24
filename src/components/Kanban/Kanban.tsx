@@ -21,16 +21,18 @@ export interface KanbanProps<T extends KanbanItem, K extends KanbanState> {
   onCollapseColumn?: (collapsed: boolean) => void;
   onReorderCard?: (item: T, oldPos: number, newPos: number, oldState: string, newState: string) => void;
   onReorderColumn?: (col: K, oldPos: number, newPos: number) => void;
+  itemStateKey?: keyof T;
+  itemPositionKey?: keyof T;
+  statePositionKey?: keyof K;
 }
 
 export const Kanban = <T extends KanbanItem, K extends KanbanState>(props: KanbanProps<T, K>) => {
   const sortedColumns = createMemo(() => {
-    return props.columns.toSorted((a, b) => (a.statePosition ?? 0) - (b.statePosition ?? 0));
+    const posKey = props.statePositionKey;
+    if (!posKey) return props.columns;
+    return props.columns.toSorted((a, b) => (Number(a[posKey]) ?? 0) - (Number(b[posKey]) ?? 0));
   });
-  const colDragEnabled = createMemo(() => {
-    const data = props.columns;
-    return !!data && data.length > 0 && "statePosition" in data[0];
-  });
+  const colDragEnabled = () => !!props.statePositionKey;
   const [flashedColId, setFlashedColId] = createSignal<string | null>(null);
 
   createEffect(() => {
@@ -54,11 +56,14 @@ export const Kanban = <T extends KanbanItem, K extends KanbanState>(props: Kanba
         const sourceItem = sourceData.item as K;
         const targetItem = targetData.item as K;
 
+        const posKey = props.statePositionKey;
+        if (!posKey) return;
+
         if (sourceItem.collectionId !== targetItem.collectionId && source.data.isKanbanColumn) {
           return;
         }
 
-        if ((sourceItem.statePosition || 0) < 0 || (targetItem.statePosition || 0) < 0) {
+        if ((Number(sourceItem[posKey]) || 0) < 0 || (Number(targetItem[posKey]) || 0) < 0) {
           return;
         }
 
@@ -66,19 +71,19 @@ export const Kanban = <T extends KanbanItem, K extends KanbanState>(props: Kanba
 
         let newInd =
           closestEdgeOfTarget === "left"
-            ? targetItem.statePosition || 0
-            : (targetItem.statePosition || 0) + 1;
+            ? Number(targetItem[posKey]) || 0
+            : (Number(targetItem[posKey]) || 0) + 1;
 
-        if (newInd > (sourceItem.statePosition || 0)) {
+        if (newInd > (Number(sourceItem[posKey]) || 0)) {
           newInd--;
         }
 
-        if ((sourceItem.statePosition || 0) !== newInd) {
+        if ((Number(sourceItem[posKey]) || 0) !== newInd) {
           setFlashedColId(sourceItem.id);
           setTimeout(() => setFlashedColId(null), 10);
         }
 
-        props.onReorderColumn?.(sourceItem, sourceItem.statePosition || 0, newInd);
+        props.onReorderColumn?.(sourceItem, Number(sourceItem[posKey]) || 0, newInd);
       },
     });
 
@@ -101,6 +106,8 @@ export const Kanban = <T extends KanbanItem, K extends KanbanState>(props: Kanba
             onReorderCard={props.onReorderCard}
             onCollapse={props.onCollapseColumn}
             flashSignal={() => flashedColId()}
+            itemPositionKey={props.itemPositionKey}
+            itemStateKey={props.itemStateKey}
           />
         )}
       </For>

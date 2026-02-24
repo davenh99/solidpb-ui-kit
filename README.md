@@ -17,44 +17,6 @@ Also to index.css (refer daisyui docs):
 @source "../node_modules/@solidpb/ui-kit";
 ```
 
-### TODO light theme
-
-- [x] Avatar
-- [x] AlertDialog
-- [x] Button
-- [x] Card
-- [x] Checkbox
-- [x] Container
-- [x] DateInput
-- [x] DropdownMenu
-- [x] FileInput
-- [x] Form
-- [x] Image
-- [x] Input
-- [x] Link
-- [x] Modal
-- [x] NumberInput
-- [x] SearchInput
-- [x] Select
-- [x] Slider
-- [x] Switch
-- [x] Tabs
-- [x] Tag
-- [x] TagArea
-- [x] TextArea
-- [x] Toast
-- [x] Tooltip
-- [x] Kanban
-- [x] ThemeSwitch
-- [x] ColorPicker
-- [x] Navbar
-- [x] Drawer
-- [x] Table
-- [x] BreadCrumbs
-- [ ] FilterBar
-- [x] ActivityFeed
-- [x] Pagination
-
 ### TODO dark theme
 
 - [ ] Avatar

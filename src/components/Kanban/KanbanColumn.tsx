@@ -63,6 +63,8 @@ export interface KanbanColumnProps<T extends KanbanItem, K extends KanbanState> 
   onReorderCard?: (item: T, oldPos: number, newPos: number, oldState: string, newState: string) => void;
   onCollapse?: (collapsed: boolean) => void;
   flashSignal: Accessor<string | null>;
+  itemStateKey?: keyof T;
+  itemPositionKey?: keyof T;
 }
 
 export const KanbanColumn = <T extends KanbanItem, K extends KanbanState>(props: KanbanColumnProps<T, K>) => {
@@ -74,14 +76,19 @@ export const KanbanColumn = <T extends KanbanItem, K extends KanbanState>(props:
   const [creatingItem, setCreatingItem] = createSignal(false);
   const [newItemTitle, setNewItemTitle] = createSignal("");
   const filteredItems = createMemo(() => {
-    return props.items
-      .filter((item) => item.kanbanState === props.col.id)
-      .sort((a, b) => (a.kanbanPosition || 0) - (b.kanbanPosition || 0));
+    let items = [...props.items];
+    const stateKey = props.itemStateKey;
+    const posKey = props.itemPositionKey;
+
+    if (stateKey) {
+      items = items.filter((item) => item[stateKey] === props.col.id);
+    }
+
+    if (!posKey) return items;
+
+    return items.sort((a, b) => (Number(a[posKey]) || 0) - (Number(b[posKey]) || 0));
   });
-  const itemDragEnabled = createMemo(() => {
-    const data = filteredItems();
-    return !!data && data.length > 0 && "kanbanPosition" in data[0];
-  });
+  const itemDragEnabled = () => !!props.itemPositionKey;
   const [flashedCardId, setFlashedCardId] = createSignal<string | null>(null);
 
   createEffect(() => {
@@ -199,19 +206,21 @@ export const KanbanColumn = <T extends KanbanItem, K extends KanbanState>(props:
         const sourceItem = sourceData.item as T;
         const targetItem = targetData.item as T;
 
-        if (sourceItem.collectionId !== targetItem.collectionId) {
-          return;
-        }
+        const stateKey = props.itemStateKey;
+        const posKey = props.itemPositionKey;
+
+        if (!stateKey || !posKey) return;
+        if (sourceItem.collectionId !== targetItem.collectionId) return;
 
         if (target.data.isKanbanColumn) {
           let newInd = 0;
-          for (const item of props.items.filter((item) => item.kanbanState === (target.data.item as K).id)) {
-            if ((item.kanbanPosition || 0) >= newInd) {
-              newInd = (item.kanbanPosition || 0) + 1;
+          for (const item of props.items.filter((item) => item[stateKey] === (target.data.item as K).id)) {
+            if ((Number(item[posKey]) || 0) >= newInd) {
+              newInd = (Number(item[posKey]) || 0) + 1;
             }
           }
 
-          if ((sourceItem.kanbanPosition || 0) !== newInd) {
+          if ((sourceItem[posKey] || 0) !== newInd) {
             setFlashedCardId(sourceItem.id as string);
             setTimeout(() => setFlashedCardId(null), 10);
           }
@@ -219,28 +228,28 @@ export const KanbanColumn = <T extends KanbanItem, K extends KanbanState>(props:
           // if we drop on the column
           props.onReorderCard?.(
             sourceItem,
-            sourceItem.kanbanPosition!,
+            Number(sourceItem[posKey]),
             newInd,
-            sourceItem.kanbanState!,
+            String(sourceItem[stateKey]),
             (targetData.item as K).id,
           );
         } else {
           const closestEdgeOfTarget = extractClosestEdge(targetData);
 
           const newInd =
-            closestEdgeOfTarget === "top" ? targetItem.kanbanPosition! : targetItem.kanbanPosition! + 1;
+            closestEdgeOfTarget === "top" ? Number(targetItem[posKey]) : Number(targetItem[posKey]) + 1;
 
-          if ((sourceItem.kanbanPosition || 0) !== newInd) {
+          if ((sourceItem[posKey] || 0) !== newInd) {
             setFlashedCardId(sourceItem.id as string);
             setTimeout(() => setFlashedCardId(null), 10);
           }
 
           props.onReorderCard?.(
             sourceItem,
-            sourceItem.kanbanPosition!,
+            Number(sourceItem[posKey]),
             newInd,
-            sourceItem.kanbanState!,
-            targetItem.kanbanState!,
+            String(sourceItem[stateKey]),
+            String(targetItem[stateKey]),
           );
         }
       },
