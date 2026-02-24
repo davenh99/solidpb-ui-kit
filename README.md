@@ -19,38 +19,10 @@ Also to index.css (refer daisyui docs):
 
 ### TODO dark theme
 
-- [ ] Avatar
-- [ ] AlertDialog
-- [ ] Button
-- [ ] Card
-- [ ] Checkbox
-- [ ] Container
-- [ ] DateInput
-- [ ] DropdownMenu
-- [ ] FileInput
-- [ ] Form
-- [ ] Image
-- [ ] Input
-- [ ] Link
-- [ ] Modal
-- [ ] NumberInput
-- [ ] SearchInput
-- [ ] Select
-- [ ] Slider
-- [ ] Switch
-- [ ] Tabs
-- [ ] Tag
-- [ ] TagArea
-- [ ] TextArea
-- [ ] Toast
-- [ ] Tooltip
-- [ ] Kanban
-- [ ] ThemeSwitch
-- [ ] ColorPicker
-- [ ] Navbar
-- [ ] Drawer
-- [ ] Table
-- [ ] BreadCrumbs
 - [ ] FilterBar
-- [ ] ActivityFeed
-- [ ] Pagination
+
+### TODO
+
+- [ ] Filterbar
+- [ ] Form, fix select
+- [ ] tagarea, need a see more action/generic action attached to the dropdown

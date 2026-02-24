@@ -142,7 +142,7 @@ export function createForm<T>() {
         {...props}
         labelKey="label"
         valueKey="value"
-        value={form.getValue(props.field) as any}
+        value={(form.getValue(props.field) as any) ?? null}
         onChange={(v) => form.setValue(props.field, v as any)}
       />
     );

@@ -10,7 +10,7 @@ interface Props {
 }
 
 const card = tv({
-  base: "card bg-base-100 shadow-sm",
+  base: "card bg-base-100 shadow-sm border border-base-200",
 });
 
 const cardBody = tv({

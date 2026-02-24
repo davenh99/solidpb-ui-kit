@@ -14,7 +14,7 @@ interface DropdownMenuComponents {
 }
 
 const menu = tv({
-  base: "dropdown-content menu bg-base-100 shadow-sm mt-2 rounded-box z-50",
+  base: "dropdown-content menu bg-base-100 shadow-sm mt-2 rounded-box z-50 border border-base-200",
   variants: {
     size: {
       xs: "menu-xs",

@@ -63,6 +63,7 @@ const menu = tv({
 });
 
 export const Select = <T,>(props: SelectProps<T>) => {
+  console.log(props.value);
   return (
     <label class="floating-label">
       {props.label && <span>{props.label}</span>}
@@ -105,7 +106,7 @@ export const Select = <T,>(props: SelectProps<T>) => {
           </KSelect.Icon>
         </KSelect.Trigger>
         <KSelect.Portal>
-          <KSelect.Content class="rounded-box bg-base-100 shadow-md z-50">
+          <KSelect.Content class="rounded-box bg-base-100 shadow-md z-50 border border-base-200">
             <KSelect.Listbox class={menu({ size: props.size })} />
           </KSelect.Content>
         </KSelect.Portal>

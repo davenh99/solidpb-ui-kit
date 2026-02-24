@@ -25,7 +25,7 @@ const tagArea = tv({
 });
 
 const menu = tv({
-  base: "dropdown-content bg-base-200 min-w-30 shadow-sm rounded-box menu p-0 absolute",
+  base: "dropdown-content bg-base-200 min-w-30 shadow-sm rounded-box menu absolute border border-base-200",
   variants: {
     size: {
       xs: "menu-xs",
@@ -143,10 +143,7 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
                 <ul>
                   <For each={filteredSuggestions()}>
                     {(s) => (
-                      <li
-                        class="px-3 py-2 cursor-pointer rounded"
-                        onMouseDown={() => handleSuggestionClick(s)}
-                      >
+                      <li class="cursor-pointer rounded" onMouseDown={() => handleSuggestionClick(s)}>
                         <a>{s.name}</a>
                       </li>
                     )}
