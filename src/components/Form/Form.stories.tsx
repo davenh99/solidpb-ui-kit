@@ -66,8 +66,8 @@ export const Default: Story = {
             <ProductForm.SelectField
               field="category"
               label="Category"
-              // onChange={setSelected}
-              // value={selected()}
+              onChange={setSelected}
+              value={selected()}
               options={[
                 { label: "Electronics", value: "electronics" },
                 { label: "Clothing", value: "clothing" },

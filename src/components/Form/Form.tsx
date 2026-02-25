@@ -1,4 +1,4 @@
-import { JSXElement } from "solid-js";
+import { createEffect, JSXElement, splitProps } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { InternalFormContext, useInternalFormContext } from "./formContext";
@@ -135,15 +135,19 @@ export function createForm<T>() {
   };
 
   const SelectField = (props: SelectProps<{ label: string; value: string }> & BaseFieldProps<T>) => {
+    const [local, others] = splitProps(props, ["onChange", "value"]);
     const form = useInternalFormContext() as Ctx;
 
     return (
       <Select
-        {...props}
+        {...others}
         labelKey="label"
         valueKey="value"
-        value={(form.getValue(props.field) as any) ?? null}
-        onChange={(v) => form.setValue(props.field, v as any)}
+        value={local.value}
+        onChange={(v) => {
+          local.onChange(v);
+          form.setValue(props.field, v?.value as any);
+        }}
       />
     );
   };

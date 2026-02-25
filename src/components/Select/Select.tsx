@@ -63,7 +63,6 @@ const menu = tv({
 });
 
 export const Select = <T,>(props: SelectProps<T>) => {
-  console.log(props.value);
   return (
     <label class="floating-label">
       {props.label && <span>{props.label}</span>}

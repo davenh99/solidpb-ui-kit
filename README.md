@@ -24,5 +24,4 @@ Also to index.css (refer daisyui docs):
 ### TODO
 
 - [ ] Filterbar
-- [ ] Form, fix select
 - [ ] tagarea, need a see more action/generic action attached to the dropdown
