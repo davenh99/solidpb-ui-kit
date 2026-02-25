@@ -1,4 +1,4 @@
-import { createSignal, For, JSX, Show, createMemo } from "solid-js";
+import { createSignal, For, JSX, Show, createMemo, JSXElement } from "solid-js";
 import { TextField } from "@kobalte/core/text-field";
 import Tag from "../Tag/Tag";
 import { tv } from "tailwind-variants";
@@ -9,6 +9,8 @@ interface TagAreaProps<T extends Tag = Tag> {
   onCreateTag: (name: string) => Promise<T | undefined>;
   onDeleteTag: (tag: T) => Promise<void>;
   suggestions?: T[];
+  noSuggestionsPlaceholder?: string;
+  dropDownAction?: JSXElement;
   placeholder?: string;
   editable?: boolean;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
@@ -25,7 +27,7 @@ const tagArea = tv({
 });
 
 const menu = tv({
-  base: "dropdown-content bg-base-200 min-w-30 shadow-sm rounded-box menu absolute border border-base-200",
+  base: "dropdown-content bg-base-200 min-w-30 shadow-sm rounded-box menu absolute border border-base-200 gap-1",
   variants: {
     size: {
       xs: "menu-xs",
@@ -54,9 +56,8 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
   );
 
   const handleTagInput: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = async (e) => {
+    setShowSuggestions(true);
     if (tagInput().trim()) {
-      setShowSuggestions(true);
-
       if (e.key === "Enter") {
         e.preventDefault();
         e.stopPropagation();
@@ -72,8 +73,6 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
         setShowSuggestions(true);
       }
     } else {
-      setShowSuggestions(false);
-
       if (e.key === "Delete" || e.key === "Backspace") {
         if (props.tags.length > 0) {
           const lastTag = props.tags[props.tags.length - 1];
@@ -138,17 +137,25 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
                 class="w-full focus:outline-none"
               />
             </TextField>
-            <Show when={showSuggestions() && filteredSuggestions().length > 0}>
+            <Show when={showSuggestions()}>
               <div class={menu({ size: props.size })}>
-                <ul>
-                  <For each={filteredSuggestions()}>
-                    {(s) => (
-                      <li class="cursor-pointer rounded" onMouseDown={() => handleSuggestionClick(s)}>
-                        <a>{s.name}</a>
-                      </li>
-                    )}
-                  </For>
-                </ul>
+                <Show
+                  when={filteredSuggestions().length > 0}
+                  fallback={
+                    <p class="italic text-xs">{props.noSuggestionsPlaceholder ?? "No matches found"}</p>
+                  }
+                >
+                  <ul>
+                    <For each={filteredSuggestions()}>
+                      {(s) => (
+                        <li class="cursor-pointer rounded" onMouseDown={() => handleSuggestionClick(s)}>
+                          <a>{s.name}</a>
+                        </li>
+                      )}
+                    </For>
+                  </ul>
+                </Show>
+                <Show when={props.dropDownAction}>{props.dropDownAction}</Show>
               </div>
             </Show>
           </div>

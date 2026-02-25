@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
-import { createMemo, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
+import ExternalLink from "lucide-solid/icons/external-link";
+
 import { TagArea } from "./TagArea";
+import { Button } from "../Button";
+import { iconSize } from "../../constants";
 
 const meta: Meta<typeof TagArea> = {
   title: "Components/TagArea",
@@ -22,21 +26,21 @@ const suggestions: Tag[] = [
 export const Default: Story = {
   render: () => {
     const [tags, setTags] = createSignal<Tag[]>(initialTags);
-    // const [searchText, setSearchText] = createSignal<string>("");
-    // const suggestionsFiltered = createMemo(() => {
-    //   return suggestions.filter((s) => s.name.includes(searchText()));
-    // });
 
     return (
       <TagArea
         tags={tags()}
-        // searchText={searchText()}
-        // setSearchText={setSearchText}
         setTags={setTags}
-        // suggestions={suggestionsFiltered}
+        noSuggestionsPlaceholder="nothing here"
         suggestions={suggestions}
         onCreateTag={async (name) => ({ id: Math.random().toString(), name, colorHex: "#6b7280" })}
         onDeleteTag={async () => {}}
+        dropDownAction={
+          <Button variant="ghost" class="text-left">
+            <ExternalLink class="h-[1em] w-[1em]" />
+            See more
+          </Button>
+        }
       />
     );
   },
