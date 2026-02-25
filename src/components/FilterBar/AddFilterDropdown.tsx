@@ -20,6 +20,7 @@ export const AddFilterDropdown = <T,>(props: AddFilterDropdownProps<T>) => {
   return (
     <Popover.Portal>
       <Popover.Content class="dropdown-content mt-1 rounded-box bg-base-200 shadow-md z-20 p-3">
+        <p class="text-sm mb-1">Add filters</p>
         <FiltersEdit
           addConditionTrigger={
             <>

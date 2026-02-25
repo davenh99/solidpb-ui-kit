@@ -41,7 +41,6 @@ export const FiltersEdit = <T,>(props: FiltersEditProps<T>) => {
 
   return (
     <div class="flex flex-col gap-2 bg-base-200">
-      <p class="text-sm">Add filters</p>
       <For each={filters}>
         {(f, i) => (
           <>

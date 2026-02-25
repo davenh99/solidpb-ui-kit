@@ -156,14 +156,14 @@ interface FilterBarProps<T> {
 }
 
 const filterBar = tv({
-  base: "textarea outline-offset-0 gap-1 flex items-start flex-wrap p-1 min-h-2",
+  base: "input outline-offset-0 join-item",
   variants: {
     size: {
-      xs: "textarea-xs",
-      sm: "textarea-sm",
-      md: "textarea-md",
-      lg: "textarea-lg",
-      xl: "textarea-xl",
+      xs: "input-xs",
+      sm: "input-sm",
+      md: "input-md",
+      lg: "input-lg",
+      xl: "input-xl",
     },
   },
   defaultVariants: {
@@ -230,72 +230,19 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
   });
 
   return (
-    <div class="relative">
-      <div class="flex gap-1 items-start">
+    <div class="relative flex flex-col">
+      <div class="join">
         <TextField
           ref={ref}
           value={props.value}
           onChange={props.onChangeValue}
           class={filterBar({ size: props.size, class: props.class })}
         >
-          <Search class="w-[1em] h-[1em] opacity-70 m-1.5" />
-          <For each={props.items}>
-            {(item, i) => {
-              const [itemOpen, setItemOpen] = createSignal(false);
-
-              return (
-                <>
-                  <Popover open={itemOpen()} onOpenChange={setItemOpen}>
-                    <Show
-                      when={isFilterGroup(item)}
-                      fallback={
-                        <Popover.Anchor>
-                          <Popover.Trigger
-                            as={FilterChip<T>}
-                            onDelete={() => props.onFilterRemove(i(), item as Filter<T>)}
-                            filter={item as Filter<T>}
-                            size={props.size}
-                            onGroupDrag={(sourceInd, sourceFilterGroupInd) =>
-                              props.onGroupDrag(sourceInd, i(), sourceFilterGroupInd)
-                            }
-                            index={i()}
-                            setOpen={setItemOpen}
-                          />
-                        </Popover.Anchor>
-                      }
-                    >
-                      <Popover.Anchor>
-                        <Popover.Trigger
-                          as={FilterGroupChip<T>}
-                          filterGroup={item as FilterGroup<T>}
-                          size={props.size}
-                          onGroupDrag={(sourceInd, sourceFilterGroupInd) =>
-                            props.onGroupDrag(sourceInd, i(), sourceFilterGroupInd)
-                          }
-                          index={i()}
-                          setOpen={setItemOpen}
-                        />
-                      </Popover.Anchor>
-                    </Show>
-                    <EditFiltersDropdown
-                      size={props.size}
-                      availableFields={props.availableFields ?? []}
-                      onSaveFilters={(filters) => props.onUpdateFilterGroup(i(), filters)}
-                      currentFilters={isFilterGroup(item) ? item.filters : [item]}
-                      setOpen={setItemOpen}
-                    />
-                  </Popover>
-                </>
-              );
-            }}
-          </For>
-          <TextField.Input
-            placeholder={props.placeholder || "Search"}
-            class="grow focus:outline-none min-w-20 ml-1"
-          />
+          <Search class="w-[1em] h-[1em] opacity-90" />
+          <TextField.Input placeholder={props.placeholder || "Search"} class="grow focus:outline-none" />
         </TextField>
         <Popover open={filterDropdownOpen()} onOpenChange={setFilterDropdownOpen}>
-          <Popover.Trigger as={Button} size={props.size} modifier="square">
+          <Popover.Trigger as={Button} size={props.size} modifier="square" class="join-item">
             <ListFilter class="w-[1em] h-[1em]" />
           </Popover.Trigger>
           <AddFilterDropdown<T>
@@ -309,7 +256,7 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
           <Popover>
             <div class="indicator">
               {props.sortBy && <span class="indicator-item status status-neutral"></span>}
-              <Popover.Trigger as={Button} size={props.size} modifier="square">
+              <Popover.Trigger as={Button} size={props.size} modifier="square" class="join-item">
                 <ArrowDown class="w-[1em] h-[1em]" />
               </Popover.Trigger>
             </div>
@@ -339,6 +286,56 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
           </ul>
         </div>
       )}
+      <div class="w-full flex flex-wrap gap-0.5 mt-0.5">
+        <For each={props.items}>
+          {(item, i) => {
+            const [itemOpen, setItemOpen] = createSignal(false);
+
+            return (
+              <Popover open={itemOpen()} onOpenChange={setItemOpen}>
+                <Show
+                  when={isFilterGroup(item)}
+                  fallback={
+                    <Popover.Anchor>
+                      <Popover.Trigger
+                        as={FilterChip<T>}
+                        onDelete={() => props.onFilterRemove(i(), item as Filter<T>)}
+                        filter={item as Filter<T>}
+                        size={props.size}
+                        onGroupDrag={(sourceInd, sourceFilterGroupInd) =>
+                          props.onGroupDrag(sourceInd, i(), sourceFilterGroupInd)
+                        }
+                        index={i()}
+                        setOpen={setItemOpen}
+                      />
+                    </Popover.Anchor>
+                  }
+                >
+                  <Popover.Anchor>
+                    <Popover.Trigger
+                      as={FilterGroupChip<T>}
+                      filterGroup={item as FilterGroup<T>}
+                      size={props.size}
+                      onGroupDrag={(sourceInd, sourceFilterGroupInd) =>
+                        props.onGroupDrag(sourceInd, i(), sourceFilterGroupInd)
+                      }
+                      index={i()}
+                      setOpen={setItemOpen}
+                    />
+                  </Popover.Anchor>
+                </Show>
+                <EditFiltersDropdown
+                  size={props.size}
+                  availableFields={props.availableFields ?? []}
+                  onSaveFilters={(filters) => props.onUpdateFilterGroup(i(), filters)}
+                  currentFilters={isFilterGroup(item) ? item.filters : [item]}
+                  setOpen={setItemOpen}
+                />
+              </Popover>
+            );
+          }}
+        </For>
+      </div>
     </div>
   );
 };

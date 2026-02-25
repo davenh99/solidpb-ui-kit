@@ -24,7 +24,7 @@ interface FilterChipProps<T> extends FilterChipOrGroupProps {
 }
 
 const filterChip = tv({
-  base: "badge badge-neutral badge-soft cursor-pointer",
+  base: "badge badge-soft cursor-pointer",
   variants: {
     size: {
       xs: "badge-xs",
@@ -142,11 +142,16 @@ export const FilterChip = <T,>(props: FilterChipProps<T>) => {
       style={{ opacity: dragging() === "dragging" ? 0.2 : 1, ...bgStyle() }}
       onClick={() => props.setOpen?.((prev) => !prev)}
     >
-      <p>
+      <div class="tooltip tooltip-bottom tooltip-neutral">
         <span class="font-bold">{String(props.filter.field.label)}</span>
-        <span class="mx-1">{filterOperator()}</span>
-        {valueLabel() && <span>{valueLabel()}</span>}
-      </p>
+        <span class="mx-1 hidden sm:inline">{filterOperator()}</span>
+        {valueLabel() && <span class="hidden sm:inline">{valueLabel()}</span>}
+        <div class="hidden sm:none tooltip-content">
+          <span class="font-bold">{String(props.filter.field.label)}</span>
+          <span class="mx-1 hidden sm:inline">{filterOperator()}</span>
+          {valueLabel() && <span class="hidden sm:inline">{valueLabel()}</span>}
+        </div>
+      </div>
       {props.onDelete && (
         <Button onClick={props.onDelete} size="xs" variant="ghost" class="p-0.5 m-0 h-min">
           <CloseIcon class="w-[1em] h-[1em]" stroke-width={4} />
@@ -162,7 +167,7 @@ interface FilterGroupProps<T> extends FilterChipOrGroupProps {
 }
 
 const filterGroupChip = tv({
-  base: "badge badge-neutral badge-soft cursor-pointer pl-0 pr-1 gap-0.5",
+  base: "badge badge-soft cursor-pointer pl-0 pr-1 gap-0.5",
   variants: {
     size: {
       xs: "badge-xs",
@@ -250,6 +255,7 @@ export const FilterGroupChip = <T,>(props: FilterGroupProps<T>) => {
       ref={ref}
       class={filterGroupChip({ size: props.size })}
       style={{ opacity: dragging() === "dragging" ? 0.2 : 1, ...bgStyle() }}
+      onClick={() => props.setOpen?.((prev) => !prev)}
     >
       <For each={props.filterGroup.filters}>
         {(filter, ind) => (
@@ -258,7 +264,6 @@ export const FilterGroupChip = <T,>(props: FilterGroupProps<T>) => {
             <FilterChip<T>
               filter={filter}
               onGroupDrag={props.onGroupDrag}
-              class="badge-primary"
               isInGroup={true}
               groupIndex={ind()}
               index={props.index}

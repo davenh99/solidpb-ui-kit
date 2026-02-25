@@ -44,6 +44,9 @@ const trigger = tv({
       xl: "input-xl",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 const menu = tv({

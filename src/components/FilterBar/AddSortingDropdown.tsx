@@ -22,7 +22,7 @@ export const AddSortingDropdown = <T,>(props: AddSortingDropDownProps<T>) => {
 
   return (
     <Popover.Portal>
-      <Popover.Content class="dropdown-content rounded-box bg-base-200 shadow-md z-20 min-w-50 outline-none">
+      <Popover.Content class="dropdown-content mt-1 rounded-box bg-base-200 shadow-md z-20 min-w-50 outline-none">
         <ul class="menu w-full">
           <For each={validFields()}>
             {(field) => {

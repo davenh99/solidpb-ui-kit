@@ -153,8 +153,9 @@ export const Default: Story = {
         }
 
         if (targetInd === -1) {
-          // Dropped on the bar itself - append to end
-          return [...updated, draggedItem];
+          if (sourceFilterGroupInd !== undefined)
+            // Dropped on the bar itself - append to end
+            return [...updated, draggedItem];
         }
 
         // Dropped on another chip - merge into a group
@@ -176,13 +177,12 @@ export const Default: Story = {
 
     return (
       <Container class="flex justify-center h-screen space-x-5">
-        <div class="flex gap-2">
-          <Button appearance="success" size="md">
+        <div class="flex gap-1">
+          <Button appearance="success">
             <Plus size={16} /> New
           </Button>
           <FilterBar<MockProductWithDate>
-            size="md"
-            class="w-160"
+            class="md:w-160"
             availableFields={availableFields}
             value={searchValue()}
             onChangeValue={setSearchValue}
