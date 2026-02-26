@@ -142,14 +142,14 @@ export const FilterChip = <T,>(props: FilterChipProps<T>) => {
       style={{ opacity: dragging() === "dragging" ? 0.2 : 1, ...bgStyle() }}
       onClick={() => props.setOpen?.((prev) => !prev)}
     >
-      <div class="tooltip tooltip-bottom tooltip-neutral">
+      <div class="not-sm:tooltip not-sm:tooltip-bottom not-sm:tooltip-neutral">
         <span class="font-bold">{String(props.filter.field.label)}</span>
         <span class="mx-1 hidden sm:inline">{filterOperator()}</span>
         {valueLabel() && <span class="hidden sm:inline">{valueLabel()}</span>}
-        <div class="hidden sm:none tooltip-content">
+        <div class="inline sm:hidden tooltip-content">
           <span class="font-bold">{String(props.filter.field.label)}</span>
-          <span class="mx-1 hidden sm:inline">{filterOperator()}</span>
-          {valueLabel() && <span class="hidden sm:inline">{valueLabel()}</span>}
+          <span class="mx-1 inline sm:hidden">{filterOperator()}</span>
+          {valueLabel() && <span class="inline sm:hidden">{valueLabel()}</span>}
         </div>
       </div>
       {props.onDelete && (
@@ -182,6 +182,7 @@ const filterGroupChip = tv({
 export const FilterGroupChip = <T,>(props: FilterGroupProps<T>) => {
   let ref!: HTMLDivElement;
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
+  const extraCount = () => props.filterGroup.filters.length - 1;
 
   createEffect(() => {
     const element = ref;
@@ -257,20 +258,32 @@ export const FilterGroupChip = <T,>(props: FilterGroupProps<T>) => {
       style={{ opacity: dragging() === "dragging" ? 0.2 : 1, ...bgStyle() }}
       onClick={() => props.setOpen?.((prev) => !prev)}
     >
+      <FilterChip<T>
+        filter={props.filterGroup.filters[0]}
+        onGroupDrag={props.onGroupDrag}
+        isInGroup={true}
+        groupIndex={0}
+        index={props.index}
+      />
       <For each={props.filterGroup.filters}>
         {(filter, ind) => (
           <>
-            {ind() > 0 && <span class="italic mx-0.5">Or</span>}
-            <FilterChip<T>
-              filter={filter}
-              onGroupDrag={props.onGroupDrag}
-              isInGroup={true}
-              groupIndex={ind()}
-              index={props.index}
-            />
+            <span class="italic mx-0.5 hidden sm:inline">Or</span>
+            <div class="hidden sm:contents">
+              <FilterChip<T>
+                filter={filter}
+                onGroupDrag={props.onGroupDrag}
+                isInGroup={true}
+                groupIndex={ind()}
+                index={props.index}
+              />
+            </div>
           </>
         )}
       </For>
+
+      <span class="sm:hidden badge badge-ghost badge-xs">+{extraCount()} more</span>
+
       <Button onClick={props.onDelete} size="xs" variant="ghost" class="p-0.5 m-0 h-min">
         <CloseIcon class="w-[1em] h-[1em]" stroke-width={4} />
       </Button>

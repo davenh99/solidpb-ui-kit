@@ -1,20 +1,42 @@
-import { DropdownMenu as KDropdownMenu } from "@kobalte/core/dropdown-menu";
-import { ParentComponent } from "solid-js";
+import {
+  DropdownMenu as KDropdownMenu,
+  type DropdownMenuItemProps,
+  type DropdownMenuRootProps as KDropdownMenuRootProps,
+  type DropdownMenuTriggerProps,
+} from "@kobalte/core/dropdown-menu";
+import { ParentComponent, splitProps, ValidComponent } from "solid-js";
 import { tv } from "tailwind-variants";
+import { Button, type ButtonProps } from "../Button";
+import { PolymorphicProps } from "@kobalte/core";
 
 interface DropdownMenuProps {
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   class?: string;
 }
 
+type DropdownMenuRootProps<T extends ValidComponent = "div"> = PolymorphicProps<T, KDropdownMenuRootProps> & {
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  class?: string;
+};
+
+type DropDownMenuItemProps<T extends ValidComponent = "div"> = PolymorphicProps<
+  T,
+  DropdownMenuItemProps<T>
+> & { onSelect: () => void };
+
+type DropDownMenuTriggerProps<T extends ValidComponent = "div"> = PolymorphicProps<
+  T,
+  DropdownMenuTriggerProps<T>
+> & { onSelect: () => void };
+
 interface DropdownMenuComponents {
-  MenuItem: ParentComponent<{ onSelect: () => void }>;
-  Trigger: ParentComponent;
+  MenuItem: ParentComponent<DropDownMenuItemProps>;
+  Trigger: ParentComponent<ButtonProps>;
   Content: ParentComponent<DropdownMenuProps>;
 }
 
 const menu = tv({
-  base: "dropdown-content menu bg-base-100 shadow-sm mt-2 rounded-box z-50 border border-base-200",
+  base: "dropdown-content menu bg-base-100 shadow-sm mt-2 rounded-box z-50 border border-base-200 outline-none",
   variants: {
     size: {
       xs: "menu-xs",
@@ -30,16 +52,24 @@ const menu = tv({
 });
 
 const item = tv({
-  base: "cursor-pointer rounded w-full",
+  base: "cursor-pointer rounded w-full outline-none focus:bg-base-300 rounded-sm",
 });
 
-export const DropdownMenu: ParentComponent & DropdownMenuComponents = (props) => (
-  <KDropdownMenu>{props.children}</KDropdownMenu>
-);
+export const DropdownMenu: ParentComponent<DropdownMenuRootProps> & DropdownMenuComponents = (props) => {
+  const [local, others] = splitProps(props, ["children"]);
 
-export const DropdownMenuTrigger: ParentComponent = (props) => (
-  <KDropdownMenu.Trigger>{props.children}</KDropdownMenu.Trigger>
-);
+  return <KDropdownMenu {...others}>{local.children}</KDropdownMenu>;
+};
+
+export const DropdownMenuTrigger: ParentComponent<ButtonProps> = (props) => {
+  const [local, others] = splitProps(props, ["children"]);
+
+  return (
+    <KDropdownMenu.Trigger as={Button} {...others}>
+      {local.children}
+    </KDropdownMenu.Trigger>
+  );
+};
 
 export const DropdownMenuContent: ParentComponent<DropdownMenuProps> = (props) => {
   return (
@@ -53,7 +83,7 @@ export const DropdownMenuContent: ParentComponent<DropdownMenuProps> = (props) =
 
 export const DropdownMenuItem: ParentComponent<{ onSelect: () => void }> = (props) => {
   return (
-    <KDropdownMenu.Item as="li" class={item()} onSelect={props.onSelect}>
+    <KDropdownMenu.Item as="li" class={item()} {...props}>
       {props.children}
     </KDropdownMenu.Item>
   );

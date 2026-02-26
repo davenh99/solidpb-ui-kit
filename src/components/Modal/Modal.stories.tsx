@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "storybook-solidjs-vite";
 
 import { Modal, useModal } from "./Modal";
 import { ProductForm, productData } from "../Form/Form.stories";
+import { createSignal } from "solid-js";
 
 const meta: Meta<typeof Modal> = {
   title: "Components/Modal",
@@ -12,6 +13,7 @@ type Story = StoryObj<typeof Modal>;
 
 const ProdForm = () => {
   const { setOpen } = useModal();
+  const [selected, setSelected] = createSignal<{ label: string; value: string } | null>(null);
 
   return (
     <ProductForm
@@ -26,6 +28,17 @@ const ProdForm = () => {
         label="Price"
         inputProps={{ class: "w-40" }}
         formatOptions={{ style: "currency", currency: "AUD" }}
+      />
+      <ProductForm.SelectField
+        field="category"
+        label="Category"
+        onChange={setSelected}
+        value={selected()}
+        options={[
+          { label: "Electronics", value: "electronics" },
+          { label: "Clothing", value: "clothing" },
+          { label: "Books", value: "books" },
+        ]}
       />
       <ProductForm.CheckboxField field="inStock" label="In Stock" />
     </ProductForm>

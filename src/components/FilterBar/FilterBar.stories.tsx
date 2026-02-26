@@ -177,25 +177,25 @@ export const Default: Story = {
 
     return (
       <Container class="flex justify-center h-screen space-x-5">
-        <div class="flex gap-1">
-          <Button appearance="success">
-            <Plus size={16} /> New
-          </Button>
-          <FilterBar<MockProductWithDate>
-            class="md:w-160"
-            availableFields={availableFields}
-            value={searchValue()}
-            onChangeValue={setSearchValue}
-            items={items()}
-            setItems={setItems}
-            onFilterRemove={(ind) => setItems((prev) => prev.filter((_, i) => ind !== i))}
-            onAddFilterGroup={handleAddFilterGroup}
-            onUpdateFilterGroup={handleUpdateFilterGroup}
-            onGroupDrag={handleGroupDrag}
-            sortBy={sortBy()}
-            setSortBy={setSortBy}
-          />
-        </div>
+        <FilterBar<MockProductWithDate>
+          leftAction={
+            <Button appearance="success">
+              <Plus size={16} /> New
+            </Button>
+          }
+          class="md:w-160"
+          availableFields={availableFields}
+          value={searchValue()}
+          onChangeValue={setSearchValue}
+          items={items()}
+          setItems={setItems}
+          onFilterRemove={(ind) => setItems((prev) => prev.filter((_, i) => ind !== i))}
+          onAddFilterGroup={handleAddFilterGroup}
+          onUpdateFilterGroup={handleUpdateFilterGroup}
+          onGroupDrag={handleGroupDrag}
+          sortBy={sortBy()}
+          setSortBy={setSortBy}
+        />
       </Container>
     );
   },

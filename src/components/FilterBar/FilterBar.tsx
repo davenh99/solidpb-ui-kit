@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, For, onCleanup, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, For, JSXElement, onCleanup, Show } from "solid-js";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { TextField } from "@kobalte/core/text-field";
 import { Popover } from "@kobalte/core/popover";
@@ -9,10 +9,11 @@ import ArrowDown from "lucide-solid/icons/arrow-down-narrow-wide";
 import invariant from "tiny-invariant";
 
 import { FilterChip, FilterGroupChip } from "./FilterChip";
-import { Button } from "../Button";
-import AddFilterDropdown from "./AddFilterDropdown";
+import AddFilter from "./AddFilter";
 import AddSortingDropdown from "./AddSortingDropdown";
 import EditFiltersDropdown from "./EditFiltersDropdown";
+import { DropdownMenu } from "../DropdownMenu";
+import { Modal } from "../Modal";
 
 export type FieldType = "text" | "number" | "date" | "select" | "bool";
 
@@ -127,6 +128,7 @@ interface FilterBarProps<T> {
 
   // Configuration
   availableFields?: FilterField<T>[];
+  leftAction?: JSXElement;
 
   // Sorting
   sortBy?: SortOption<T>;
@@ -155,8 +157,12 @@ interface FilterBarProps<T> {
   // Grouping
 }
 
+const filterBarBase = tv({
+  base: "relative flex flex-col not-sm:w-screen",
+});
+
 const filterBar = tv({
-  base: "input outline-offset-0 join-item",
+  base: "input outline-offset-0 join-item flex-1",
   variants: {
     size: {
       xs: "input-xs",
@@ -171,14 +177,34 @@ const filterBar = tv({
   },
 });
 
+const suggestions = tv({
+  base: "menu w-full",
+  variants: {
+    size: {
+      xs: "menu-xs",
+      sm: "menu-sm",
+      md: "menu-md",
+      lg: "menu-lg",
+      xl: "menu-xl",
+    },
+  },
+  defaultVariants: {
+    size: "sm",
+  },
+});
+
 export const FilterBar = <T,>(props: FilterBarProps<T>) => {
   let ref!: HTMLDivElement;
   const [dragging, setDragging] = createSignal<DraggingState>("idle");
   const [filterDropdownOpen, setFilterDropdownOpen] = createSignal(false);
-  const showFieldDropdown = createMemo(() => {
-    return !!props.value;
-  });
+  const [showFieldDropdown, setShowFieldDropdown] = createSignal(false);
   const textFields = createMemo(() => props.availableFields?.filter((f) => f.type === "text"));
+
+  const handleTextValueChange = (val: string) => {
+    setFocusedIndex(-1); // reset on type
+    props.onChangeValue?.(val);
+    setShowFieldDropdown(!!val);
+  };
 
   const createTextFilter = (field: FilterField<T>) => {
     const newFilter: Filter<T> = {
@@ -188,7 +214,7 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
     };
 
     props.onAddFilterGroup([newFilter]);
-    props.onChangeValue("");
+    handleTextValueChange("");
   };
 
   const isFilterGroup = (item: Filter<T> | FilterGroup<T>): item is FilterGroup<T> => {
@@ -229,63 +255,110 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
     onCleanup(dispose);
   });
 
+  const [focusedIndex, setFocusedIndex] = createSignal(-1);
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    const fields = textFields() ?? [];
+    if (!showFieldDropdown() || fields.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setFocusedIndex((i) => Math.min(i + 1, fields.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setFocusedIndex((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter" && focusedIndex() >= 0) {
+      e.preventDefault();
+      createTextFilter(fields[focusedIndex()]);
+      setFocusedIndex(-1);
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      setShowFieldDropdown(false);
+      setFocusedIndex(-1);
+    }
+  };
+
   return (
-    <div class="relative flex flex-col">
-      <div class="join">
-        <TextField
-          ref={ref}
-          value={props.value}
-          onChange={props.onChangeValue}
-          class={filterBar({ size: props.size, class: props.class })}
-        >
-          <Search class="w-[1em] h-[1em] opacity-90" />
-          <TextField.Input placeholder={props.placeholder || "Search"} class="grow focus:outline-none" />
-        </TextField>
-        <Popover open={filterDropdownOpen()} onOpenChange={setFilterDropdownOpen}>
-          <Popover.Trigger as={Button} size={props.size} modifier="square" class="join-item">
-            <ListFilter class="w-[1em] h-[1em]" />
-          </Popover.Trigger>
-          <AddFilterDropdown<T>
-            size={props.size}
-            availableFields={props.availableFields ?? []}
-            onAddFilters={props.onAddFilterGroup}
-            setOpen={setFilterDropdownOpen}
-          />
-        </Popover>
-        <Show when={props.setSortBy}>
-          <Popover>
-            <div class="indicator">
-              {props.sortBy && <span class="indicator-item status status-neutral"></span>}
-              <Popover.Trigger as={Button} size={props.size} modifier="square" class="join-item">
-                <ArrowDown class="w-[1em] h-[1em]" />
-              </Popover.Trigger>
-            </div>
-            <AddSortingDropdown
-              size={props.size}
-              availableFields={props.availableFields ?? []}
-              sortBy={props.sortBy}
-              setSortBy={props.setSortBy!}
+    <div class={filterBarBase({ class: props.class })}>
+      <div class="flex w-full gap-1">
+        <Show when={props.leftAction}>{props.leftAction}</Show>
+        <div class="join flex flex-1 relative">
+          <TextField
+            ref={ref}
+            value={props.value}
+            onChange={handleTextValueChange}
+            class={filterBar({ size: props.size })}
+            onKeyDown={handleKeyDown}
+          >
+            <Search class="w-[1em] h-[1em] opacity-90" />
+            <TextField.Input
+              placeholder={props.placeholder || "Search"}
+              class="grow focus:outline-none"
+              onFocusIn={() => setShowFieldDropdown(!!props.value)}
+              onFocusOut={() => setShowFieldDropdown(false)}
             />
-          </Popover>
-        </Show>
-      </div>
-      {showFieldDropdown() && (
-        <div class="absolute left-0 mt-1 w-full dropdown-content rounded-box bg-base-100 shadow-md z-20">
-          <ul class="menu w-full">
-            <For each={textFields()}>
-              {(item) => (
-                <li class="menu-item" onClick={() => createTextFilter(item)}>
-                  <p class="flex gap-1">
-                    <span class="font-bold">{item.label}</span>
-                    <span class="italic">Contains</span>
-                    <span>'{props.value}'</span>
-                  </p>
-                </li>
-              )}
-            </For>
-          </ul>
+          </TextField>
+          <Modal
+            id="filter-modal"
+            title="Add filters"
+            open={filterDropdownOpen()}
+            onOpenChange={setFilterDropdownOpen}
+          >
+            <Modal.Trigger>
+              <ListFilter class="w-[1em] h-[1em]" />
+            </Modal.Trigger>
+            <Modal.Modal class="bg-base-200">
+              <AddFilter<T>
+                size={props.size}
+                availableFields={props.availableFields ?? []}
+                onAddFilters={props.onAddFilterGroup}
+                setOpen={setFilterDropdownOpen}
+              />
+            </Modal.Modal>
+          </Modal>
+          <Show when={props.setSortBy}>
+            <DropdownMenu>
+              <div class="indicator">
+                {props.sortBy && <span class="indicator-item status status-neutral"></span>}
+                <DropdownMenu.Trigger size={props.size} modifier="square" class="join-item">
+                  <ArrowDown class="w-[1em] h-[1em]" />
+                </DropdownMenu.Trigger>
+              </div>
+              <AddSortingDropdown
+                size={props.size}
+                availableFields={props.availableFields ?? []}
+                sortBy={props.sortBy}
+                setSortBy={props.setSortBy!}
+              />
+            </DropdownMenu>
+          </Show>
+          {showFieldDropdown() && (
+            <div class="absolute top-full left-0 mt-1 w-full dropdown-content rounded-box bg-base-100 shadow-md z-20">
+              <ul class={suggestions({ size: props.size })}>
+                <For each={textFields()}>
+                  {(item, index) => (
+                    <li
+                      class="menu-item"
+                      classList={{ "bg-base-300 rounded-sm": focusedIndex() === index() }}
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // prevent input blur
+                        createTextFilter(item);
+                      }}
+                      onMouseEnter={() => setFocusedIndex(index())}
+                    >
+                      <p class="flex gap-1">
+                        <span class="font-bold">{item.label}</span>
+                        <span class="italic">Contains</span>
+                        <span>'{props.value}'</span>
+                      </p>
+                    </li>
+                  )}
+                </For>
+              </ul>
+            </div>
+          )}
         </div>
-      )}
+      </div>
       <div class="w-full flex flex-wrap gap-0.5 mt-0.5">
         <For each={props.items}>
           {(item, i) => {

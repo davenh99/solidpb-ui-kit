@@ -13,10 +13,8 @@ export const Default: Story = {
   render: () => (
     <div class="space-x-2">
       <DropdownMenu>
-        <DropdownMenu.Trigger>
-          <Button appearance="neutral" size="xs">
-            Open Menu (xs)
-          </Button>
+        <DropdownMenu.Trigger appearance="neutral" size="xs">
+          Open Menu (xs)
         </DropdownMenu.Trigger>
         <DropdownMenu.Content size="xs">
           <DropdownMenu.MenuItem onSelect={() => {}}>
@@ -28,9 +26,7 @@ export const Default: Story = {
         </DropdownMenu.Content>
       </DropdownMenu>
       <DropdownMenu>
-        <DropdownMenu.Trigger>
-          <Button size="lg">Open Menu (lg)</Button>
-        </DropdownMenu.Trigger>
+        <DropdownMenu.Trigger size="lg">Open Menu (lg)</DropdownMenu.Trigger>
         <DropdownMenu.Content size="lg">
           <DropdownMenu.MenuItem onSelect={() => {}}>
             <a>Item 1</a>

@@ -81,7 +81,7 @@ export const Select = <T,>(props: SelectProps<T>) => {
         placeholder={props.placeholder}
         itemComponent={(itemProps) => {
           return (
-            <KSelect.Item item={itemProps.item} class="outline-none">
+            <KSelect.Item item={itemProps.item} class="outline-none focus:bg-base-300 rounded-sm">
               <KSelect.ItemLabel class="flex flex-row justify-between items-center">
                 {props.labelKey ? String(itemProps.item.rawValue[props.labelKey]) : itemProps.item.textValue}
                 <KSelect.ItemIndicator>
@@ -108,7 +108,7 @@ export const Select = <T,>(props: SelectProps<T>) => {
           </KSelect.Icon>
         </KSelect.Trigger>
         <KSelect.Portal>
-          <KSelect.Content class="rounded-box bg-base-100 shadow-md z-50 border border-base-200">
+          <KSelect.Content class="rounded-box bg-base-100 shadow-md z-500000000000000 border border-base-200">
             <KSelect.Listbox class={menu({ size: props.size })} />
           </KSelect.Content>
         </KSelect.Portal>
