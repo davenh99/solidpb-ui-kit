@@ -1,13 +1,22 @@
 import { ParentComponent } from "solid-js";
-interface Props {
-    setModalVisible?: (v: boolean) => void;
-    saveFunc?: () => Promise<void>;
-    zIndexClass?: string;
+import { Dialog } from "@kobalte/core/dialog";
+interface ModalProps {
     title?: string;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
-export declare const Modal: ParentComponent<Props>;
+interface ModalComponents {
+    Trigger: typeof Dialog.Trigger;
+    Modal: ParentComponent<{
+        class?: string;
+    }>;
+}
+export declare const Modal: ParentComponent<ModalProps> & ModalComponents;
+export declare const ModalContent: ParentComponent<{
+    class?: string;
+}>;
 export default Modal;
-export declare function useModalLoading(): {
-    loading: import("solid-js").Accessor<boolean>;
-    setLoading: import("solid-js").Setter<boolean>;
+export declare function useModal(): {
+    title?: string;
+    setOpen?: (v: boolean) => void;
 };

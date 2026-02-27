@@ -1,7 +1,6 @@
-import { Accessor, Setter } from "solid-js";
 type ModalContextType = {
-    loading: Accessor<boolean>;
-    setLoading: Setter<boolean>;
+    title?: string;
+    setOpen?: (v: boolean) => void;
 };
 export declare const ModalContext: import("solid-js").Context<ModalContextType | undefined>;
 export {};

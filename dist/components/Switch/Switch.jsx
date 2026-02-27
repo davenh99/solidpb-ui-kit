@@ -1,22 +1,41 @@
-import { Switch as KSwitch } from "@kobalte/core/switch";
-import { createMemo, Show } from "solid-js";
-import { debounce } from "../../methods/debounce";
+import { splitProps } from "solid-js";
+import { tv } from "tailwind-variants";
+const toggle = tv({
+    base: "toggle",
+    variants: {
+        size: {
+            xs: "toggle-xs",
+            sm: "toggle-sm",
+            md: "toggle-md",
+            lg: "toggle-lg",
+            xl: "toggle-xl",
+        },
+        appearance: {
+            primary: "toggle-primary",
+            secondary: "toggle-secondary",
+            success: "toggle-success",
+            warning: "toggle-warning",
+            error: "toggle-error",
+            info: "toggle-info",
+            accent: "toggle-accent",
+            neutral: "toggle-neutral",
+        },
+    },
+    defaultVariants: {
+        size: "sm",
+    },
+});
 export const Switch = (props) => {
-    const debouncedSave = createMemo(() => (props.saveFunc ? debounce(props.saveFunc) : undefined));
-    const handleChange = (v) => {
-        props.onChange?.(v);
-        debouncedSave()?.(v);
-    };
-    return (<KSwitch class={`flex flex-row justify-between items-center ${props.class ?? ""}`} checked={props.checked} onChange={handleChange}>
-      <Show when={props.label}>
-        <KSwitch.Label>{props.label}</KSwitch.Label>
-      </Show>
-      <KSwitch.Input />
-      <KSwitch.Control class={`flex items-center w-10 h-6 bg-black rounded-full border-1 border-black
-        data-[checked]:bg-white data-[checked]:border-white transition-all`}>
-        <KSwitch.Thumb class={`h-5 w-5 rounded-full bg-white transition-transform 
-            data-[checked]:[transform:translateX(calc(100%-2px))]`}/>
-      </KSwitch.Control>
-    </KSwitch>);
+    const [local, inputProps] = splitProps(props, ["label", "size", "appearance", "class", "onChange"]);
+    return (<label class="flex items-center gap-3 w-fit">
+      <input {...inputProps} type="checkbox" class={toggle({
+            size: local.size,
+            appearance: local.appearance,
+            class: local.class,
+        })} onChange={(e) => {
+            local.onChange?.(Boolean(e.currentTarget.value));
+        }}/>
+      {local.label && <span class="select-none">{local.label}</span>}
+    </label>);
 };
 export default Switch;

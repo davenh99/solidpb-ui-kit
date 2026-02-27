@@ -1,9 +1,11 @@
-import { JSX, ValidComponent, ParentComponent } from "solid-js";
-interface LinkProps {
-    as?: ValidComponent;
+import { PolymorphicProps } from "@kobalte/core";
+import { JSXElement, ValidComponent } from "solid-js";
+type LinkProps<T extends ValidComponent = "a"> = PolymorphicProps<T, {
     href?: string;
-    children: JSX.Element;
+    disabled?: boolean;
     class?: string;
-}
-export declare const Link: ParentComponent<LinkProps>;
+    appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
+    children: JSXElement;
+}>;
+export declare function Link<T extends ValidComponent = "a">(props: LinkProps<T>): import("solid-js").JSX.Element;
 export default Link;

@@ -1,10 +1,9 @@
-import { Component, ValidComponent } from "solid-js";
-import { CheckboxRootProps } from "@kobalte/core/checkbox";
-import { PolymorphicProps } from "@kobalte/core";
-type CheckBoxProps<T extends ValidComponent = "div"> = PolymorphicProps<T, CheckboxRootProps<T>>;
-interface Props extends CheckBoxProps {
+import { Component, JSX } from "solid-js";
+export interface CheckboxProps extends Omit<JSX.InputHTMLAttributes<HTMLInputElement>, "type" | "onChange"> {
     label?: string;
-    saveFunc?: (v: boolean) => Promise<void>;
+    size?: "xs" | "sm" | "md" | "lg" | "xl";
+    appearance?: "primary" | "secondary" | "success" | "warning" | "error" | "info" | "accent" | "neutral";
+    onChange?: (checked: boolean) => void;
 }
-export declare const Checkbox: Component<Props>;
+export declare const Checkbox: Component<CheckboxProps>;
 export default Checkbox;

@@ -1,40 +1,76 @@
-import { createEffect, on, Show, splitProps, createMemo } from "solid-js";
+import { Show, splitProps, createMemo } from "solid-js";
 import { TextField } from "@kobalte/core/text-field";
 import { tv } from "tailwind-variants";
 import { debounce } from "../../methods/debounce";
-const root = tv({ base: "flex flex-col gap-1" });
+const root = tv({
+    base: "flex flex-col gap-1",
+    variants: {
+        marginTop: {
+            yes: "mt-3",
+            no: "",
+        },
+    },
+});
 const textarea = tv({
-    base: "w-full resize-none rounded-sm outline-none px-2 py-1 min-h-[80px]",
+    base: "textarea outline-offset-0 resize-none",
     variants: {
         variant: {
-            bordered: "border-2 border-[var(--color-light-muted)] dark:border-[var(--color-dark-muted)]",
             none: "",
+            ghost: "textarea-ghost",
+        },
+        size: {
+            xs: "textarea-xs",
+            sm: "textarea-sm",
+            md: "textarea-md",
+            lg: "textarea-lg",
+            xl: "textarea-xl",
+        },
+        appearance: {
+            primary: "textarea-primary",
+            secondary: "textarea-secondary",
+            success: "textarea-success",
+            warning: "textarea-warning",
+            neutral: "textarea-neutral",
+            error: "textarea-error",
+            accent: "textarea-accent",
+            info: "textarea-info",
         },
     },
     defaultVariants: {
-        variant: "none",
+        size: "sm",
     },
 });
 export const TextArea = (props) => {
-    const [local, others] = splitProps(props, ["label", "class", "inputProps", "saveFunc", "variant"]);
+    const [local, others] = splitProps(props, [
+        "label",
+        "class",
+        "textareaProps",
+        "saveFunc",
+        "variant",
+        "size",
+        "appearance",
+    ]);
     let textareaRef;
     const debouncedSave = createMemo(() => (local.saveFunc ? debounce(local.saveFunc) : undefined));
     const handleChange = (v) => {
         props.onChange?.(v);
         debouncedSave()?.(v);
     };
-    const autoResize = () => {
-        if (!textareaRef)
-            return;
-        textareaRef.style.height = "auto";
-        textareaRef.style.height = `${textareaRef.scrollHeight}px`;
-    };
-    createEffect(on(() => others.value, () => autoResize()));
-    return (<TextField class={root({ class: local.class })} {...others} onChange={handleChange}>
-      <Show when={local.label}>
-        <TextField.Label>{local.label}</TextField.Label>
-      </Show>
-      <TextField.TextArea ref={textareaRef} class={textarea({ variant: local.variant, class: local.inputProps?.class })} {...local.inputProps}/>
+    return (<TextField {...others} class={root({
+            marginTop: local.label ? "yes" : "no",
+            class: local.class,
+        })} onChange={handleChange}>
+      <TextField.Label class="floating-label">
+        <Show when={local.label}>
+          <span>{local.label}</span>
+        </Show>
+        <TextField.TextArea {...local.textareaProps} ref={textareaRef} class={textarea({
+            variant: local.variant,
+            appearance: local.appearance,
+            size: local.size,
+            class: local.textareaProps?.class,
+        })}/>
+      </TextField.Label>
     </TextField>);
 };
 export default TextArea;

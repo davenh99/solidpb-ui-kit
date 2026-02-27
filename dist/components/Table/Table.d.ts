@@ -1,8 +1,12 @@
-import { ColumnDef, ColumnFiltersState, Row } from "@tanstack/solid-table";
 import { Accessor, JSXElement } from "solid-js";
-interface ListProps<T> {
-    data?: Accessor<T[]>;
-    filters?: Accessor<ColumnFiltersState>;
+import { ColumnDef, Row } from "@tanstack/solid-table";
+interface TableItem {
+    id: string;
+    collectionId: string;
+    tablePosition?: number;
+}
+interface TableProps<T extends TableItem> {
+    data: T[];
     createFunc?: () => Promise<void>;
     headerActions?: JSXElement;
     columns: Accessor<ColumnDef<T>[]>;
@@ -13,14 +17,11 @@ interface ListProps<T> {
     searchPlaceholder?: string;
     renderRow?: (row: Row<T>, onRowClick: (item: T) => void) => JSXElement;
     showItemCount?: boolean;
-    containerClass?: string;
+    class?: string;
     search?: boolean;
     headers?: boolean;
+    size?: "xs" | "sm" | "md" | "lg" | "xl";
+    onReorderRow?: (item: T, oldInd: number, newInd: number) => void;
 }
-export declare const DefaultRowRenderer: <T>(props: {
-    row: Row<T>;
-    columns: Accessor<ColumnDef<T>[]>;
-    onClick: (item: T) => void;
-}) => JSXElement;
-export declare const List: <T>(props: ListProps<T>) => JSXElement;
-export default List;
+export declare const Table: <T extends TableItem>(props: TableProps<T>) => JSXElement;
+export default Table;

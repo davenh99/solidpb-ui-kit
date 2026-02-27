@@ -4,30 +4,6 @@ import { tv } from "tailwind-variants";
 import { debounce } from "../../methods/debounce";
 const inputRoot = tv({
     base: "relative flex flex-col gap-1",
-    variants: {
-        marginTop: {
-            yes: "mt-2",
-            no: "",
-        },
-    },
-    defaultVariants: {
-        marginTop: "no",
-    },
-});
-const inputLabel = tv({
-    base: "absolute left-3 px-1 font-medium pointer-events-none z-10 bg-base-100",
-    variants: {
-        size: {
-            xs: "text-xs",
-            sm: "text-xs",
-            md: "text-sm",
-            lg: "text-sm",
-            xl: "text-md",
-        },
-    },
-    defaultVariants: {
-        size: "md",
-    },
 });
 const inputField = tv({
     base: "input outline-offset-0",
@@ -55,9 +31,7 @@ const inputField = tv({
         },
     },
     defaultVariants: {
-        variant: "none",
-        size: "md",
-        appearance: "neutral",
+        size: "sm",
     },
 });
 export const Input = (props) => {
@@ -76,19 +50,19 @@ export const Input = (props) => {
         local.onChange?.(v);
         debouncedSave()?.(v);
     };
-    return (<TextField class={inputRoot({ class: local.class, marginTop: local.label ? "yes" : "no" })} {...others} onChange={handleChange}>
+    return (<TextField {...others} class={inputRoot({ class: local.class })} onChange={handleChange}>
       <div class="relative w-full">
-        <Show when={local.label}>
-          <TextField.Label class={inputLabel({ size: local.size })} style="transform: translateY(-50%);">
-            {local.label}
-          </TextField.Label>
-        </Show>
-        <TextField.Input class={inputField({
+        <TextField.Label class="floating-label">
+          <Show when={local.label}>
+            <span>{local.label}</span>
+          </Show>
+          <TextField.Input {...local.inputProps} class={inputField({
             appearance: local.appearance,
             variant: local.variant,
             size: local.size,
             class: local.inputProps?.class,
-        })} {...local.inputProps}/>
+        })}/>
+        </TextField.Label>
       </div>
     </TextField>);
 };

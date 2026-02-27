@@ -1,15 +1,17 @@
-import { Component } from "solid-js";
-interface Option {
-    label: string;
-    value: string;
-}
-interface SelectProps {
+export interface SelectProps<T> {
+    options: T[];
+    value: T | null;
+    onChange: (val: T | null) => void;
+    labelKey?: keyof T;
+    valueKey?: keyof T;
+    disabledKey?: keyof T;
     label?: string;
-    options: Option[];
-    value: string;
-    onChange: (value: string | null) => void;
-    placeholder?: string;
+    variant?: "ghost";
+    appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
+    size?: "xs" | "sm" | "md" | "lg" | "xl";
     class?: string;
+    placeholder?: string;
+    disabled?: boolean;
 }
-export declare const Select: Component<SelectProps>;
+export declare const Select: <T>(props: SelectProps<T>) => import("solid-js").JSX.Element;
 export default Select;

@@ -1,10 +1,12 @@
 import { Component } from "solid-js";
-interface Props {
-    onClick: () => void;
+export interface TagProps {
     title: string;
-    colorHex: string;
-    size?: "xs" | "s" | "m";
+    colorHex?: string;
+    onDelete?: () => void;
+    variant?: "ghost" | "outline" | "dash" | "soft";
+    appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
+    size?: "xs" | "sm" | "md" | "lg" | "xl";
     class?: string;
 }
-export declare const Tag: Component<Props>;
+export declare const Tag: Component<TagProps>;
 export default Tag;

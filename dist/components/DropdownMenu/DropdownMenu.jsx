@@ -1,22 +1,48 @@
-import { DropdownMenu as KDropdownMenu } from "@kobalte/core/dropdown-menu";
-import { For } from "solid-js";
+import { DropdownMenu as KDropdownMenu, } from "@kobalte/core/dropdown-menu";
+import { splitProps } from "solid-js";
 import { tv } from "tailwind-variants";
+import { Button } from "../Button";
 const menu = tv({
-    base: "bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] rounded shadow-md p-2 min-w-[120px]",
+    base: "dropdown-content menu bg-base-100 shadow-sm mt-2 rounded-box z-50 border border-base-200 outline-none",
+    variants: {
+        size: {
+            xs: "menu-xs",
+            sm: "menu-sm",
+            md: "menu-base",
+            lg: "menu-lg",
+            xl: "menu-xl",
+        },
+    },
+    defaultVariants: {
+        size: "sm",
+    },
 });
 const item = tv({
-    base: "px-3 py-2 cursor-pointer hover:bg-[var(--color-light-muted)] dark:hover:bg-[var(--color-dark-muted)] rounded",
+    base: "cursor-pointer rounded w-full outline-none focus:bg-base-300 rounded-sm",
 });
-export const DropdownMenu = (props) => (<KDropdownMenu>
-    <KDropdownMenu.Trigger class={props.class}>{props.label}</KDropdownMenu.Trigger>
-    <KDropdownMenu.Portal>
-      <KDropdownMenu.Content class={menu()}>
-        <For each={props.items}>
-          {(itemObj) => (<KDropdownMenu.Item class={item()} onSelect={itemObj.onSelect}>
-              {itemObj.label}
-            </KDropdownMenu.Item>)}
-        </For>
+export const DropdownMenu = (props) => {
+    const [local, others] = splitProps(props, ["children"]);
+    return <KDropdownMenu {...others}>{local.children}</KDropdownMenu>;
+};
+export const DropdownMenuTrigger = (props) => {
+    const [local, others] = splitProps(props, ["children"]);
+    return (<KDropdownMenu.Trigger as={Button} {...others}>
+      {local.children}
+    </KDropdownMenu.Trigger>);
+};
+export const DropdownMenuContent = (props) => {
+    return (<KDropdownMenu.Portal>
+      <KDropdownMenu.Content as="ul" class={menu({ size: props.size, class: props.class })}>
+        {props.children}
       </KDropdownMenu.Content>
-    </KDropdownMenu.Portal>
-  </KDropdownMenu>);
+    </KDropdownMenu.Portal>);
+};
+export const DropdownMenuItem = (props) => {
+    return (<KDropdownMenu.Item as="li" class={item()} {...props}>
+      {props.children}
+    </KDropdownMenu.Item>);
+};
+DropdownMenu.Trigger = DropdownMenuTrigger;
+DropdownMenu.Content = DropdownMenuContent;
+DropdownMenu.MenuItem = DropdownMenuItem;
 export default DropdownMenu;

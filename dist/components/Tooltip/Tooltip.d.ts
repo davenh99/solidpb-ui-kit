@@ -1,8 +1,9 @@
-import { Component, JSX } from "solid-js";
+import { Component, JSXElement } from "solid-js";
 interface TooltipProps {
-    content: JSX.Element;
-    children: JSX.Element;
+    content: JSXElement;
+    children: JSXElement;
     class?: string;
+    appearance?: "neutral" | "primary" | "secondary" | "accent" | "info" | "success" | "warning" | "error";
 }
 export declare const Tooltip: Component<TooltipProps>;
 export default Tooltip;

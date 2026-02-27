@@ -1,11 +1,9 @@
-import { SwitchRootProps } from "@kobalte/core/switch";
-import { Component, ValidComponent } from "solid-js";
-import { PolymorphicProps } from "@kobalte/core";
-type SwitchProps<T extends ValidComponent = "div"> = PolymorphicProps<T, SwitchRootProps<T>>;
-interface Props extends SwitchProps {
+import { Component, JSX } from "solid-js";
+export interface SwitchProps extends Omit<JSX.InputHTMLAttributes<HTMLInputElement>, "type" | "onChange"> {
     label?: string;
-    size?: "sm" | "md";
-    saveFunc?: (v: boolean) => Promise<any>;
+    size?: "xs" | "sm" | "md" | "lg" | "xl";
+    appearance?: "primary" | "secondary" | "success" | "warning" | "error" | "info" | "accent" | "neutral";
+    onChange?: (checked: boolean) => void;
 }
-export declare const Switch: Component<Props>;
+export declare const Switch: Component<SwitchProps>;
 export default Switch;

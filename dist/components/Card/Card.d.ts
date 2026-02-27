@@ -3,6 +3,7 @@ interface Props {
     class?: string;
     img?: string;
     imgAlt?: string;
+    imgClass?: string;
     bodyClass?: string;
 }
 export declare const Card: ParentComponent<Props> & {

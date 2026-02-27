@@ -1,51 +1,44 @@
-import { createSignal, Show, useContext } from "solid-js";
-import { Portal } from "solid-js/web";
-import Loader from "lucide-solid/icons/loader";
+import { useContext } from "solid-js";
+import { Dialog } from "@kobalte/core/dialog";
+import Close from "lucide-solid/icons/x";
+import { tv } from "tailwind-variants";
 import { Button } from "../Button";
 import { ModalContext } from "./modalContext";
 export const Modal = (props) => {
-    const [loading, setLoading] = createSignal(false);
-    const containerStyle = `${props.zIndexClass !== undefined ? props.zIndexClass : "z-50"} fixed inset-0 flex items-center justify-center bg-black/50`;
-    return (<Portal>
-      <Show when={loading()}>
-        <div class="fixed inset-0 z-100 flex items-center justify-center bg-gray-800/25">
-          <Loader class="w-9 h-9 animate-spin text-gray-700"/>
-        </div>
-      </Show>
-      <div class={containerStyle} onClick={() => props.setModalVisible?.(false)}>
-        <div class={`bg-charcoal-500 text-dark-slate-gray-900 rounded-xl shadow-lg p-4 md:p-6
-              w-full mx-3 sm:w-[50vw] lg:w-[35vw] flex flex-col`} onClick={(e) => e.stopPropagation()}>
-          <Show when={props.title}>
-            <h2 class="pb-2">{props.title}</h2>
-          </Show>
-          <div class="max-h-[55vh] overflow-y-hidden flex flex-col h-full">
-            <ModalContext.Provider value={{ loading, setLoading }}>{props.children}</ModalContext.Provider>
-          </div>
-          <div class="w-full flex justify-end space-x-2">
-            <Button onClick={() => props.setModalVisible?.(false)} class="mt-3">
-              Cancel
-            </Button>
-
-            <Show when={props.saveFunc}>
-              <Button appearance="success" onClick={() => {
-            setLoading(true);
-            props.saveFunc()
-                .then(() => props.setModalVisible?.(false))
-                .finally(() => setLoading(false));
-        }} class="mt-3">
-                Save
-              </Button>
-            </Show>
-          </div>
-        </div>
-      </div>
-    </Portal>);
+    return (<ModalContext.Provider value={{ title: props.title, setOpen: props.onOpenChange }}>
+      <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+        {props.children}
+      </Dialog>
+    </ModalContext.Provider>);
 };
+const modalContent = tv({
+    base: "modal-box w-fit max-w-[90vw]",
+});
+export const ModalContent = (props) => {
+    const { title } = useModal();
+    return (<Dialog.Portal>
+      <div class="modal modal-open z-10">
+        <Dialog.Content class={modalContent({ class: props.class })}>
+          <div class="flex justify-between items-start">
+            {title && (<Dialog.Title>
+                <h3 class="font-bold text-lg mb-2">{title}</h3>
+              </Dialog.Title>)}
+            <Dialog.CloseButton as={Button} variant="ghost" modifier="square" size="xs">
+              <Close size={20}/>
+            </Dialog.CloseButton>
+          </div>
+          {props.children}
+        </Dialog.Content>
+      </div>
+    </Dialog.Portal>);
+};
+Modal.Trigger = Dialog.Trigger;
+Modal.Modal = ModalContent;
 export default Modal;
-export function useModalLoading() {
+export function useModal() {
     const context = useContext(ModalContext);
     if (!context) {
-        throw new Error("useModalLoading must be used within a Modal");
+        throw new Error("useModal must be used within a Modal");
     }
     return context;
 }

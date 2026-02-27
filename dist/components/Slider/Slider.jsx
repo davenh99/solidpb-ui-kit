@@ -1,0 +1,60 @@
+import { createMemo, Show } from "solid-js";
+import { debounce } from "../../methods/debounce";
+import { tv } from "tailwind-variants";
+const slider = tv({
+    base: "range",
+    variants: {
+        appearance: {
+            neutral: "range-neutral",
+            primary: "range-primary",
+            secondary: "range-secondary",
+            accent: "range-accent",
+            info: "range-info",
+            success: "range-success",
+            warning: "range-warning",
+            error: "range-error",
+        },
+        size: {
+            xs: "range-xs",
+            sm: "range-sm",
+            md: "range-md",
+            lg: "range-lg",
+            xl: "range-xl",
+        },
+    },
+    defaultVariants: {
+        size: "sm",
+    },
+});
+const label = tv({
+    base: "label text-xs",
+    variants: {
+        size: {
+            xs: "text-xs",
+            sm: "text-xs",
+            md: "text-xs",
+            lg: "text-sm",
+            xl: "text-sm",
+        },
+    },
+    defaultVariants: {
+        size: "sm",
+    },
+});
+export const Slider = (props) => {
+    const debouncedSave = createMemo(() => (props.saveFunc ? debounce(props.saveFunc) : undefined));
+    const handleChange = (val) => {
+        const v = val[0];
+        props.onChange?.(v);
+        debouncedSave()?.(v);
+    };
+    return (<label class="flex flex-col gap-1 w-fit">
+      <Show when={props.label}>
+        <span class={label({ size: props.size, class: props.labelClass })}>{props.label}</span>
+      </Show>
+      <input class={slider({ appearance: props.appearance, size: props.size, class: props.class })} type="range" min={props.min} max={props.max} value={props.value} step={props.step} onInput={(e) => {
+            handleChange([e.currentTarget.valueAsNumber]);
+        }}/>
+    </label>);
+};
+export default Slider;

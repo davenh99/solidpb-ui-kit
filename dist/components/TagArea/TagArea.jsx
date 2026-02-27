@@ -1,25 +1,65 @@
 import { createSignal, For, Show, createMemo } from "solid-js";
-import { Input } from "../Input";
+import { TextField } from "@kobalte/core/text-field";
 import Tag from "../Tag/Tag";
+import { tv } from "tailwind-variants";
+const tagArea = tv({
+    base: "textarea outline-offset-0 p-2 min-h-2",
+    variants: {
+        editing: {
+            true: "",
+            false: "cursor-pointer",
+        },
+    },
+});
+const menu = tv({
+    base: "dropdown-content bg-base-200 min-w-30 shadow-sm rounded-box menu absolute border border-base-200 gap-1",
+    variants: {
+        size: {
+            xs: "menu-xs",
+            sm: "menu-sm",
+            md: "menu-base",
+            lg: "menu-lg",
+            xl: "menu-xl",
+        },
+    },
+    defaultVariants: {
+        size: "sm",
+    },
+});
 export const TagArea = (props) => {
     const [tagInput, setTagInput] = createSignal("");
     const [showSuggestions, setShowSuggestions] = createSignal(false);
+    const [editing, setEditing] = createSignal(false);
+    let inputRef;
     const filteredSuggestions = createMemo(() => (props.suggestions || []).filter((s) => s.name.toLowerCase().includes(tagInput().toLowerCase()) && !props.tags.some((t) => t.id === s.id)));
     const handleTagInput = async (e) => {
-        if (e.key === "Enter" && tagInput().trim()) {
-            e.preventDefault();
-            const newTagName = tagInput().trim();
-            if (!props.tags.map((t) => t.name).includes(newTagName)) {
-                let newTag = undefined;
-                newTag = await props.onCreateTag(newTagName);
-                if (newTag)
-                    props.setTags([...props.tags, newTag]);
+        setShowSuggestions(true);
+        if (tagInput().trim()) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                e.stopPropagation();
+                const newTagName = tagInput().trim();
+                if (!props.tags.map((t) => t.name).includes(newTagName)) {
+                    let newTag = undefined;
+                    newTag = await props.onCreateTag(newTagName);
+                    if (newTag)
+                        props.setTags([...props.tags, newTag]);
+                }
+                setTagInput("");
+                setShowSuggestions(false);
             }
-            setTagInput("");
-            setShowSuggestions(false);
+            else {
+                setShowSuggestions(true);
+            }
         }
         else {
-            setShowSuggestions(true);
+            if (e.key === "Delete" || e.key === "Backspace") {
+                if (props.tags.length > 0) {
+                    const lastTag = props.tags[props.tags.length - 1];
+                    await props.onDeleteTag(lastTag);
+                    props.setTags(props.tags.slice(0, -1));
+                }
+            }
         }
     };
     const handleSuggestionClick = (tag) => {
@@ -31,31 +71,45 @@ export const TagArea = (props) => {
         await props.onDeleteTag(t);
         props.setTags((props.tags || []).filter((tag) => tag.id !== t.id));
     };
-    return (<div class="rounded-md p-2 flex flex-col bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)]">
-      <div class="flex flex-wrap gap-2">
+    return (<div class={tagArea({ editing: editing() })} onMouseDown={(e) => {
+            if (props.editable === false)
+                return;
+            e.preventDefault();
+            setEditing(true);
+            inputRef?.focus();
+        }}>
+      <div class="flex flex-wrap gap-1">
         <For each={props.tags || []}>
-          {(t) => (<Tag title={t.name || ""} colorHex={t.colorHex || "#6b7280"} onClick={() => deleteTag(t)}/>)}
+          {(t) => (<Tag title={t.name || ""} colorHex={t.colorHex || "#6b7280"} onDelete={editing()
+                ? () => {
+                    setShowSuggestions(false);
+                    deleteTag(t);
+                }
+                : undefined} size={props.size}/>)}
         </For>
-        <div class="relative flex-1 min-w-[120px]">
-          <Input label="" value={tagInput()} onChange={(v) => {
-            setTagInput(v);
-            setShowSuggestions(true);
-        }} inputProps={{
-            onKeyDown: handleTagInput,
-            placeholder: props.placeholder || "Add tags (press Enter)",
-            onFocus: () => setShowSuggestions(true),
-            onBlur: () => setTimeout(() => setShowSuggestions(false), 100),
-        }} class="w-full"/>
-          <Show when={showSuggestions() && filteredSuggestions().length > 0}>
-            <div class="absolute z-10 mt-1 w-full bg-[var(--color-light-surface)] dark:bg-[var(--color-dark-surface)] border border-[var(--color-light-muted)] dark:border-[var(--color-dark-muted)] rounded shadow-lg max-h-40 overflow-auto">
-              <For each={filteredSuggestions()}>
-                {(s) => (<div class="px-3 py-2 cursor-pointer hover:bg-[var(--color-light-muted)] dark:hover:bg-[var(--color-dark-muted)]" onMouseDown={() => handleSuggestionClick(s)}>
-                    {s.name}
-                  </div>)}
-              </For>
-            </div>
-          </Show>
-        </div>
+        {editing() && props.editable !== false && (<div class="relative flex-1 min-w-30">
+            <TextField value={tagInput()} onChange={setTagInput}>
+              <TextField.Input ref={inputRef} onKeyDown={handleTagInput} placeholder={props.placeholder || ""} onBlur={() => {
+                setEditing(false);
+                setShowSuggestions(false);
+                setTagInput("");
+            }} class="w-full focus:outline-none"/>
+            </TextField>
+            <Show when={showSuggestions()}>
+              <div class={menu({ size: props.size })}>
+                <Show when={filteredSuggestions().length > 0} fallback={<p class="italic text-xs">{props.noSuggestionsPlaceholder ?? "No matches found"}</p>}>
+                  <ul>
+                    <For each={filteredSuggestions()}>
+                      {(s) => (<li class="cursor-pointer rounded" onMouseDown={() => handleSuggestionClick(s)}>
+                          <a>{s.name}</a>
+                        </li>)}
+                    </For>
+                  </ul>
+                </Show>
+                <Show when={props.dropDownAction}>{props.dropDownAction}</Show>
+              </div>
+            </Show>
+          </div>)}
       </div>
     </div>);
 };
