@@ -16,11 +16,3 @@ Also to index.css (refer daisyui docs):
 }
 @source "../node_modules/@solidpb/ui-kit";
 ```
-
-### TODO dark theme
-
-- [ ] FilterBar
-
-### TODO
-
-- [ ] Filterbar

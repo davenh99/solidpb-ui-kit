@@ -133,7 +133,7 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
           </Button>
         </Show>
       </div>
-      <div class="flex flex-col lg:flex-row min-w-50 lg:min-w-150 gap-3">
+      <div class="flex flex-col lg:flex-row gap-3">
         <Select<FilterField<T>>
           label="Field"
           value={props.filter.field ?? null}

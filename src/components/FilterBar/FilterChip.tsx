@@ -265,7 +265,7 @@ export const FilterGroupChip = <T,>(props: FilterGroupProps<T>) => {
         groupIndex={0}
         index={props.index}
       />
-      <For each={props.filterGroup.filters}>
+      <For each={props.filterGroup.filters.slice(1)}>
         {(filter, ind) => (
           <>
             <span class="italic mx-0.5 hidden sm:inline">Or</span>

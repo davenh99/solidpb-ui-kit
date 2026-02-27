@@ -1,7 +1,6 @@
 import { createEffect, createMemo, createSignal, For, JSXElement, onCleanup, Show } from "solid-js";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { TextField } from "@kobalte/core/text-field";
-import { Popover } from "@kobalte/core/popover";
 import { tv } from "tailwind-variants";
 import Search from "lucide-solid/icons/search";
 import ListFilter from "lucide-solid/icons/list-filter";
@@ -11,9 +10,10 @@ import invariant from "tiny-invariant";
 import { FilterChip, FilterGroupChip } from "./FilterChip";
 import AddFilter from "./AddFilter";
 import AddSortingDropdown from "./AddSortingDropdown";
-import EditFiltersDropdown from "./EditFiltersDropdown";
+import EditFilters from "./EditFilters";
 import { DropdownMenu } from "../DropdownMenu";
 import { Modal } from "../Modal";
+import { Button } from "../Button";
 
 export type FieldType = "text" | "number" | "date" | "select" | "bool";
 
@@ -284,7 +284,6 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
         <Show when={props.leftAction}>{props.leftAction}</Show>
         <div class="join flex flex-1 relative">
           <TextField
-            ref={ref}
             value={props.value}
             onChange={handleTextValueChange}
             class={filterBar({ size: props.size })}
@@ -299,7 +298,7 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
             />
           </TextField>
           <Modal title="Add filters" open={filterDropdownOpen()} onOpenChange={setFilterDropdownOpen}>
-            <Modal.Trigger modifier="square" class="join-item">
+            <Modal.Trigger as={Button} modifier="square" class="join-item">
               <ListFilter class="w-[1em] h-[1em]" />
             </Modal.Trigger>
             <Modal.Modal class="bg-base-200">
@@ -354,35 +353,20 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
           )}
         </div>
       </div>
-      <div class="w-full flex flex-wrap gap-0.5 mt-0.5">
+      <div ref={ref} class="w-full flex flex-wrap gap-0.5 mt-1">
         <For each={props.items}>
           {(item, i) => {
             const [itemOpen, setItemOpen] = createSignal(false);
 
             return (
-              <Popover open={itemOpen()} onOpenChange={setItemOpen}>
+              <Modal title="Edit filters" open={itemOpen()} onOpenChange={setItemOpen}>
                 <Show
                   when={isFilterGroup(item)}
                   fallback={
-                    <Popover.Anchor>
-                      <Popover.Trigger
-                        as={FilterChip<T>}
-                        onDelete={() => props.onFilterRemove(i(), item as Filter<T>)}
-                        filter={item as Filter<T>}
-                        size={props.size}
-                        onGroupDrag={(sourceInd, sourceFilterGroupInd) =>
-                          props.onGroupDrag(sourceInd, i(), sourceFilterGroupInd)
-                        }
-                        index={i()}
-                        setOpen={setItemOpen}
-                      />
-                    </Popover.Anchor>
-                  }
-                >
-                  <Popover.Anchor>
-                    <Popover.Trigger
-                      as={FilterGroupChip<T>}
-                      filterGroup={item as FilterGroup<T>}
+                    <Modal.Trigger
+                      as={FilterChip<T>}
+                      onDelete={() => props.onFilterRemove(i(), item as Filter<T>)}
+                      filter={item as Filter<T>}
                       size={props.size}
                       onGroupDrag={(sourceInd, sourceFilterGroupInd) =>
                         props.onGroupDrag(sourceInd, i(), sourceFilterGroupInd)
@@ -390,16 +374,29 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
                       index={i()}
                       setOpen={setItemOpen}
                     />
-                  </Popover.Anchor>
+                  }
+                >
+                  <Modal.Trigger
+                    as={FilterGroupChip<T>}
+                    filterGroup={item as FilterGroup<T>}
+                    size={props.size}
+                    onGroupDrag={(sourceInd, sourceFilterGroupInd) =>
+                      props.onGroupDrag(sourceInd, i(), sourceFilterGroupInd)
+                    }
+                    index={i()}
+                    setOpen={setItemOpen}
+                  />
                 </Show>
-                <EditFiltersDropdown
-                  size={props.size}
-                  availableFields={props.availableFields ?? []}
-                  onSaveFilters={(filters) => props.onUpdateFilterGroup(i(), filters)}
-                  currentFilters={isFilterGroup(item) ? item.filters : [item]}
-                  setOpen={setItemOpen}
-                />
-              </Popover>
+                <Modal.Modal class="bg-base-200">
+                  <EditFilters
+                    size={props.size}
+                    availableFields={props.availableFields ?? []}
+                    onSaveFilters={(filters) => props.onUpdateFilterGroup(i(), filters)}
+                    currentFilters={isFilterGroup(item) ? item.filters : [item]}
+                    setOpen={setItemOpen}
+                  />
+                </Modal.Modal>
+              </Modal>
             );
           }}
         </For>

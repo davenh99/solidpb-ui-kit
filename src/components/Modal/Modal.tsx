@@ -1,10 +1,9 @@
-import { ParentComponent, useContext, createSignal, splitProps } from "solid-js";
+import { ParentComponent, useContext } from "solid-js";
 import { Dialog } from "@kobalte/core/dialog";
-import { Portal } from "solid-js/web";
 import Close from "lucide-solid/icons/x";
 import { tv } from "tailwind-variants";
 
-import { Button, ButtonProps } from "../Button";
+import { Button } from "../Button";
 import { ModalContext } from "./modalContext";
 
 interface ModalProps {
@@ -14,7 +13,7 @@ interface ModalProps {
 }
 
 interface ModalComponents {
-  Trigger: ParentComponent<ButtonProps>;
+  Trigger: typeof Dialog.Trigger;
   Modal: ParentComponent<{ class?: string }>;
 }
 
@@ -28,18 +27,8 @@ export const Modal: ParentComponent<ModalProps> & ModalComponents = (props) => {
   );
 };
 
-export const ModalTrigger: ParentComponent<ButtonProps> = (props) => {
-  const [local, others] = splitProps(props, ["children"]);
-
-  return (
-    <Dialog.Trigger as={Button} {...others}>
-      {local.children}
-    </Dialog.Trigger>
-  );
-};
-
 const modalContent = tv({
-  base: "modal-box w-full sm:max-w-2xl max-w-[90%]",
+  base: "modal-box w-fit max-w-[90vw]",
 });
 
 export const ModalContent: ParentComponent<{ class?: string }> = (props) => {
@@ -66,7 +55,7 @@ export const ModalContent: ParentComponent<{ class?: string }> = (props) => {
   );
 };
 
-Modal.Trigger = ModalTrigger;
+Modal.Trigger = Dialog.Trigger;
 Modal.Modal = ModalContent;
 
 export default Modal;
