@@ -298,13 +298,8 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
               onFocusOut={() => setShowFieldDropdown(false)}
             />
           </TextField>
-          <Modal
-            id="filter-modal"
-            title="Add filters"
-            open={filterDropdownOpen()}
-            onOpenChange={setFilterDropdownOpen}
-          >
-            <Modal.Trigger>
+          <Modal title="Add filters" open={filterDropdownOpen()} onOpenChange={setFilterDropdownOpen}>
+            <Modal.Trigger modifier="square" class="join-item">
               <ListFilter class="w-[1em] h-[1em]" />
             </Modal.Trigger>
             <Modal.Modal class="bg-base-200">

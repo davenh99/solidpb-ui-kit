@@ -1,73 +1,68 @@
-import { ParentComponent, useContext, createSignal } from "solid-js";
+import { ParentComponent, useContext, createSignal, splitProps } from "solid-js";
+import { Dialog } from "@kobalte/core/dialog";
+import { Portal } from "solid-js/web";
 import Close from "lucide-solid/icons/x";
 import { tv } from "tailwind-variants";
 
-import { Button } from "../Button";
+import { Button, ButtonProps } from "../Button";
 import { ModalContext } from "./modalContext";
 
 interface ModalProps {
-  id: string;
   title?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
 interface ModalComponents {
-  Trigger: ParentComponent;
+  Trigger: ParentComponent<ButtonProps>;
   Modal: ParentComponent<{ class?: string }>;
 }
 
 export const Modal: ParentComponent<ModalProps> & ModalComponents = (props) => {
-  const [_open, _setOpen] = createSignal(false);
-
-  const open = () => props.open ?? _open();
-
-  const handleOpen = (v: boolean) => {
-    const dialog = document.getElementById(props.id) as HTMLDialogElement;
-    if (v) {
-      dialog.showModal();
-    } else {
-      dialog.close();
-    }
-    _setOpen(v);
-    props.onOpenChange?.(v);
-  };
-
   return (
-    <ModalContext.Provider value={{ id: props.id, open, setOpen: handleOpen, title: props.title }}>
-      {props.children}
+    <ModalContext.Provider value={{ title: props.title, setOpen: props.onOpenChange }}>
+      <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+        {props.children}
+      </Dialog>
     </ModalContext.Provider>
   );
 };
 
-export const ModalTrigger: ParentComponent = (props) => {
-  const { setOpen } = useModal();
+export const ModalTrigger: ParentComponent<ButtonProps> = (props) => {
+  const [local, others] = splitProps(props, ["children"]);
 
-  return <Button onClick={() => setOpen(true)}>{props.children}</Button>;
+  return (
+    <Dialog.Trigger as={Button} {...others}>
+      {local.children}
+    </Dialog.Trigger>
+  );
 };
 
 const modalContent = tv({
-  base: "modal-box w-full max-w-2xl",
+  base: "modal-box w-full sm:max-w-2xl max-w-[90%]",
 });
 
 export const ModalContent: ParentComponent<{ class?: string }> = (props) => {
-  const { id, title, setOpen } = useModal();
+  const { title } = useModal();
 
   return (
-    <dialog id={id} class="modal">
-      <div class={modalContent({ class: props.class })}>
-        <div class="flex justify-between items-start">
-          {title && <h3 class="font-bold text-lg mb-2">{title}</h3>}
-          <Button variant="ghost" modifier="square" size="xs" onClick={() => setOpen(false)}>
-            <Close size={20} />
-          </Button>
-        </div>
-        {props.children}
+    <Dialog.Portal>
+      <div class="modal modal-open z-10">
+        <Dialog.Content class={modalContent({ class: props.class })}>
+          <div class="flex justify-between items-start">
+            {title && (
+              <Dialog.Title>
+                <h3 class="font-bold text-lg mb-2">{title}</h3>
+              </Dialog.Title>
+            )}
+            <Dialog.CloseButton as={Button} variant="ghost" modifier="square" size="xs">
+              <Close size={20} />
+            </Dialog.CloseButton>
+          </div>
+          {props.children}
+        </Dialog.Content>
       </div>
-      <form method="dialog" class="modal-backdrop">
-        <button class="cursor-auto">close</button>
-      </form>
-    </dialog>
+    </Dialog.Portal>
   );
 };
 

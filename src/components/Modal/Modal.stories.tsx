@@ -19,7 +19,7 @@ const ProdForm = () => {
     <ProductForm
       data={productData}
       onSave={async (vals) => alert(JSON.stringify(vals))}
-      onCancel={() => setOpen(false)}
+      onCancel={() => setOpen?.(false)}
     >
       <ProductForm.ImageField field="imageUrl" label="Product Image" size="lg" />
       <ProductForm.TextField field="name" label="Name" />
@@ -48,11 +48,11 @@ const ProdForm = () => {
 export const Default: Story = {
   render: () => (
     <div class="flex flex-col gap-4 w-fit">
-      <Modal id="modal-1" title="Example Modal">
+      <Modal title="Example Modal">
         <Modal.Trigger>Open Modal</Modal.Trigger>
         <Modal.Modal>Modal content</Modal.Modal>
       </Modal>
-      <Modal id="modal-2" title="Product form">
+      <Modal title="Product form">
         <Modal.Trigger>Open product</Modal.Trigger>
         <Modal.Modal>
           <ProdForm />

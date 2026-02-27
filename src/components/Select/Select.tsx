@@ -108,7 +108,7 @@ export const Select = <T,>(props: SelectProps<T>) => {
           </KSelect.Icon>
         </KSelect.Trigger>
         <KSelect.Portal>
-          <KSelect.Content class="rounded-box bg-base-100 shadow-md z-500000000000000 border border-base-200">
+          <KSelect.Content class="rounded-box bg-base-100 shadow-md border border-base-200 z-20">
             <KSelect.Listbox class={menu({ size: props.size })} />
           </KSelect.Content>
         </KSelect.Portal>
