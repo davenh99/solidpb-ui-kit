@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, For, onCleanup } from "solid-js";
+import { createEffect, createMemo, createSignal, For, onCleanup, Show } from "solid-js";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { tv } from "tailwind-variants";
@@ -11,7 +11,7 @@ export const Kanban = (props) => {
         const posKey = props.statePositionKey;
         if (!posKey)
             return props.columns;
-        return props.columns.toSorted((a, b) => (Number(a[posKey]) ?? 0) - (Number(b[posKey]) ?? 0));
+        return props.columns?.toSorted((a, b) => (Number(a[posKey]) ?? 0) - (Number(b[posKey]) ?? 0));
     });
     const colDragEnabled = () => !!props.statePositionKey;
     const [flashedColId, setFlashedColId] = createSignal(null);
@@ -58,9 +58,11 @@ export const Kanban = (props) => {
         onCleanup(dispose);
     });
     return (<div class={container({ class: props.containerClass })}>
-      <For each={sortedColumns()}>
-        {(col) => (<KanbanColumn col={col} dragEnabled={colDragEnabled} cardClass={props.cardClass} items={props.items} class={props.columnClass} onCardClick={props.onCardClick} renderItem={props.renderItem} onCreateItem={props.onCreateItem} onReorderCard={props.onReorderCard} onCollapse={props.onCollapseColumn} flashSignal={() => flashedColId()} itemPositionKey={props.itemPositionKey} itemStateKey={props.itemStateKey}/>)}
-      </For>
+      <Show when={sortedColumns()?.length} fallback={<KanbanColumn dragEnabled={colDragEnabled} cardClass={props.cardClass} items={props.items} class={props.columnClass} onCardClick={props.onCardClick} renderItem={props.renderItem} onCreateItem={props.onCreateItem} onReorderCard={props.onReorderCard} onCollapse={props.onCollapseColumn} flashSignal={() => flashedColId()} itemPositionKey={props.itemPositionKey} itemStateKey={props.itemStateKey}/>}>
+        <For each={sortedColumns()}>
+          {(col) => (<KanbanColumn col={col} dragEnabled={colDragEnabled} cardClass={props.cardClass} items={props.items} class={props.columnClass} onCardClick={props.onCardClick} renderItem={props.renderItem} onCreateItem={props.onCreateItem} onReorderCard={props.onReorderCard} onCollapse={props.onCollapseColumn} flashSignal={() => flashedColId()} itemPositionKey={props.itemPositionKey} itemStateKey={props.itemStateKey}/>)}
+        </For>
+      </Show>
     </div>);
 };
 export default Kanban;

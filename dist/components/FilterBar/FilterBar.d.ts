@@ -24,12 +24,10 @@ export interface FilterField<T> {
     name: keyof T;
     label: string;
     type: FieldType;
-    operators?: FilterOperator[];
     options?: {
         label: string;
         value: string;
     }[];
-    searchable?: boolean;
 }
 export interface SortOption<T> {
     field: keyof T;

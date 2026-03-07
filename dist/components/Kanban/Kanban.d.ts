@@ -1,6 +1,6 @@
 import { JSXElement } from "solid-js";
 export interface KanbanProps<T extends KanbanItem, K extends KanbanState> {
-    columns: K[];
+    columns?: K[];
     items: T[];
     renderItem?: (item: T) => JSXElement;
     onCardClick?: (item: T) => void;

@@ -1,6 +1,6 @@
 import { Accessor, JSXElement } from "solid-js";
 export interface KanbanColumnProps<T extends KanbanItem, K extends KanbanState> {
-    col: K;
+    col?: K;
     items: T[];
     dragEnabled: Accessor<boolean>;
     class?: string;

@@ -5,3 +5,4 @@ export declare const iconSize: {
     lg: number;
     xl: number;
 };
+export declare const THEME_KEY = "theme";

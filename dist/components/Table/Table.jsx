@@ -116,7 +116,7 @@ export const Table = (props) => {
         get data() {
             return props.data || [];
         },
-        columns: props.columns(),
+        columns: props.columns,
         getCoreRowModel: getCoreRowModel(),
     });
     const rowCount = createMemo(() => table.getRowModel().rows.length);
@@ -182,7 +182,7 @@ export const Table = (props) => {
 
             <tbody>
               <For each={rows()}>
-                {(row, ind) => (<TableRow row={row} ind={ind()} onRowClick={() => props.onRowClick(row.original)} dragEnabled={dragEnabled} flashSignal={() => flashedRowId()}/>)}
+                {(row, ind) => (<TableRow row={row} ind={ind()} onRowClick={() => props.onRowClick?.(row.original)} dragEnabled={dragEnabled} flashSignal={() => flashedRowId()}/>)}
               </For>
             </tbody>
           </table>

@@ -12,7 +12,7 @@ import { Button } from "../Button";
 import { KanbanCard } from "./KanbanCard";
 import { Input } from "../Input";
 const column = tv({
-    base: "kanban-column flex flex-col gap-1 flex-shrink-0 bg-base-300 p-1.5 rounded-md transition-[width] text-nowrap",
+    base: "kanban-column flex flex-col gap-1 bg-base-300 p-1.5 rounded-md transition-[width] text-nowrap",
     variants: {
         folded: {
             true: "w-9",
@@ -35,9 +35,6 @@ const columnHeader = tv({
         folded: false,
     },
 });
-const columnContent = tv({
-    base: "flex flex-col gap-1.5",
-});
 export const KanbanColumn = (props) => {
     let ref;
     const [dragging, setDragging] = createSignal("idle");
@@ -51,7 +48,7 @@ export const KanbanColumn = (props) => {
         const stateKey = props.itemStateKey;
         const posKey = props.itemPositionKey;
         if (stateKey) {
-            items = items.filter((item) => item[stateKey] === props.col.id);
+            items = items.filter((item) => item[stateKey] === props.col?.id);
         }
         if (!posKey)
             return items;
@@ -60,7 +57,7 @@ export const KanbanColumn = (props) => {
     const itemDragEnabled = () => !!props.itemPositionKey;
     const [flashedCardId, setFlashedCardId] = createSignal(null);
     createEffect(() => {
-        if (props.flashSignal?.() === props.col.id && ref) {
+        if (props.flashSignal?.() === props.col?.id && ref) {
             triggerFlash(ref);
         }
     });
@@ -77,7 +74,7 @@ export const KanbanColumn = (props) => {
                     return false;
                 }
                 // only allowing same collection for now to be dropped on me
-                return source.data.item.collectionId == props.col.collectionId;
+                return source.data.item.collectionId == props.col?.collectionId;
             },
             getData({ input }) {
                 return attachClosestEdge({
@@ -201,7 +198,7 @@ export const KanbanColumn = (props) => {
         return {};
     });
     return (<div data-drop-edge={dragging() === "dragging-over" && !cardDraggedOver() ? (closestEdge() ?? undefined) : undefined} ref={ref} class={column({ class: props.class, folded: folded() })} style={{ opacity: dragging() == "dragging" ? 0.2 : 1, ...bgStyle() }}>
-      <div>
+      <Show when={props.col}>
         <div class={columnHeader({ folded: folded() })}>
           <div class="flex items-center gap-2">
             <Button size="xs" variant="ghost" modifier="square" onClick={() => setFolded(!folded())}>
@@ -224,33 +221,31 @@ export const KanbanColumn = (props) => {
               <span class="text-xs font-normal text-base-content/50 mt-2">{filteredItems().length}</span>
             </div>)}
         </div>
-      </div>
-      <div class={columnContent()}>
-        {!folded() && (<>
-            {creatingItem() && (<div class="card bg-base-100 p-2 rounded-md space-y-1.5">
-                <p class="font-medium text-sm">New Item</p>
-                <Input value={newItemTitle()} onChange={setNewItemTitle} label="Title"/>
-                <div class="flex justify-end space-x-1.5">
-                  <Button appearance="neutral" size="sm" onClick={() => {
+      </Show>
+      {!folded() && (<>
+          {creatingItem() && props.col && (<div class="card bg-base-100 p-2 rounded-md space-y-1.5">
+              <p class="font-medium text-sm">New Item</p>
+              <Input value={newItemTitle()} onChange={setNewItemTitle} label="Title"/>
+              <div class="flex justify-end space-x-1.5">
+                <Button appearance="neutral" size="sm" onClick={() => {
                     setCreatingItem(false);
                     setNewItemTitle("");
                 }}>
-                    Cancel
-                  </Button>
-                  <Button appearance="success" size="sm" onClick={() => {
+                  Cancel
+                </Button>
+                <Button appearance="success" size="sm" onClick={() => {
                     setCreatingItem(false);
                     props.onCreateItem?.(newItemTitle(), props.col.id);
                     setNewItemTitle("");
                 }}>
-                    Add
-                  </Button>
-                </div>
-              </div>)}
-            <For each={filteredItems()}>
-              {(item) => (<KanbanCard item={item} dragEnabled={itemDragEnabled} onCardClick={() => props.onCardClick?.(item)} class={props.cardClass} renderItem={props.renderItem} flashSignal={() => flashedCardId()}/>)}
-            </For>
-          </>)}
-      </div>
+                  Add
+                </Button>
+              </div>
+            </div>)}
+          <For each={filteredItems()}>
+            {(item) => (<KanbanCard item={item} dragEnabled={itemDragEnabled} onCardClick={() => props.onCardClick?.(item)} class={props.cardClass} renderItem={props.renderItem} flashSignal={() => flashedCardId()}/>)}
+          </For>
+        </>)}
     </div>);
 };
 export default KanbanColumn;

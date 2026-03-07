@@ -7,7 +7,9 @@ export const Navbar = (props) => {
     return <nav class={navbar({ class: props.class })}>{props.children}</nav>;
 };
 export const NavbarBrand = (props) => {
-    return <div class="btn btn-lg btn-ghost">{props.children}</div>;
+    return (<a class="btn btn-lg btn-ghost" href={props.href}>
+      {props.children}
+    </a>);
 };
 export const NavbarProfile = (props) => {
     return <div class="avatar">{props.children}</div>;

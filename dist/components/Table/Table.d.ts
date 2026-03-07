@@ -1,4 +1,4 @@
-import { Accessor, JSXElement } from "solid-js";
+import { JSXElement } from "solid-js";
 import { ColumnDef, Row } from "@tanstack/solid-table";
 interface TableItem {
     id: string;
@@ -9,8 +9,8 @@ interface TableProps<T extends TableItem> {
     data: T[];
     createFunc?: () => Promise<void>;
     headerActions?: JSXElement;
-    columns: Accessor<ColumnDef<T>[]>;
-    onRowClick: (item: T) => void;
+    columns: ColumnDef<T>[];
+    onRowClick?: (item: T) => void;
     loading?: boolean;
     emptyState?: JSXElement;
     loadingFallback?: JSXElement;

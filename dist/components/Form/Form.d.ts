@@ -14,6 +14,7 @@ export interface FormProps<T> {
     onSave?: (values: Partial<T>) => Promise<void>;
     onCancel?: () => void;
     children: JSXElement;
+    class?: string;
 }
 type BaseFieldProps<T> = {
     field: keyof T;

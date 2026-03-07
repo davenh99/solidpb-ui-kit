@@ -11,6 +11,10 @@ import { Slider } from "../Slider";
 import { Image } from "../Image";
 import { Button } from "../Button";
 import { FileInput } from "../FileInput";
+import { tv } from "tailwind-variants";
+const formClass = tv({
+    base: "space-y-4 space-x-4",
+});
 export function createForm() {
     const Form = (props) => {
         const [values, setValues] = createStore({ ...props.data });
@@ -26,7 +30,7 @@ export function createForm() {
             props.onSave?.(values);
         };
         return (<InternalFormContext.Provider value={contextValue}>
-        <form onSubmit={handleSubmit} class="space-y-4 space-x-4">
+        <form onSubmit={handleSubmit} class={formClass({ class: props.class })}>
           {props.title && <h2 class="text-lg font-semibold">{props.title}</h2>}
 
           {props.children}

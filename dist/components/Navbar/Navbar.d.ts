@@ -3,7 +3,9 @@ export interface NavbarProps {
     class?: string;
 }
 export interface NavbarComponents {
-    Brand: ParentComponent;
+    Brand: ParentComponent<{
+        href?: string;
+    }>;
     Profile: ParentComponent;
     Menu: ParentComponent;
     MenuItem: ParentComponent;
@@ -12,7 +14,9 @@ export interface NavbarComponents {
     }>;
 }
 export declare const Navbar: ParentComponent<NavbarProps> & NavbarComponents;
-export declare const NavbarBrand: ParentComponent;
+export declare const NavbarBrand: ParentComponent<{
+    href?: string;
+}>;
 export declare const NavbarProfile: ParentComponent;
 export declare const NavbarMenu: ParentComponent;
 export declare const NavbarSubmenu: ParentComponent<{

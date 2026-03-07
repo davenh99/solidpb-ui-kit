@@ -5,3 +5,4 @@ export const iconSize = {
     lg: 20,
     xl: 22,
 };
+export const THEME_KEY = "theme";
