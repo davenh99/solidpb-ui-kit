@@ -278,7 +278,7 @@ export const Default: Story = {
             <Table<MockProduct>
               headers
               size="sm"
-              columns={createMemo(() => columns)}
+              columns={columns}
               data={paginatedData()}
               onRowClick={(r) =>
                 toaster.show((props) => (

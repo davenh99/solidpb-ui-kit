@@ -104,9 +104,7 @@ export interface FilterField<T> {
   name: keyof T;
   label: string;
   type: FieldType;
-  operators?: FilterOperator[]; // Available operators for this field type
   options?: { label: string; value: string }[];
-  searchable?: boolean; // Show in quick search text fields
 }
 
 export interface SortOption<T> {

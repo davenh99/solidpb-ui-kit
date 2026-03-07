@@ -74,28 +74,6 @@ export const Default: Story = {
     const [searchValue, setSearchValue] = createSignal("");
     const [sortBy, setSortBy] = createSignal<SortOption<MockProductWithDate>>();
 
-    // const handleGroupCreate = (
-    //   sourceFilter: Filter<MockProductWithDate>,
-    //   targetFilter: Filter<MockProductWithDate>,
-    // ) => {
-    //   // Remove both source and target filters from items
-    //   const remainingItems = items().filter((item) => {
-    //     // Check if it's a filter (not a group)
-    //     if ("filters" in item) return true;
-
-    //     // Keep items that aren't the source or target
-    //     return item.id !== sourceFilter.id && item.id !== targetFilter.id;
-    //   });
-
-    //   // Create new group
-    //   const newGroup: FilterGroup<MockProductWithDate> = {
-    //     filters: [targetFilter, sourceFilter],
-    //   };
-
-    //   // Update items with remaining filters + new group
-    //   setItems([...remainingItems, newGroup]);
-    // };
-
     const handleAddFilterGroup = (newFilters: Filter<MockProductWithDate>[]) => {
       if (newFilters.length === 1) {
         setItems?.([...(items() || []), newFilters[0]]);

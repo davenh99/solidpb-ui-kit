@@ -12,7 +12,7 @@ export interface MockProduct {
   sellable: boolean;
   description: string;
   percentageDiscount: number;
-  imageUrl: string;
+  imageUrl?: string;
   file: string;
   id: string;
   collectionId: string;
@@ -27,7 +27,7 @@ export const productData: MockProduct = {
   sellable: true,
   description: "This is a sample product used for demonstrating the Form component.",
   percentageDiscount: 10,
-  imageUrl: "https://placehold.co/128x128",
+  imageUrl: undefined,
   file: "data.pdf",
   id: "0",
   collectionId: "0",

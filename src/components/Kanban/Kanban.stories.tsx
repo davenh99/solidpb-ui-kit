@@ -199,7 +199,7 @@ export const CustomRendering: Story = {
   render: () => (
     <Kanban<Task, KanbanState>
       items={defaultTasks}
-      columns={defaultColumns}
+      columnClass="w-full grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))]"
       renderItem={(item) => (
         <div>
           <div class="font-medium text-sm">{item.title}</div>

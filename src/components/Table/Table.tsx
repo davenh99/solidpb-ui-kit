@@ -25,8 +25,8 @@ interface TableProps<T extends TableItem> {
   data: T[];
   createFunc?: () => Promise<void>; // if not set, don't show 'new' button
   headerActions?: JSXElement;
-  columns: Accessor<ColumnDef<T>[]>;
-  onRowClick: (item: T) => void;
+  columns: ColumnDef<T>[];
+  onRowClick?: (item: T) => void;
   loading?: boolean;
   emptyState?: JSXElement;
   loadingFallback?: JSXElement;
@@ -177,7 +177,7 @@ export const Table = <T extends TableItem>(props: TableProps<T>): JSXElement => 
     get data() {
       return props.data || [];
     },
-    columns: props.columns(),
+    columns: props.columns,
     getCoreRowModel: getCoreRowModel(),
   });
   const rowCount = createMemo(() => table.getRowModel().rows.length);
@@ -274,7 +274,7 @@ export const Table = <T extends TableItem>(props: TableProps<T>): JSXElement => 
                   <TableRow<T>
                     row={row}
                     ind={ind()}
-                    onRowClick={() => props.onRowClick(row.original)}
+                    onRowClick={() => props.onRowClick?.(row.original)}
                     dragEnabled={dragEnabled}
                     flashSignal={() => flashedRowId()}
                   />

@@ -12,6 +12,7 @@ import { Slider, type SliderProps } from "../Slider";
 import { Image, type ImageProps } from "../Image";
 import { Button } from "../Button";
 import { FileInput, type FileInputProps } from "../FileInput";
+import { tv } from "tailwind-variants";
 
 export interface FormProps<T> {
   data: T;
@@ -19,11 +20,16 @@ export interface FormProps<T> {
   onSave?: (values: Partial<T>) => Promise<void>;
   onCancel?: () => void;
   children: JSXElement;
+  class?: string;
 }
 
 type BaseFieldProps<T> = {
   field: keyof T;
 };
+
+const formClass = tv({
+  base: "space-y-4 space-x-4",
+});
 
 export function createForm<T>() {
   type Ctx = {
@@ -52,7 +58,7 @@ export function createForm<T>() {
 
     return (
       <InternalFormContext.Provider value={contextValue}>
-        <form onSubmit={handleSubmit} class="space-y-4 space-x-4">
+        <form onSubmit={handleSubmit} class={formClass({ class: props.class })}>
           {props.title && <h2 class="text-lg font-semibold">{props.title}</h2>}
 
           {props.children}

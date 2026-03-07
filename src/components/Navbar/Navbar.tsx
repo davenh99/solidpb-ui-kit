@@ -7,7 +7,7 @@ export interface NavbarProps {
 }
 
 export interface NavbarComponents {
-  Brand: ParentComponent;
+  Brand: ParentComponent<{ href?: string }>;
   Profile: ParentComponent;
   Menu: ParentComponent;
   MenuItem: ParentComponent;
@@ -22,8 +22,12 @@ export const Navbar: ParentComponent<NavbarProps> & NavbarComponents = (props) =
   return <nav class={navbar({ class: props.class })}>{props.children}</nav>;
 };
 
-export const NavbarBrand: ParentComponent = (props) => {
-  return <div class="btn btn-lg btn-ghost">{props.children}</div>;
+export const NavbarBrand: ParentComponent<{ href?: string }> = (props) => {
+  return (
+    <a class="btn btn-lg btn-ghost" href={props.href}>
+      {props.children}
+    </a>
+  );
 };
 
 export const NavbarProfile: ParentComponent = (props) => {

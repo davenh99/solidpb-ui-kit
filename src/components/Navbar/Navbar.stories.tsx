@@ -304,7 +304,7 @@ export const TablePageWithNavbar: Story = {
             <Card>
               <Table<MockItem>
                 headers
-                columns={createMemo(() => columns)}
+                columns={columns}
                 data={createMemo(() => tableData)()}
                 onRowClick={(r) => {}}
                 size="xs"
