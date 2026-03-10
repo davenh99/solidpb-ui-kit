@@ -4,7 +4,7 @@ import { Container } from "../Container";
 import { Button } from "../Button";
 import Plus from "lucide-solid/icons/plus";
 
-import { productData, type MockProduct } from "../Form/Form.stories";
+import { productData, type MockProduct } from "../../stories/Form.stories";
 import { createSignal } from "solid-js";
 
 const meta: Meta<typeof FilterBar> = {

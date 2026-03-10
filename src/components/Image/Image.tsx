@@ -14,7 +14,7 @@ export interface ImageProps extends Omit<JSX.ImgHTMLAttributes<HTMLImageElement>
 }
 
 const image = tv({
-  base: "rounded-box shadow object-cover",
+  base: "rounded-sm object-cover",
   variants: {
     size: {
       xs: "w-16 h-16",
@@ -27,7 +27,7 @@ const image = tv({
 });
 
 const placeholder = tv({
-  base: "rounded-box shadow flex items-center justify-center bg-base-200",
+  base: "rounded-sm flex items-center justify-center bg-base-200",
   variants: {
     size: {
       xs: "w-16 h-16",
@@ -98,7 +98,7 @@ export const Image: Component<ImageProps> = (props) => {
           />
         </Show>
         <Show when={editable}>
-          <div class="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity z-10 rounded-box">
+          <div class="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity z-10 rounded-sm">
             <Button size="sm" modifier="square" variant="ghost" onClick={handleEditClick}>
               <Pencil class="w-4 h-4" />
             </Button>

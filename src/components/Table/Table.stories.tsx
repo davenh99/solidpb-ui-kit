@@ -8,7 +8,7 @@ import { Image } from "../Image";
 import { Tabs } from "../Tabs";
 import { Toast, Toaster } from "../Toast";
 import { Container } from "../Container";
-import { MockProduct } from "../Form/Form.stories";
+import { MockProduct } from "../../stories/Form.stories";
 import { NumberInput } from "../NumberInput";
 import { Checkbox } from "../Checkbox";
 import { Switch } from "../Switch";

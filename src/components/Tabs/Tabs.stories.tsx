@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
 import { Tabs } from "./Tabs";
 import Chart from "lucide-solid/icons/chart-area";
-import { ProductForm, productData } from "../Form/Form.stories";
+import { ProductForm, productData } from "../../stories/Form.stories";
 
 const meta: Meta<typeof Tabs> = {
   title: "Components/Tabs",

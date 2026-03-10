@@ -46,7 +46,7 @@ export const TagArea = <T extends Tag = Tag>(props: TagAreaProps<T>) => {
   const [tagInput, setTagInput] = createSignal("");
   const [showSuggestions, setShowSuggestions] = createSignal(false);
   const [editing, setEditing] = createSignal(false);
-  let inputRef: HTMLInputElement | undefined;
+  let inputRef!: HTMLInputElement;
 
   const filteredSuggestions = createMemo(() =>
     (props.suggestions || []).filter(

@@ -16,7 +16,7 @@ import { DropdownMenu } from "../DropdownMenu";
 import { Avatar } from "../Avatar";
 import { Card } from "../Card";
 import { BreadCrumbs } from "../BreadCrumbs";
-import { ProductForm, productData } from "../Form/Form.stories";
+import { ProductForm, productData } from "../../stories/Form.stories";
 import { ActivityFeed } from "../ActivityFeed";
 import { Kanban } from "../Kanban";
 import { defaultColumns, defaultTasks, type Task } from "../Kanban/Kanban.stories";

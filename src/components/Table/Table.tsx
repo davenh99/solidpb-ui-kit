@@ -248,7 +248,7 @@ export const Table = <T extends TableItem>(props: TableProps<T>): JSXElement => 
           when={rowCount() > 0}
           fallback={props.emptyState || <div class="text-center py-4">No results found.</div>}
         >
-          <table class={tableClass({ class: props.class })}>
+          <table class={tableClass({ class: props.class, size: props.size })}>
             <Show when={props.headers}>
               <thead>
                 <For each={table.getHeaderGroups()}>

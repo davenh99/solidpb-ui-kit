@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
 
 import { Modal, useModal } from "./Modal";
-import { ProductForm, productData } from "../Form/Form.stories";
+import { ProductForm, productData } from "../../stories/Form.stories";
 import { createSignal } from "solid-js";
 
 const meta: Meta<typeof Modal> = {

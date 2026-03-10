@@ -1,4 +1,4 @@
-import { Component, createSignal, JSXElement, For } from "solid-js";
+import { Component, JSXElement, For } from "solid-js";
 import Monitor from "lucide-solid/icons/monitor";
 import { tv } from "tailwind-variants";
 
@@ -27,10 +27,9 @@ const SystemOption = () => (
 
 export const ThemeSwitch: Component<ThemeSwitchProps> = (props) => {
   const options = () => props.options;
-  const [theme, setTheme] = createSignal<string>("system");
+  const theme = localStorage.getItem("theme");
 
   const handleChange = (val: string) => {
-    setTheme(val);
     if (val === "system") {
       localStorage.removeItem(THEME_KEY);
       document.documentElement.removeAttribute("data-theme");
@@ -41,12 +40,11 @@ export const ThemeSwitch: Component<ThemeSwitchProps> = (props) => {
   };
 
   const getCurrentLabel = () => {
-    const current = theme();
-    if (current === "system") {
+    if (theme === "system") {
       return <SystemOption />;
     }
-    const option = options().find((opt) => opt.value === current);
-    return option?.label || current;
+    const option = options().find((opt) => opt.value === theme);
+    return option?.label || theme;
   };
 
   return (

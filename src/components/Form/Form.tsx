@@ -1,5 +1,4 @@
-import { createEffect, JSXElement, splitProps } from "solid-js";
-import { createStore } from "solid-js/store";
+import { createSignal, JSXElement, splitProps } from "solid-js";
 
 import { InternalFormContext, useInternalFormContext } from "./formContext";
 import { Switch, type SwitchProps } from "../Switch";
@@ -13,9 +12,11 @@ import { Image, type ImageProps } from "../Image";
 import { Button } from "../Button";
 import { FileInput, type FileInputProps } from "../FileInput";
 import { tv } from "tailwind-variants";
+import RelationPicker, { RelationPickerProps } from "../RelationPicker";
 
 export interface FormProps<T> {
-  data: T;
+  data: Partial<T>;
+  setData: (data: Partial<T>) => void;
   title?: string;
   onSave?: (values: Partial<T>) => Promise<void>;
   onCancel?: () => void;
@@ -35,25 +36,22 @@ export function createForm<T>() {
   type Ctx = {
     setValue<K extends keyof T>(key: K, value: T[K]): void;
     getValue<K extends keyof T>(key: K): T[K] | undefined;
-    values: Partial<T>;
   };
 
   const Form = (props: FormProps<T>): JSXElement => {
-    const [values, setValues] = createStore<Partial<T>>({ ...props.data });
-
     const setValue = <K extends keyof T>(key: K, value: T[K]) => {
-      setValues(key as any, value as any);
+      props.setData({ ...props.data, [key]: value });
     };
 
     const getValue = <K extends keyof T>(key: K): T[K] | undefined => {
-      return values[key];
+      return props.data[key];
     };
 
-    const contextValue: Ctx = { setValue, getValue, values };
+    const contextValue: Ctx = { setValue, getValue };
 
     const handleSubmit = (e: any) => {
       e.preventDefault();
-      props.onSave?.(values);
+      props.onSave?.(props.data);
     };
 
     return (
@@ -65,12 +63,12 @@ export function createForm<T>() {
 
           <div class="flex justify-end gap-2">
             {props.onCancel && (
-              <Button appearance="neutral" onClick={props.onCancel} size="sm">
+              <Button appearance="neutral" onClick={props.onCancel}>
                 Cancel
               </Button>
             )}
             {props.onSave && (
-              <Button appearance="success" type="submit" size="sm">
+              <Button appearance="success" type="submit">
                 Save
               </Button>
             )}
@@ -192,6 +190,22 @@ export function createForm<T>() {
     );
   };
 
+  const RelationField = <K extends { id: string }>(props: RelationPickerProps<K> & BaseFieldProps<T>) => {
+    const form = useInternalFormContext() as Ctx;
+    const [values, setValues] = createSignal<K | K[] | null>(null);
+
+    const handleChange = (val: K | K[] | null) => {
+      if (props.multi) {
+        form.setValue(props.field, (Array.isArray(val) ? val.map((v) => v.id) : []) as any);
+      } else {
+        form.setValue(props.field, ((val as K)?.id || null) as any);
+      }
+      setValues(val);
+    };
+
+    return <RelationPicker<K> {...props} value={values()} onChange={handleChange} />;
+  };
+
   Form.TextField = TextField;
   Form.NumberField = NumberField;
   Form.CheckboxField = CheckboxField;
@@ -201,6 +215,7 @@ export function createForm<T>() {
   Form.FileField = FileField;
   Form.ImageField = ImageField;
   Form.SliderField = SliderField;
+  Form.RelationField = RelationField;
 
   return Form;
 }

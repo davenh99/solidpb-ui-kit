@@ -9,7 +9,7 @@ const meta: Meta<typeof Tag> = {
 export default meta;
 type Story = StoryObj<typeof Tag>;
 
-const variants = ["none", "ghost", "outline", "dash", "soft"] as const;
+const variants = [undefined, "ghost", "outline", "dash", "soft"] as const;
 const appearances = [
   "primary",
   "secondary",
