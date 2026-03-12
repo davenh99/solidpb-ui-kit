@@ -1,22 +1,22 @@
-import { createSignal, JSXElement, splitProps } from "solid-js";
+import { JSXElement, splitProps } from "solid-js";
+import { createStore } from "solid-js/store";
+import { tv } from "tailwind-variants";
 
 import { InternalFormContext, useInternalFormContext } from "./formContext";
-import { Switch, type SwitchProps } from "../Switch";
-import { Select, type SelectProps } from "../Select";
-import { Input, type InputRootProps } from "../Input";
-import { TextArea, type TextAreaRootProps } from "../TextArea";
-import { Checkbox, type CheckboxProps } from "../Checkbox";
-import { NumberInput, type NumberInputRootProps } from "../NumberInput";
-import { Slider, type SliderProps } from "../Slider";
-import { Image, type ImageProps } from "../Image";
-import { Button } from "../Button";
-import { FileInput, type FileInputProps } from "../FileInput";
-import { tv } from "tailwind-variants";
-import RelationPicker, { RelationPickerProps } from "../RelationPicker";
+import { Switch, type SwitchProps } from "./Switch";
+import { Select, type SelectProps } from "./Select";
+import { Input, type InputRootProps } from "./Input";
+import { TextArea, type TextAreaRootProps } from "./TextArea";
+import { Checkbox, type CheckboxProps } from "./Checkbox";
+import { NumberInput, type NumberInputRootProps } from "./NumberInput";
+import { Slider, type SliderProps } from "./Slider";
+import { Image, type ImageProps } from "./Image";
+import { Button } from "./Button";
+import { FileInput, type FileInputProps } from "./FileInput";
+import RelationPicker, { RelationPickerProps } from "./RelationPicker";
 
 export interface FormProps<T> {
   data: Partial<T>;
-  setData: (data: Partial<T>) => void;
   title?: string;
   onSave?: (values: Partial<T>) => Promise<void>;
   onCancel?: () => void;
@@ -39,19 +39,22 @@ export function createForm<T>() {
   };
 
   const Form = (props: FormProps<T>): JSXElement => {
+    const [values, setValues] = createStore<Partial<T>>({ ...props.data });
+
     const setValue = <K extends keyof T>(key: K, value: T[K]) => {
-      props.setData({ ...props.data, [key]: value });
+      console.log("Setting value", key, value);
+      setValues(key as any, value as any);
     };
 
     const getValue = <K extends keyof T>(key: K): T[K] | undefined => {
-      return props.data[key];
+      return values[key];
     };
 
     const contextValue: Ctx = { setValue, getValue };
 
     const handleSubmit = (e: any) => {
       e.preventDefault();
-      props.onSave?.(props.data);
+      props.onSave?.(JSON.parse(JSON.stringify(values)) as Partial<T>); // deep clone to avoid issues with reactive proxies
     };
 
     return (
@@ -164,15 +167,18 @@ export function createForm<T>() {
 
   const ImageField = (props: ImageProps & BaseFieldProps<T>) => {
     const form = useInternalFormContext() as Ctx;
+    const [local, others] = splitProps(props, ["onChange"]);
+
+    // have to set src manually, when using with pocketbase, the value will be a URL string,
+    // but when uploading a new file it will be a File object, so we need to handle both cases
 
     return (
       <Image
-        {...props}
         editable
-        src={form.getValue(props.field) as any}
+        {...others}
         onChange={(file) => {
-          const fileURL = URL.createObjectURL(file);
-          form.setValue(props.field, fileURL as any);
+          form.setValue(props.field, file as any);
+          local.onChange?.(file);
         }}
       />
     );
@@ -192,7 +198,7 @@ export function createForm<T>() {
 
   const RelationField = <K extends { id: string }>(props: RelationPickerProps<K> & BaseFieldProps<T>) => {
     const form = useInternalFormContext() as Ctx;
-    const [values, setValues] = createSignal<K | K[] | null>(null);
+    const [local, others] = splitProps(props, ["onChange"]);
 
     const handleChange = (val: K | K[] | null) => {
       if (props.multi) {
@@ -200,10 +206,10 @@ export function createForm<T>() {
       } else {
         form.setValue(props.field, ((val as K)?.id || null) as any);
       }
-      setValues(val);
+      local.onChange?.(val);
     };
 
-    return <RelationPicker<K> {...props} value={values()} onChange={handleChange} />;
+    return <RelationPicker<K> {...others} onChange={handleChange} />;
   };
 
   Form.TextField = TextField;

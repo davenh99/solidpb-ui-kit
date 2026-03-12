@@ -3,7 +3,6 @@ import { createForm } from "../components/Form";
 import { Container } from "../components/Container";
 import { Card } from "../components/Card";
 import { createSignal } from "solid-js";
-import { RelationPicker } from "../components/RelationPicker";
 import { Button } from "../components/Button";
 
 const tags = [
@@ -13,22 +12,15 @@ const tags = [
   { id: "4", name: "Tag 4" },
   { id: "5", name: "Tag 5" },
   { id: "6", name: "Tag 6" },
-  // need like 50 to see the scroll in action
-  { id: "7", name: "Tag 7" },
-  { id: "8", name: "Tag 8" },
-  { id: "9", name: "Tag 9" },
-  { id: "10", name: "Tag 10" },
-  { id: "11", name: "Tag 11" },
-  { id: "12", name: "Tag 12" },
-  { id: "13", name: "Tag 13" },
-  { id: "14", name: "Tag 14" },
-  { id: "15", name: "Tag 15" },
-  { id: "16", name: "Tag 16" },
-  { id: "17", name: "Tag 17" },
-  { id: "18", name: "Tag 18" },
-  { id: "19", name: "Tag 19" },
-  { id: "20", name: "Tag 20" },
-  { id: "21", name: "No records found", disabled: true },
+  { id: "20", name: "Tag 20", disabled: false },
+];
+
+const parentOptions = [
+  { id: "1", name: "Parent 1" },
+  { id: "2", name: "Parent 2" },
+  { id: "3", name: "Parent 3" },
+  { id: "4", name: "Parent 4" },
+  { id: "5", name: "Parent 5" },
 ];
 
 export interface MockProduct {
@@ -44,6 +36,8 @@ export interface MockProduct {
   id: string;
   collectionId: string;
   tablePosition?: number;
+  tags?: string[];
+  parentId?: string;
 }
 
 export const productData: MockProduct = {
@@ -58,6 +52,8 @@ export const productData: MockProduct = {
   file: "data.pdf",
   id: "0",
   collectionId: "0",
+  tags: [],
+  parentId: undefined,
 };
 
 export const ProductForm = createForm<MockProduct>();
@@ -72,20 +68,28 @@ type Story = StoryObj<typeof ProductForm>;
 export const Default: Story = {
   render: () => {
     const [selected, setSelected] = createSignal<{ label: string; value: string } | null>(null);
-    const [data, setData] = createSignal<Partial<MockProduct>>(productData);
+    // we need this, as when updating the data it will change to a blob, but we still want the url to show in the image field
+    const [imageUrl, setImageUrl] = createSignal<string | undefined>(productData.imageUrl);
+    const [file, setFile] = createSignal<string | undefined>(productData.file);
     const [chosenTags, setChosenTags] = createSignal<typeof tags>([]);
-    const [chosenTag, setChosenTag] = createSignal<typeof tags>([]);
+    const [parentOption, setParentOption] = createSignal<(typeof parentOptions)[0] | null>(null);
 
     return (
       <Container class="bg-base-200 flex items-center justify-center">
         <Card class="min-w-150">
           <ProductForm
-            data={data()}
-            setData={setData}
+            data={productData}
             title="Edit Product"
             onSave={async (vals) => alert(JSON.stringify(vals))}
           >
-            <ProductForm.ImageField field="imageUrl" label="Product Image" size="lg" />
+            <ProductForm.ImageField
+              field="imageUrl"
+              label="Product Image"
+              size="lg"
+              src={imageUrl()}
+              // temporary url for viewing. the blob is stored in data for when we want to save.
+              onChange={(file) => setImageUrl(file ? URL.createObjectURL(file) : undefined)}
+            />
             <ProductForm.TextField field="name" label="Name" />
             <ProductForm.NumberField
               field="price"
@@ -113,7 +117,8 @@ export const Default: Story = {
             <ProductForm.SwitchField field="sellable" label="Sellable" />
             <ProductForm.SliderField field="percentageDiscount" min={0} max={100} label="random slider" />
             <ProductForm.FileField field="file" label="Product data" />
-            <RelationPicker
+            <ProductForm.RelationField
+              field="tags"
               valueKey="id"
               labelKey="name"
               options={tags}
@@ -123,15 +128,14 @@ export const Default: Story = {
               label="multi tags!"
               placeholder="search records"
             />
-            <RelationPicker
+            <ProductForm.RelationField
+              field="parentId"
               valueKey="id"
               labelKey="name"
-              disabledKey="disabled"
-              options={tags}
-              value={chosenTag()}
-              onChange={setChosenTag}
-              label="Choose tag"
-              variant="ghost"
+              options={parentOptions}
+              value={parentOption()}
+              onChange={setParentOption}
+              label="Choose parent"
               placeholder="search records"
               listboxAction={
                 <div class="px-1.25 pb-1.25">

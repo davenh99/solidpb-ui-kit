@@ -1,7 +1,9 @@
 import { Select as KSelect } from "@kobalte/core/select";
 import Check from "lucide-solid/icons/check";
-import Down from "lucide-solid/icons/chevron-down";
+import UpDown from "lucide-solid/icons/chevrons-up-down";
 import { tv } from "tailwind-variants";
+import { Button } from "../Button";
+import { iconSize } from "../../constants";
 
 export interface SelectProps<T> {
   options: T[];
@@ -20,7 +22,7 @@ export interface SelectProps<T> {
 }
 
 const trigger = tv({
-  base: "input outline-offset-0 flex justify-between items-center",
+  base: "input outline-offset-0 flex justify-between items-center join-item",
   variants: {
     variant: {
       ghost: "input-ghost",
@@ -92,19 +94,21 @@ export const Select = <T,>(props: SelectProps<T>) => {
           );
         }}
       >
-        <KSelect.Trigger
-          class={trigger({
-            variant: props.variant,
-            appearance: props.appearance,
-            size: props.size,
-            class: props.class,
-          })}
-        >
-          <KSelect.Value<T>>
-            {(state) => String(props.labelKey ? state.selectedOption()?.[props.labelKey] : "")}
-          </KSelect.Value>
-          <KSelect.Icon>
-            <Down size={16} />
+        <KSelect.Trigger class="join w-full max-w-[20rem]">
+          <div
+            class={trigger({
+              variant: props.variant,
+              appearance: props.appearance,
+              size: props.size,
+              class: props.class,
+            })}
+          >
+            <KSelect.Value<T>>
+              {(state) => String(props.labelKey ? state.selectedOption()?.[props.labelKey] : "")}
+            </KSelect.Value>
+          </div>
+          <KSelect.Icon as={Button} class="join-item" modifier="square" size={props.size}>
+            <UpDown size={iconSize[props.size ?? "sm"]} />
           </KSelect.Icon>
         </KSelect.Trigger>
         <KSelect.Portal>

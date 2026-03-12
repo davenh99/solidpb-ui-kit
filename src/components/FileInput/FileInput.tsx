@@ -42,6 +42,22 @@ const input = tv({
   },
 });
 
+const label = tv({
+  base: "label text-xs",
+  variants: {
+    size: {
+      xs: "text-xs",
+      sm: "text-xs",
+      md: "text-xs",
+      lg: "text-sm",
+      xl: "text-sm",
+    },
+  },
+  defaultVariants: {
+    size: "sm",
+  },
+});
+
 export const FileInput: Component<FileInputProps> = (props) => {
   const [local, others] = splitProps(props, ["label", "class", "onChange", "saveFunc"]);
 
@@ -53,7 +69,7 @@ export const FileInput: Component<FileInputProps> = (props) => {
   return (
     <label class="flex flex-col gap-1 w-fit">
       <Show when={local.label}>
-        <span class="label">{local.label}</span>
+        <span class={label({ size: props.size })}>{local.label}</span>
       </Show>
       <input
         {...others}
