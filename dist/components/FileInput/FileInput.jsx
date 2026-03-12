@@ -28,6 +28,21 @@ const input = tv({
         size: "sm",
     },
 });
+const label = tv({
+    base: "label text-xs",
+    variants: {
+        size: {
+            xs: "text-xs",
+            sm: "text-xs",
+            md: "text-xs",
+            lg: "text-sm",
+            xl: "text-sm",
+        },
+    },
+    defaultVariants: {
+        size: "sm",
+    },
+});
 export const FileInput = (props) => {
     const [local, others] = splitProps(props, ["label", "class", "onChange", "saveFunc"]);
     const handleChange = (files) => {
@@ -36,7 +51,7 @@ export const FileInput = (props) => {
     };
     return (<label class="flex flex-col gap-1 w-fit">
       <Show when={local.label}>
-        <span class="label">{local.label}</span>
+        <span class={label({ size: props.size })}>{local.label}</span>
       </Show>
       <input {...others} type="file" class={input({ class: local.class })} accept={props.accept} multiple={props.multiple} onChange={(e) => handleChange(e.currentTarget.files)}/>
     </label>);

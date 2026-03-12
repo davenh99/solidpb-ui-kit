@@ -33,4 +33,5 @@ export * from "./components/TextArea";
 export * from "./components/ThemeSwitch";
 export * from "./components/Toast";
 export * from "./components/Tooltip";
+export * from "./components/RelationPicker";
 export * from "./methods/debounce";

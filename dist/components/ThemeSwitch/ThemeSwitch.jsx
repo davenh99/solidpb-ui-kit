@@ -1,4 +1,4 @@
-import { createSignal, For } from "solid-js";
+import { For } from "solid-js";
 import Monitor from "lucide-solid/icons/monitor";
 import { tv } from "tailwind-variants";
 import { DropdownMenu } from "../DropdownMenu";
@@ -11,9 +11,8 @@ const SystemOption = () => (<span class="flex items-center gap-1">
   </span>);
 export const ThemeSwitch = (props) => {
     const options = () => props.options;
-    const [theme, setTheme] = createSignal("system");
+    const theme = localStorage.getItem("theme");
     const handleChange = (val) => {
-        setTheme(val);
         if (val === "system") {
             localStorage.removeItem(THEME_KEY);
             document.documentElement.removeAttribute("data-theme");
@@ -23,12 +22,11 @@ export const ThemeSwitch = (props) => {
         document.documentElement.setAttribute("data-theme", val);
     };
     const getCurrentLabel = () => {
-        const current = theme();
-        if (current === "system") {
+        if (theme === "system") {
             return <SystemOption />;
         }
-        const option = options().find((opt) => opt.value === current);
-        return option?.label || current;
+        const option = options().find((opt) => opt.value === theme);
+        return option?.label || theme;
     };
     return (<DropdownMenu>
       <DropdownMenu.Trigger class={trigger({ class: props.triggerClass })}>

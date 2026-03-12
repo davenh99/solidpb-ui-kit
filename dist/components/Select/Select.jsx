@@ -1,9 +1,11 @@
 import { Select as KSelect } from "@kobalte/core/select";
 import Check from "lucide-solid/icons/check";
-import Down from "lucide-solid/icons/chevron-down";
+import UpDown from "lucide-solid/icons/chevrons-up-down";
 import { tv } from "tailwind-variants";
+import { Button } from "../Button";
+import { iconSize } from "../../constants";
 const trigger = tv({
-    base: "input outline-offset-0 flex justify-between items-center",
+    base: "input outline-offset-0 flex justify-between items-center join-item",
     variants: {
         variant: {
             ghost: "input-ghost",
@@ -59,21 +61,23 @@ export const Select = (props) => {
               </KSelect.ItemLabel>
             </KSelect.Item>);
         }}>
-        <KSelect.Trigger class={trigger({
+        <KSelect.Trigger class="join w-full max-w-[20rem]">
+          <div class={trigger({
             variant: props.variant,
             appearance: props.appearance,
             size: props.size,
             class: props.class,
         })}>
-          <KSelect.Value>
-            {(state) => String(props.labelKey ? state.selectedOption()?.[props.labelKey] : "")}
-          </KSelect.Value>
-          <KSelect.Icon>
-            <Down size={16}/>
+            <KSelect.Value>
+              {(state) => String(props.labelKey ? state.selectedOption()?.[props.labelKey] : "")}
+            </KSelect.Value>
+          </div>
+          <KSelect.Icon as={Button} class="join-item" modifier="square" size={props.size}>
+            <UpDown size={iconSize[props.size ?? "sm"]}/>
           </KSelect.Icon>
         </KSelect.Trigger>
         <KSelect.Portal>
-          <KSelect.Content class="rounded-box bg-base-100 shadow-md border border-base-200 z-20">
+          <KSelect.Content class="rounded-box bg-base-100 shadow-md border border-base-200 z-20 max-h-100 overflow-auto">
             <KSelect.Listbox class={menu({ size: props.size })}/>
           </KSelect.Content>
         </KSelect.Portal>

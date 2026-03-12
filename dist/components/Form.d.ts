@@ -1,15 +1,16 @@
 import { JSXElement } from "solid-js";
-import { type SwitchProps } from "../Switch";
-import { type SelectProps } from "../Select";
-import { type InputRootProps } from "../Input";
-import { type TextAreaRootProps } from "../TextArea";
-import { type CheckboxProps } from "../Checkbox";
-import { type NumberInputRootProps } from "../NumberInput";
-import { type SliderProps } from "../Slider";
-import { type ImageProps } from "../Image";
-import { type FileInputProps } from "../FileInput";
+import { type SwitchProps } from "./Switch";
+import { type SelectProps } from "./Select";
+import { type InputRootProps } from "./Input";
+import { type TextAreaRootProps } from "./TextArea";
+import { type CheckboxProps } from "./Checkbox";
+import { type NumberInputRootProps } from "./NumberInput";
+import { type SliderProps } from "./Slider";
+import { type ImageProps } from "./Image";
+import { type FileInputProps } from "./FileInput";
+import { RelationPickerProps } from "./RelationPicker";
 export interface FormProps<T> {
-    data: T;
+    data: Partial<T>;
     title?: string;
     onSave?: (values: Partial<T>) => Promise<void>;
     onCancel?: () => void;
@@ -33,5 +34,8 @@ export declare function createForm<T>(): {
     FileField: (props: FileInputProps & BaseFieldProps<T>) => import("solid-js").JSX.Element;
     ImageField: (props: ImageProps & BaseFieldProps<T>) => import("solid-js").JSX.Element;
     SliderField: (props: SliderProps & BaseFieldProps<T>) => import("solid-js").JSX.Element;
+    RelationField: <K extends {
+        id: string;
+    }>(props: RelationPickerProps<K> & BaseFieldProps<T>) => import("solid-js").JSX.Element;
 };
 export {};
