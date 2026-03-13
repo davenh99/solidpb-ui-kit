@@ -20,7 +20,6 @@ export function createForm() {
     const Form = (props) => {
         const [values, setValues] = createStore({ ...props.data });
         const setValue = (key, value) => {
-            console.log("Setting value", key, value);
             setValues(key, value);
         };
         const getValue = (key) => {
@@ -29,7 +28,7 @@ export function createForm() {
         const contextValue = { setValue, getValue };
         const handleSubmit = (e) => {
             e.preventDefault();
-            props.onSave?.(JSON.parse(JSON.stringify(values))); // deep clone to avoid issues with reactive proxies
+            props.onSave?.(values);
         };
         return (<InternalFormContext.Provider value={contextValue}>
         <form onSubmit={handleSubmit} class={formClass({ class: props.class })}>
