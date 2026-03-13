@@ -69,10 +69,10 @@ export const Default: Story = {
   render: () => {
     const [selected, setSelected] = createSignal<{ label: string; value: string } | null>(null);
     // we need this, as when updating the data it will change to a blob, but we still want the url to show in the image field
-    // const [imageUrl, setImageUrl] = createSignal<string | undefined>(productData.imageUrl);
     const [file, setFile] = createSignal<string | undefined>(productData.file);
     const [chosenTags, setChosenTags] = createSignal<typeof tags>([]);
     const [parentOption, setParentOption] = createSignal<(typeof parentOptions)[0] | null>(null);
+    const [tagOptions, setTagOptions] = createSignal(tags);
 
     return (
       <Container class="bg-base-200 flex items-center justify-center">
@@ -118,12 +118,17 @@ export const Default: Story = {
               field="tags"
               valueKey="id"
               labelKey="name"
-              options={tags}
+              options={tagOptions()}
               value={chosenTags()}
               onChange={setChosenTags}
               multi
               label="multi tags!"
               placeholder="search records"
+              onCreateInline={async (text) => {
+                const newTag = { id: text, name: text };
+                setTagOptions((prev) => [...prev, newTag]);
+                return newTag;
+              }}
             />
             <ProductForm.RelationField
               field="parentId"

@@ -2,7 +2,7 @@ import { Combobox } from "@kobalte/core/combobox";
 import Check from "lucide-solid/icons/check";
 import Link from "lucide-solid/icons/link";
 import UpDown from "lucide-solid/icons/chevrons-up-down";
-import { For, JSXElement, Show } from "solid-js";
+import { For, JSX, JSXElement, Show } from "solid-js";
 import { tv } from "tailwind-variants";
 import { Tag } from "./Tag";
 import { Button } from "./Button";
@@ -28,6 +28,7 @@ export interface RelationPickerProps<T> {
   defaultFilter?: (option: T[] | Exclude<NonNullable<T>, null>, filter: string) => boolean;
   onLinkClick?: (value: T) => void;
   href?: string;
+  onCreateInline?: (text: string) => Promise<T | undefined>;
 }
 
 const input = tv({
@@ -80,7 +81,7 @@ const menu = tv({
   },
 });
 
-export const RelationPicker = <T,>(props: RelationPickerProps<T>) => {
+export const RelationPicker = <T extends object>(props: RelationPickerProps<T>) => {
   let inputRef!: HTMLInputElement;
   const values = () => {
     if (props.multi) {
@@ -97,6 +98,21 @@ export const RelationPicker = <T,>(props: RelationPickerProps<T>) => {
       ];
 
     return props.options;
+  };
+
+  const handleKeyDown: JSX.EventHandlerUnion<HTMLInputElement, KeyboardEvent> = async (e) => {
+    if (e.key === "Enter" && props.onCreateInline) {
+      e.preventDefault();
+      e.stopPropagation();
+      const newValue = await props.onCreateInline(inputRef.value);
+      if (newValue) {
+        if (props.multi) {
+          props.onChange([...((Array.isArray(props.value) ? props.value : []) as T[]), newValue]);
+        } else {
+          props.onChange(newValue);
+        }
+      }
+    }
   };
 
   return (
@@ -168,6 +184,7 @@ export const RelationPicker = <T,>(props: RelationPickerProps<T>) => {
                         }}
                         ref={inputRef}
                         onInput={(e) => props.onTextInputChange?.(e.currentTarget.value)}
+                        onKeyDown={handleKeyDown}
                       />
                     </>
                   }
@@ -181,6 +198,7 @@ export const RelationPicker = <T,>(props: RelationPickerProps<T>) => {
                             variant="soft"
                             title={String(option[props.labelKey])}
                             onDelete={() => state.remove(option)}
+                            colorHex={"colorHex" in option ? (option as any).colorHex : undefined}
                           />
                         </span>
                       )}
@@ -190,6 +208,7 @@ export const RelationPicker = <T,>(props: RelationPickerProps<T>) => {
                       onBlur={(e) => (e.currentTarget.value = "")}
                       ref={inputRef}
                       onInput={(e) => props.onTextInputChange?.(e.currentTarget.value)}
+                      onKeyDown={handleKeyDown}
                     />
                   </div>
                 </Show>

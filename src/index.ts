@@ -28,7 +28,6 @@ export * from "./components/Switch";
 export * from "./components/Table";
 export * from "./components/Tabs";
 export * from "./components/Tag";
-export * from "./components/TagArea";
 export * from "./components/TextArea";
 export * from "./components/ThemeSwitch";
 export * from "./components/Toast";
