@@ -18,6 +18,7 @@ export interface RelationPickerProps<T> {
     onTextInputChange?: (text: string) => void;
     defaultFilter?: (option: T[] | Exclude<NonNullable<T>, null>, filter: string) => boolean;
     onLinkClick?: (value: T) => void;
+    href?: string;
 }
 export declare const RelationPicker: <T>(props: RelationPickerProps<T>) => import("solid-js").JSX.Element;
 export default RelationPicker;

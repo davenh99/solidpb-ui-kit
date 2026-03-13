@@ -103,9 +103,9 @@ export const RelationPicker = (props) => {
                 tags: props.multi && Array.isArray(props.value) && props.value.length > 0,
             })}>
                 <Show when={props.multi} fallback={<>
-                      {!props.multi && values() && (<Button variant="ghost" appearance="primary" size="xs" modifier="square" onClick={() => props.onLinkClick?.(props.value)}>
+                      {!props.multi && values() && (props.href || props.onLinkClick) && (<a class="btn btn-ghost btn-primary btn-xs btn-square" href={props.href} onClick={() => props.onLinkClick?.(props.value)}>
                           <Link class="w-[1em] h-[1em]"/>
-                        </Button>)}
+                        </a>)}
                       <Combobox.Input onBlur={(e) => {
                     if (!props.value) {
                         e.currentTarget.value = "";

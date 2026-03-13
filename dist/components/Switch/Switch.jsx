@@ -25,6 +25,21 @@ const toggle = tv({
         size: "sm",
     },
 });
+const label = tv({
+    base: "label text-xs",
+    variants: {
+        size: {
+            xs: "text-xs",
+            sm: "text-xs",
+            md: "text-xs",
+            lg: "text-sm",
+            xl: "text-sm",
+        },
+    },
+    defaultVariants: {
+        size: "sm",
+    },
+});
 export const Switch = (props) => {
     const [local, inputProps] = splitProps(props, ["label", "size", "appearance", "class", "onChange"]);
     return (<label class="flex items-center gap-3 w-fit">
@@ -33,9 +48,9 @@ export const Switch = (props) => {
             appearance: local.appearance,
             class: local.class,
         })} onChange={(e) => {
-            local.onChange?.(Boolean(e.currentTarget.value));
+            local.onChange?.(e.currentTarget.checked);
         }}/>
-      {local.label && <span class="select-none">{local.label}</span>}
+      {local.label && <span class={label({ size: local.size })}>{local.label}</span>}
     </label>);
 };
 export default Switch;
