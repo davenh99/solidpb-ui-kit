@@ -27,6 +27,7 @@ export interface RelationPickerProps<T> {
   onTextInputChange?: (text: string) => void;
   defaultFilter?: (option: T[] | Exclude<NonNullable<T>, null>, filter: string) => boolean;
   onLinkClick?: (value: T) => void;
+  href?: string;
 }
 
 const input = tv({
@@ -148,16 +149,14 @@ export const RelationPicker = <T,>(props: RelationPickerProps<T>) => {
                   when={props.multi}
                   fallback={
                     <>
-                      {!props.multi && values() && (
-                        <Button
-                          variant="ghost"
-                          appearance="primary"
-                          size="xs"
-                          modifier="square"
+                      {!props.multi && values() && (props.href || props.onLinkClick) && (
+                        <a
+                          class="btn btn-ghost btn-primary btn-xs btn-square"
+                          href={props.href}
                           onClick={() => props.onLinkClick?.(props.value as T)}
                         >
                           <Link class="w-[1em] h-[1em]" />
-                        </Button>
+                        </a>
                       )}
                       <Combobox.Input
                         onBlur={(e) => {

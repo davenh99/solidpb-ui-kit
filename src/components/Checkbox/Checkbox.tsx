@@ -34,6 +34,22 @@ const checkbox = tv({
   },
 });
 
+const label = tv({
+  base: "label text-xs",
+  variants: {
+    size: {
+      xs: "text-xs",
+      sm: "text-xs",
+      md: "text-xs",
+      lg: "text-sm",
+      xl: "text-sm",
+    },
+  },
+  defaultVariants: {
+    size: "sm",
+  },
+});
+
 export const Checkbox: Component<CheckboxProps> = (props) => {
   const [local, inputProps] = splitProps(props, ["label", "size", "appearance", "class", "onChange"]);
 
@@ -52,7 +68,7 @@ export const Checkbox: Component<CheckboxProps> = (props) => {
         }}
       />
 
-      {local.label && <span class="select-none">{local.label}</span>}
+      {local.label && <span class={label({ size: local.size })}>{local.label}</span>}
     </label>
   );
 };

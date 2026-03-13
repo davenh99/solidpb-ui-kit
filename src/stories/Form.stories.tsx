@@ -142,6 +142,7 @@ export const Default: Story = {
                 </div>
               }
               defaultFilter={() => true}
+              onLinkClick={(item) => alert(`Could navigate to ${item.name}`)}
             />
           </ProductForm>
         </Card>
