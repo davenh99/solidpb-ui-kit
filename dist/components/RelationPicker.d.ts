@@ -1,4 +1,4 @@
-import { JSXElement } from "solid-js";
+import { JSX, JSXElement } from "solid-js";
 export interface RelationPickerProps<T> {
     value: T | T[] | null;
     options: T[];
@@ -19,6 +19,7 @@ export interface RelationPickerProps<T> {
     defaultFilter?: (option: T[] | Exclude<NonNullable<T>, null>, filter: string) => boolean;
     onLinkClick?: (value: T) => void;
     href?: string;
+    onCreateInline?: (text: string) => Promise<T | undefined>;
 }
-export declare const RelationPicker: <T>(props: RelationPickerProps<T>) => import("solid-js").JSX.Element;
+export declare const RelationPicker: <T extends object>(props: RelationPickerProps<T>) => JSX.Element;
 export default RelationPicker;

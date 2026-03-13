@@ -72,6 +72,21 @@ export const RelationPicker = (props) => {
             ];
         return props.options;
     };
+    const handleKeyDown = async (e) => {
+        if (e.key === "Enter" && props.onCreateInline) {
+            e.preventDefault();
+            e.stopPropagation();
+            const newValue = await props.onCreateInline(inputRef.value);
+            if (newValue) {
+                if (props.multi) {
+                    props.onChange([...(Array.isArray(props.value) ? props.value : []), newValue]);
+                }
+                else {
+                    props.onChange(newValue);
+                }
+            }
+        }
+    };
     return (<div class="floating-label">
       {props.label && <span>{props.label}</span>}
       <Combobox disabled={props.disabled} multiple={props.multi} value={values()} onChange={props.onChange} options={options()} 
@@ -113,15 +128,15 @@ export const RelationPicker = (props) => {
                     else {
                         e.currentTarget.value = String(state.selectedOptions()[0][props.labelKey]);
                     }
-                }} ref={inputRef} onInput={(e) => props.onTextInputChange?.(e.currentTarget.value)}/>
+                }} ref={inputRef} onInput={(e) => props.onTextInputChange?.(e.currentTarget.value)} onKeyDown={handleKeyDown}/>
                     </>}>
                   <div class="flex flex-wrap gap-1 w-full">
                     <For each={state.selectedOptions()}>
                       {(option) => (<span onPointerDown={(e) => e.stopPropagation()}>
-                          <Tag appearance="neutral" variant="soft" title={String(option[props.labelKey])} onDelete={() => state.remove(option)}/>
+                          <Tag appearance="neutral" variant="soft" title={String(option[props.labelKey])} onDelete={() => state.remove(option)} colorHex={"colorHex" in option ? option.colorHex : undefined}/>
                         </span>)}
                     </For>
-                    <Combobox.Input class="w-[unset]" onBlur={(e) => (e.currentTarget.value = "")} ref={inputRef} onInput={(e) => props.onTextInputChange?.(e.currentTarget.value)}/>
+                    <Combobox.Input class="w-[unset]" onBlur={(e) => (e.currentTarget.value = "")} ref={inputRef} onInput={(e) => props.onTextInputChange?.(e.currentTarget.value)} onKeyDown={handleKeyDown}/>
                   </div>
                 </Show>
               </div>
