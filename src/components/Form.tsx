@@ -42,7 +42,6 @@ export function createForm<T>() {
     const [values, setValues] = createStore<Partial<T>>({ ...props.data });
 
     const setValue = <K extends keyof T>(key: K, value: T[K]) => {
-      console.log("Setting value", key, value);
       setValues(key as any, value as any);
     };
 
@@ -54,7 +53,7 @@ export function createForm<T>() {
 
     const handleSubmit = (e: any) => {
       e.preventDefault();
-      props.onSave?.(JSON.parse(JSON.stringify(values)) as Partial<T>); // deep clone to avoid issues with reactive proxies
+      props.onSave?.(values);
     };
 
     return (

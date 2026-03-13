@@ -69,7 +69,7 @@ export const Default: Story = {
   render: () => {
     const [selected, setSelected] = createSignal<{ label: string; value: string } | null>(null);
     // we need this, as when updating the data it will change to a blob, but we still want the url to show in the image field
-    const [imageUrl, setImageUrl] = createSignal<string | undefined>(productData.imageUrl);
+    // const [imageUrl, setImageUrl] = createSignal<string | undefined>(productData.imageUrl);
     const [file, setFile] = createSignal<string | undefined>(productData.file);
     const [chosenTags, setChosenTags] = createSignal<typeof tags>([]);
     const [parentOption, setParentOption] = createSignal<(typeof parentOptions)[0] | null>(null);
@@ -77,18 +77,15 @@ export const Default: Story = {
     return (
       <Container class="bg-base-200 flex items-center justify-center">
         <Card class="min-w-150">
-          <ProductForm
-            data={productData}
-            title="Edit Product"
-            onSave={async (vals) => alert(JSON.stringify(vals))}
-          >
+          <ProductForm data={productData} title="Edit Product" onSave={async (vals) => console.log(vals)}>
             <ProductForm.ImageField
               field="imageUrl"
               label="Product Image"
               size="lg"
-              src={imageUrl()}
+              src={productData.imageUrl}
               // temporary url for viewing. the blob is stored in data for when we want to save.
-              onChange={(file) => setImageUrl(file ? URL.createObjectURL(file) : undefined)}
+              // not needed!
+              // onChange={(file) => setImageUrl(file ? URL.createObjectURL(file) : undefined)}
             />
             <ProductForm.TextField field="name" label="Name" />
             <ProductForm.NumberField
