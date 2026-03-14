@@ -42,7 +42,6 @@ export function createForm<T>() {
     const [values, setValues] = createStore<Partial<T>>({ ...props.data });
 
     const setValue = <K extends keyof T>(key: K, value: T[K]) => {
-      console.log("Setting value", key, value);
       setValues(key as any, value as any);
     };
 

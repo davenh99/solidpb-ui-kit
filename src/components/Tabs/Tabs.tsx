@@ -5,12 +5,13 @@ import { tv } from "tailwind-variants";
 export interface TabsProps {
   defaultTab?: string;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
+  class?: string;
 }
 
 export interface TabsComponents {
-  Trigger: ParentComponent<{ value: string }>;
-  Content: ParentComponent<{ value: string }>;
-  List: ParentComponent<{ size?: "xs" | "sm" | "md" | "lg" | "xl" }>;
+  Trigger: ParentComponent<{ value: string; class?: string }>;
+  Content: ParentComponent<{ value: string; class?: string }>;
+  List: ParentComponent<{ size?: "xs" | "sm" | "md" | "lg" | "xl"; class?: string }>;
 }
 
 const tabs = tv({
@@ -39,27 +40,29 @@ const tabContent = tv({
 
 export const Tabs: ParentComponent<TabsProps> & TabsComponents = (props) => {
   return (
-    <KTabs class={tabs({ size: props.size })} defaultValue={props.defaultTab}>
+    <KTabs class={tabs({ size: props.size, class: props.class })} defaultValue={props.defaultTab}>
       {props.children}
     </KTabs>
   );
 };
 
-export const TabList: ParentComponent<{ size?: "xs" | "sm" | "md" | "lg" | "xl" }> = (props) => {
-  return <KTabs.List class={tabs({ size: props.size })}>{props.children}</KTabs.List>;
+export const TabList: ParentComponent<{ size?: "xs" | "sm" | "md" | "lg" | "xl"; class?: string }> = (
+  props,
+) => {
+  return <KTabs.List class={tabs({ size: props.size, class: props.class })}>{props.children}</KTabs.List>;
 };
 
-export const TabTrigger: ParentComponent<{ value: string }> = (props) => {
+export const TabTrigger: ParentComponent<{ value: string; class?: string }> = (props) => {
   return (
-    <KTabs.Trigger value={props.value} as={"a"} class={tab()}>
+    <KTabs.Trigger value={props.value} as={"a"} class={tab({ class: props.class })}>
       {props.children}
     </KTabs.Trigger>
   );
 };
 
-export const TabContent: ParentComponent<{ value: string }> = (props) => {
+export const TabContent: ParentComponent<{ value: string; class?: string }> = (props) => {
   return (
-    <KTabs.Content class={tabContent()} value={props.value}>
+    <KTabs.Content class={tabContent({ class: props.class })} value={props.value}>
       {props.children}
     </KTabs.Content>
   );
