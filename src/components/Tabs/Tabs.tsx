@@ -6,6 +6,8 @@ export interface TabsProps {
   defaultTab?: string;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   class?: string;
+  value?: string;
+  onTabChange?: (value: string) => void;
 }
 
 export interface TabsComponents {
@@ -40,7 +42,12 @@ const tabContent = tv({
 
 export const Tabs: ParentComponent<TabsProps> & TabsComponents = (props) => {
   return (
-    <KTabs class={tabs({ size: props.size, class: props.class })} defaultValue={props.defaultTab}>
+    <KTabs
+      class={tabs({ size: props.size, class: props.class })}
+      defaultValue={props.defaultTab}
+      value={props.value}
+      onChange={props.onTabChange}
+    >
       {props.children}
     </KTabs>
   );
