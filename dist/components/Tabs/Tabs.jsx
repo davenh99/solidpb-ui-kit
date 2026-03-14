@@ -22,20 +22,20 @@ const tabContent = tv({
     base: "card bg-base-100 border-base-300 p-3 w-full",
 });
 export const Tabs = (props) => {
-    return (<KTabs class={tabs({ size: props.size })} defaultValue={props.defaultTab}>
+    return (<KTabs class={tabs({ size: props.size, class: props.class })} defaultValue={props.defaultTab}>
       {props.children}
     </KTabs>);
 };
 export const TabList = (props) => {
-    return <KTabs.List class={tabs({ size: props.size })}>{props.children}</KTabs.List>;
+    return <KTabs.List class={tabs({ size: props.size, class: props.class })}>{props.children}</KTabs.List>;
 };
 export const TabTrigger = (props) => {
-    return (<KTabs.Trigger value={props.value} as={"a"} class={tab()}>
+    return (<KTabs.Trigger value={props.value} as={"a"} class={tab({ class: props.class })}>
       {props.children}
     </KTabs.Trigger>);
 };
 export const TabContent = (props) => {
-    return (<KTabs.Content class={tabContent()} value={props.value}>
+    return (<KTabs.Content class={tabContent({ class: props.class })} value={props.value}>
       {props.children}
     </KTabs.Content>);
 };

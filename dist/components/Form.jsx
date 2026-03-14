@@ -20,7 +20,6 @@ export function createForm() {
     const Form = (props) => {
         const [values, setValues] = createStore({ ...props.data });
         const setValue = (key, value) => {
-            console.log("Setting value", key, value);
             setValues(key, value);
         };
         const getValue = (key) => {
