@@ -3,6 +3,8 @@ export interface TabsProps {
     defaultTab?: string;
     size?: "xs" | "sm" | "md" | "lg" | "xl";
     class?: string;
+    value?: string;
+    onTabChange?: (value: string) => void;
 }
 export interface TabsComponents {
     Trigger: ParentComponent<{

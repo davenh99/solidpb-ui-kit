@@ -22,7 +22,7 @@ const tabContent = tv({
     base: "card bg-base-100 border-base-300 p-3 w-full",
 });
 export const Tabs = (props) => {
-    return (<KTabs class={tabs({ size: props.size, class: props.class })} defaultValue={props.defaultTab}>
+    return (<KTabs class={tabs({ size: props.size, class: props.class })} defaultValue={props.defaultTab} value={props.value} onChange={props.onTabChange}>
       {props.children}
     </KTabs>);
 };
