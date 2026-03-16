@@ -1,4 +1,4 @@
-import { JSXElement } from "solid-js";
+import { JSXElement, Setter } from "solid-js";
 import { type SwitchProps } from "./Switch";
 import { type SelectProps } from "./Select";
 import { type InputRootProps } from "./Input";
@@ -11,6 +11,7 @@ import { type FileInputProps } from "./FileInput";
 import { RelationPickerProps } from "./RelationPicker";
 export interface FormProps<T> {
     data: Partial<T>;
+    setData: Setter<Partial<T>>;
     title?: string;
     onSave?: (values: Partial<T>) => Promise<void>;
     onCancel?: () => void;

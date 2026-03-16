@@ -1,5 +1,4 @@
 import { splitProps } from "solid-js";
-import { createStore } from "solid-js/store";
 import { tv } from "tailwind-variants";
 import { InternalFormContext, useInternalFormContext } from "./formContext";
 import { Switch } from "./Switch";
@@ -18,17 +17,16 @@ const formClass = tv({
 });
 export function createForm() {
     const Form = (props) => {
-        const [values, setValues] = createStore({ ...props.data });
         const setValue = (key, value) => {
-            setValues(key, value);
+            props.setData((prev) => ({ ...prev, [key]: value }));
         };
         const getValue = (key) => {
-            return values[key];
+            return props.data[key];
         };
         const contextValue = { setValue, getValue };
         const handleSubmit = (e) => {
             e.preventDefault();
-            props.onSave?.(values);
+            props.onSave?.(props.data);
         };
         return (<InternalFormContext.Provider value={contextValue}>
         <form onSubmit={handleSubmit} class={formClass({ class: props.class })}>
@@ -94,18 +92,7 @@ export function createForm() {
         return (<Slider {...props} value={form.getValue(props.field)} onChange={(v) => form.setValue(props.field, v)}/>);
     };
     const RelationField = (props) => {
-        const form = useInternalFormContext();
-        const [local, others] = splitProps(props, ["onChange"]);
-        const handleChange = (val) => {
-            if (props.multi) {
-                form.setValue(props.field, (Array.isArray(val) ? val.map((v) => v.id) : []));
-            }
-            else {
-                form.setValue(props.field, (val?.id || null));
-            }
-            local.onChange?.(val);
-        };
-        return <RelationPicker {...others} onChange={handleChange}/>;
+        return <RelationPicker {...props}/>;
     };
     Form.TextField = TextField;
     Form.NumberField = NumberField;
