@@ -1,4 +1,4 @@
-import { JSXElement, splitProps } from "solid-js";
+import { JSXElement, Setter, splitProps } from "solid-js";
 import { createStore } from "solid-js/store";
 import { tv } from "tailwind-variants";
 
@@ -17,6 +17,7 @@ import RelationPicker, { RelationPickerProps } from "./RelationPicker";
 
 export interface FormProps<T> {
   data: Partial<T>;
+  setData: Setter<Partial<T>>;
   title?: string;
   onSave?: (values: Partial<T>) => Promise<void>;
   onCancel?: () => void;
@@ -39,21 +40,19 @@ export function createForm<T>() {
   };
 
   const Form = (props: FormProps<T>): JSXElement => {
-    const [values, setValues] = createStore<Partial<T>>({ ...props.data });
-
     const setValue = <K extends keyof T>(key: K, value: T[K]) => {
-      setValues(key as any, value as any);
+      props.setData((prev) => ({ ...prev, [key]: value }));
     };
 
     const getValue = <K extends keyof T>(key: K): T[K] | undefined => {
-      return values[key];
+      return props.data[key];
     };
 
     const contextValue: Ctx = { setValue, getValue };
 
     const handleSubmit = (e: any) => {
       e.preventDefault();
-      props.onSave?.(values);
+      props.onSave?.(props.data);
     };
 
     return (
@@ -196,19 +195,7 @@ export function createForm<T>() {
   };
 
   const RelationField = <K extends { id: string }>(props: RelationPickerProps<K> & BaseFieldProps<T>) => {
-    const form = useInternalFormContext() as Ctx;
-    const [local, others] = splitProps(props, ["onChange"]);
-
-    const handleChange = (val: K | K[] | null) => {
-      if (props.multi) {
-        form.setValue(props.field, (Array.isArray(val) ? val.map((v) => v.id) : []) as any);
-      } else {
-        form.setValue(props.field, ((val as K)?.id || null) as any);
-      }
-      local.onChange?.(val);
-    };
-
-    return <RelationPicker<K> {...others} onChange={handleChange} />;
+    return <RelationPicker<K> {...props} />;
   };
 
   Form.TextField = TextField;

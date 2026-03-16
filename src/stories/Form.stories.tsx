@@ -68,6 +68,7 @@ type Story = StoryObj<typeof ProductForm>;
 export const Default: Story = {
   render: () => {
     const [selected, setSelected] = createSignal<{ label: string; value: string } | null>(null);
+    const [data, setData] = createSignal<Partial<MockProduct>>({ ...productData });
     // we need this, as when updating the data it will change to a blob, but we still want the url to show in the image field
     const [file, setFile] = createSignal<string | undefined>(productData.file);
     const [chosenTags, setChosenTags] = createSignal<typeof tags>([]);
@@ -77,7 +78,12 @@ export const Default: Story = {
     return (
       <Container class="bg-base-200 flex items-center justify-center">
         <Card class="min-w-150">
-          <ProductForm data={productData} title="Edit Product" onSave={async (vals) => console.log(vals)}>
+          <ProductForm
+            data={data()}
+            setData={setData}
+            title="Edit Product"
+            onSave={async (vals) => console.log(vals)}
+          >
             <ProductForm.ImageField
               field="imageUrl"
               label="Product Image"
