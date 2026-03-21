@@ -165,7 +165,7 @@ interface FilterBarProps<T> {
 
   // saved filters
   savedFilters?: SavedFilterPreset<T>[];
-  onSavePreset?: (name: string, items: (Filter<T> | FilterGroup<T> | AdvancedFilter)[]) => void;
+  onSavePreset?: (name: string, items: (Filter<T> | FilterGroup<T> | AdvancedFilter)[]) => Promise<void>;
 
   // Grouping (later)
 }
@@ -370,10 +370,14 @@ export const FilterBar = <T,>(props: FilterBarProps<T>) => {
                 />
                 <Button
                   appearance="success"
-                  onClick={() => {
-                    if (filterPresetName()) {
-                      props.onSavePreset?.(filterPresetName(), props.items ?? []);
-                      setSaveFilterPresetOpen(false);
+                  onClick={async () => {
+                    try {
+                      if (filterPresetName()) {
+                        await props.onSavePreset?.(filterPresetName(), props.items ?? []);
+                        setSaveFilterPresetOpen(false);
+                      }
+                    } catch (err) {
+                      console.error("Error saving filter preset:", err);
                     }
                   }}
                 >
