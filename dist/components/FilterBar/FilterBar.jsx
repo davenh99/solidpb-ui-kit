@@ -222,10 +222,15 @@ export const FilterBar = (props) => {
             <Modal.Modal>
               <div class="flex flex-col gap-3">
                 <Input value={filterPresetName()} onChange={setFilterPresetName} label="Name" inputProps={{ placeholder: "Name" }}/>
-                <Button appearance="success" onClick={() => {
-            if (filterPresetName()) {
-                props.onSavePreset?.(filterPresetName(), props.items ?? []);
-                setSaveFilterPresetOpen(false);
+                <Button appearance="success" onClick={async () => {
+            try {
+                if (filterPresetName()) {
+                    await props.onSavePreset?.(filterPresetName(), props.items ?? []);
+                    setSaveFilterPresetOpen(false);
+                }
+            }
+            catch (err) {
+                console.error("Error saving filter preset:", err);
             }
         }}>
                   Save

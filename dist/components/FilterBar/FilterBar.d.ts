@@ -57,7 +57,7 @@ interface FilterBarProps<T> {
     size?: "xs" | "sm" | "md" | "lg" | "xl";
     class?: string;
     savedFilters?: SavedFilterPreset<T>[];
-    onSavePreset?: (name: string, items: (Filter<T> | FilterGroup<T> | AdvancedFilter)[]) => void;
+    onSavePreset?: (name: string, items: (Filter<T> | FilterGroup<T> | AdvancedFilter)[]) => Promise<void>;
 }
 export declare const FilterBar: <T>(props: FilterBarProps<T>) => import("solid-js").JSX.Element;
 export {};
