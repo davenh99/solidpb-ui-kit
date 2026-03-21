@@ -1,62 +1,59 @@
-import { createEffect, createMemo, createSignal, For, onCleanup, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, For, Match, onCleanup, Show, Switch, } from "solid-js";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { TextField } from "@kobalte/core/text-field";
 import { tv } from "tailwind-variants";
 import Search from "lucide-solid/icons/search";
 import ListFilter from "lucide-solid/icons/list-filter";
+import Plus from "lucide-solid/icons/plus";
+import Sparkles from "lucide-solid/icons/sparkles";
 import ArrowDown from "lucide-solid/icons/arrow-down-narrow-wide";
+import Save from "lucide-solid/icons/save";
 import invariant from "tiny-invariant";
-import { FilterChip, FilterGroupChip } from "./FilterChip";
+import { AdvancedFilterChip, FilterChip, FilterGroupChip } from "./FilterChip";
 import AddFilter from "./AddFilter";
 import AddSortingDropdown from "./AddSortingDropdown";
 import EditFilters from "./EditFilters";
 import { DropdownMenu } from "../DropdownMenu";
 import { Modal } from "../Modal";
+import EditAdvancedFilter from "./EditAdvancedFilter";
 import { Button } from "../Button";
+import { Input } from "../Input";
 export const filterDefaults = {
-    text: "loose_contains",
-    bool: "is",
-    number: "is",
-    select: "is",
-    date: "greater_than",
+    text: "~",
+    bool: "=",
+    number: "=",
+    select: "=",
+    date: ">",
 };
 export const filterLabels = {
     text: {
-        loose_contains: "Contains",
-        in: "Contains (strict)",
-        not_in: "Doesn't contain",
-        fuzzy_match: "Fuzzy contains",
-        is: "Is",
-        is_not: "Is not",
-        is_set: "Is set",
-        is_not_set: "Is not set",
+        "~": "Contains",
+        // "~*": "Fuzzy contains",
+        // "~": "Contains (strict)",
+        "!~": "Doesn't contain",
+        "=": "Is",
+        "!=": "Is not",
     },
     bool: {
-        is: "Is",
+        "=": "Is",
     },
     number: {
-        is: "Is",
-        greater_than: "Is greater than",
-        less_than: "Is less than",
-        between: "Is between",
-        is_not: "Is not",
+        "=": "Is",
+        ">": "Is greater than",
+        "<": "Is less than",
+        "!=": "Is not",
     },
     select: {
-        is: "Is",
-        is_not: "Is not",
-        in: "Contains",
-        not_in: "Doesn't contain",
-        is_set: "Is set",
-        is_not_set: "Is not set",
+        "=": "Is",
+        "!=": "Is not",
+        "~": "Contains",
+        "!~": "Doesn't contain",
     },
     date: {
-        greater_than: "Is after",
-        less_than: "Is before",
-        between: "Is between",
-        is: "Is",
-        is_not: "Is not",
-        is_set: "Is set",
-        is_not_set: "Is not set",
+        ">": "Is after",
+        "<": "Is before",
+        "=": "Is",
+        "!=": "Is not",
     },
 };
 const filterBarBase = tv({
@@ -96,6 +93,9 @@ export const FilterBar = (props) => {
     let ref;
     const [dragging, setDragging] = createSignal("idle");
     const [filterDropdownOpen, setFilterDropdownOpen] = createSignal(false);
+    const [saveFilterPresetOpen, setSaveFilterPresetOpen] = createSignal(false);
+    const [filterPresetName, setFilterPresetName] = createSignal("");
+    const [advancedFilterDropdownOpen, setAdvancedFilterDropdownOpen] = createSignal(false);
     const [showFieldDropdown, setShowFieldDropdown] = createSignal(false);
     const textFields = createMemo(() => props.availableFields?.filter((f) => f.type === "text"));
     const handleTextValueChange = (val) => {
@@ -106,14 +106,18 @@ export const FilterBar = (props) => {
     const createTextFilter = (field) => {
         const newFilter = {
             field,
-            operator: "loose_contains",
+            operator: "~",
             value: props.value,
         };
         props.onAddFilterGroup([newFilter]);
         handleTextValueChange("");
     };
-    const isFilterGroup = (item) => {
-        return "filters" in item;
+    const getFilterType = (item) => {
+        if ("filter" in item)
+            return "advanced";
+        if ("filters" in item)
+            return "group";
+        return "filter";
     };
     createEffect(() => {
         const element = ref;
@@ -178,12 +182,71 @@ export const FilterBar = (props) => {
             <Search class="w-[1em] h-[1em] opacity-90"/>
             <TextField.Input placeholder={props.placeholder || "Search"} class="grow focus:outline-none" onFocusIn={() => setShowFieldDropdown(!!props.value)} onFocusOut={() => setShowFieldDropdown(false)}/>
           </TextField>
-          <Modal title="Add filters" open={filterDropdownOpen()} onOpenChange={setFilterDropdownOpen}>
-            <Modal.Trigger as={Button} modifier="square" class="join-item">
+          <DropdownMenu>
+            <DropdownMenu.Trigger modifier="square" class="join-item">
               <ListFilter class="w-[1em] h-[1em]"/>
-            </Modal.Trigger>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              <Show when={props.savedFilters && props.savedFilters.length > 0}>
+                <For each={props.savedFilters}>
+                  {(filter) => (<DropdownMenu.MenuItem onSelect={filter.onApply}>
+                      <a>
+                        <span>{filter.filter.label}</span>
+                      </a>
+                    </DropdownMenu.MenuItem>)}
+                </For>
+                <div class="bg-base-300 w-full h-px my-1"/>
+              </Show>
+              <DropdownMenu.MenuItem onSelect={() => setFilterDropdownOpen(true)}>
+                <a>
+                  <Plus class="h-[1em] w-[1em]"/>
+                  <span>Add filters</span>
+                </a>
+              </DropdownMenu.MenuItem>
+              <DropdownMenu.MenuItem onSelect={() => setAdvancedFilterDropdownOpen(true)}>
+                <a>
+                  <Sparkles class="h-[1em] w-[1em]"/>
+                  <span>Add Advanced filter</span>
+                </a>
+              </DropdownMenu.MenuItem>
+              <div class="bg-base-300 w-full h-px my-1"/>
+              <DropdownMenu.MenuItem onSelect={() => setSaveFilterPresetOpen(true)}>
+                <a>
+                  <Save class="h-[1em] w-[1em]"/>
+                  <span>Save current filters</span>
+                </a>
+              </DropdownMenu.MenuItem>
+            </DropdownMenu.Content>
+          </DropdownMenu>
+          <Modal title="Save Filter Preset" open={saveFilterPresetOpen()} onOpenChange={setSaveFilterPresetOpen}>
+            <Modal.Modal>
+              <div class="flex flex-col gap-3">
+                <Input value={filterPresetName()} onChange={setFilterPresetName} label="Name" inputProps={{ placeholder: "Name" }}/>
+                <Button appearance="success" onClick={() => {
+            if (filterPresetName()) {
+                props.onSavePreset?.(filterPresetName(), props.items ?? []);
+                setSaveFilterPresetOpen(false);
+            }
+        }}>
+                  Save
+                </Button>
+              </div>
+            </Modal.Modal>
+          </Modal>
+          <Modal title="Add filters" open={filterDropdownOpen()} onOpenChange={setFilterDropdownOpen}>
             <Modal.Modal class="bg-base-200">
-              <AddFilter size={props.size} availableFields={props.availableFields ?? []} onAddFilters={props.onAddFilterGroup} setOpen={setFilterDropdownOpen}/>
+              <AddFilter size={props.size} availableFields={props.availableFields ?? []} onAddFilters={(filters) => {
+            props.onAddFilterGroup(filters);
+            setFilterDropdownOpen(false);
+        }}/>
+            </Modal.Modal>
+          </Modal>
+          <Modal title="Add Advanced Filter" open={advancedFilterDropdownOpen()} onOpenChange={setAdvancedFilterDropdownOpen}>
+            <Modal.Modal>
+              <EditAdvancedFilter size={props.size} onSave={(filter) => {
+            props.onAddAdvancedFilter(filter);
+            setAdvancedFilterDropdownOpen(false);
+        }}/>
             </Modal.Modal>
           </Modal>
           <Show when={props.setSortBy}>
@@ -220,11 +283,29 @@ export const FilterBar = (props) => {
           {(item, i) => {
             const [itemOpen, setItemOpen] = createSignal(false);
             return (<Modal title="Edit filters" open={itemOpen()} onOpenChange={setItemOpen}>
-                <Show when={isFilterGroup(item)} fallback={<Modal.Trigger as={FilterChip} onDelete={() => props.onFilterRemove(i(), item)} filter={item} size={props.size} onGroupDrag={(sourceInd, sourceFilterGroupInd) => props.onGroupDrag(sourceInd, i(), sourceFilterGroupInd)} index={i()} setOpen={setItemOpen}/>}>
-                  <Modal.Trigger as={FilterGroupChip} filterGroup={item} size={props.size} onGroupDrag={(sourceInd, sourceFilterGroupInd) => props.onGroupDrag(sourceInd, i(), sourceFilterGroupInd)} index={i()} setOpen={setItemOpen}/>
-                </Show>
+                <Switch>
+                  <Match when={getFilterType(item) === "advanced"}>
+                    <Modal.Trigger as={AdvancedFilterChip} index={i()} size={props.size} filter={item} onDelete={() => props.onFilterRemove(i(), item)} setOpen={setItemOpen}/>
+                  </Match>
+                  <Match when={getFilterType(item) === "filter"}>
+                    <Modal.Trigger as={FilterChip} onDelete={() => props.onFilterRemove(i(), item)} filter={item} size={props.size} onGroupDrag={(sourceInd, sourceFilterGroupInd) => props.onGroupDrag(sourceInd, i(), sourceFilterGroupInd)} index={i()} setOpen={setItemOpen}/>
+                  </Match>
+                  <Match when={getFilterType(item) === "group"}>
+                    <Modal.Trigger as={FilterGroupChip} filterGroup={item} size={props.size} onGroupDrag={(sourceInd, sourceFilterGroupInd) => props.onGroupDrag(sourceInd, i(), sourceFilterGroupInd)} index={i()} setOpen={setItemOpen}/>
+                  </Match>
+                </Switch>
                 <Modal.Modal class="bg-base-200">
-                  <EditFilters size={props.size} availableFields={props.availableFields ?? []} onSaveFilters={(filters) => props.onUpdateFilterGroup(i(), filters)} currentFilters={isFilterGroup(item) ? item.filters : [item]} setOpen={setItemOpen}/>
+                  <Show when={getFilterType(item) === "group" || getFilterType(item) === "filter"} fallback={<EditAdvancedFilter size={props.size} filter={item} onSave={(updatedFilter) => {
+                        props.onUpdateAdvancedFilter(i(), updatedFilter);
+                        setItemOpen(false);
+                    }}/>}>
+                    <EditFilters size={props.size} availableFields={props.availableFields ?? []} onSaveFilters={(filters) => {
+                    props.onUpdateFilterGroup(i(), filters);
+                    setItemOpen(false);
+                }} currentFilters={getFilterType(item) === "group"
+                    ? item.filters
+                    : [item]}/>
+                  </Show>
                 </Modal.Modal>
               </Modal>);
         }}

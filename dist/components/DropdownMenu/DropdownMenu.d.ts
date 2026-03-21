@@ -11,7 +11,7 @@ type DropdownMenuRootProps<T extends ValidComponent = "div"> = PolymorphicProps<
     class?: string;
 };
 type DropDownMenuItemProps<T extends ValidComponent = "div"> = PolymorphicProps<T, DropdownMenuItemProps<T>> & {
-    onSelect: () => void;
+    onSelect?: () => void;
 };
 interface DropdownMenuComponents {
     MenuItem: ParentComponent<DropDownMenuItemProps>;
@@ -22,6 +22,6 @@ export declare const DropdownMenu: ParentComponent<DropdownMenuRootProps> & Drop
 export declare const DropdownMenuTrigger: ParentComponent<ButtonProps>;
 export declare const DropdownMenuContent: ParentComponent<DropdownMenuProps>;
 export declare const DropdownMenuItem: ParentComponent<{
-    onSelect: () => void;
+    onSelect?: () => void;
 }>;
 export default DropdownMenu;

@@ -1,7 +1,7 @@
-import { Setter } from "solid-js";
-import { Filter, FilterGroup } from "./FilterBar";
+import { Component, Setter } from "solid-js";
+import { AdvancedFilter, Filter, FilterGroup } from "./FilterBar";
 interface FilterChipOrGroupProps {
-    onGroupDrag: (sourceInd: number, sourceFilterGroupInd?: number) => void;
+    onGroupDrag?: (sourceInd: number, sourceFilterGroupInd?: number) => void;
     onDelete?: () => void;
     size?: "xs" | "sm" | "md" | "lg" | "xl";
     class?: string;
@@ -20,4 +20,8 @@ interface FilterGroupProps<T> extends FilterChipOrGroupProps {
     onClick?: (filterGroup: FilterGroup<T>) => void;
 }
 export declare const FilterGroupChip: <T>(props: FilterGroupProps<T>) => import("solid-js").JSX.Element;
+interface AdvancedFilterChipProps extends FilterChipOrGroupProps {
+    filter: AdvancedFilter;
+}
+export declare const AdvancedFilterChip: Component<AdvancedFilterChipProps>;
 export default FilterChip;

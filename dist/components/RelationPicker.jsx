@@ -121,14 +121,7 @@ export const RelationPicker = (props) => {
                       {!props.multi && values() && (props.href || props.onLinkClick) && (<a class="btn btn-ghost btn-primary btn-xs btn-square" href={props.href} onClick={() => props.onLinkClick?.(props.value)}>
                           <Link class="w-[1em] h-[1em]"/>
                         </a>)}
-                      <Combobox.Input onBlur={(e) => {
-                    if (!props.value) {
-                        e.currentTarget.value = "";
-                    }
-                    else {
-                        e.currentTarget.value = String(state.selectedOptions()[0][props.labelKey]);
-                    }
-                }} ref={inputRef} onInput={(e) => props.onTextInputChange?.(e.currentTarget.value)} onKeyDown={handleKeyDown}/>
+                      <Combobox.Input onBlur={(e) => (e.currentTarget.value = "")} ref={inputRef} onInput={(e) => props.onTextInputChange?.(e.currentTarget.value)} onKeyDown={handleKeyDown}/>
                     </>}>
                   <div class="flex flex-wrap gap-1 w-full">
                     <For each={state.selectedOptions()}>

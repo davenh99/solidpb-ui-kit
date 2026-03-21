@@ -7,8 +7,8 @@ import { createSolidTable, flexRender, getCoreRowModel } from "@tanstack/solid-t
 import { tv } from "tailwind-variants";
 import Loader from "lucide-solid/icons/loader";
 import GripVertical from "lucide-solid/icons/grip-vertical";
-import { triggerFlash } from "../../methods/triggerFlash";
-import { iconSize } from "../../constants";
+import { triggerFlash } from "../methods/triggerFlash";
+import { iconSize } from "../constants";
 const tableClass = tv({
     base: "table table-pin-rows",
     variants: {
