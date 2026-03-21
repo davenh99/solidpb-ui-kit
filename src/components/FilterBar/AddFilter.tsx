@@ -7,13 +7,11 @@ interface AddFilterProps<T> {
   availableFields: FilterField<T>[];
   onAddFilters: (filters: Filter<T>[]) => void;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
-  setOpen: (v: boolean) => void;
 }
 
 export const AddFilter = <T,>(props: AddFilterProps<T>) => {
   const handleSaveFilters = (filters: Filter<T>[]) => {
     props.onAddFilters(filters);
-    props.setOpen(false);
   };
 
   return (

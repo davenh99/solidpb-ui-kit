@@ -1,18 +1,18 @@
-import { createMemo, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
 import { ColumnDef } from "@tanstack/solid-table";
 import { toaster } from "@kobalte/core/toast";
 
-import { Table } from "./Table";
-import { Image } from "../Image";
-import { Tabs } from "../Tabs";
-import { Toast, Toaster } from "../Toast";
-import { Container } from "../Container";
-import { MockProduct } from "../../stories/Form.stories";
-import { NumberInput } from "../NumberInput";
-import { Checkbox } from "../Checkbox";
-import { Switch } from "../Switch";
-import { Pagination } from "../Pagination";
+import { Table } from "../components/Table";
+import { Image } from "../components/Image";
+import { Tabs } from "../components/Tabs";
+import { Toast, Toaster } from "../components/Toast";
+import { Container } from "../components/Container";
+import { MockProduct } from "./Form.stories";
+import { NumberInput } from "../components/NumberInput";
+import { Checkbox } from "../components/Checkbox";
+import { Switch } from "../components/Switch";
+import { Pagination } from "../components/Pagination";
 
 const meta: Meta<typeof Table> = {
   title: "Components/Table",

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "storybook-solidjs-vite";
-import { Filter, FilterBar, FilterField, FilterGroup, SortOption } from "./FilterBar";
+import { AdvancedFilter, Filter, FilterBar, FilterField, FilterGroup, SortOption } from "./FilterBar";
 import { Container } from "../Container";
 import { Button } from "../Button";
 import Plus from "lucide-solid/icons/plus";
@@ -44,28 +44,28 @@ const availableFields: FilterField<MockProductWithDate>[] = [
 export const Default: Story = {
   render: () => {
     const [items, setItems] = createSignal<
-      (Filter<MockProductWithDate> | FilterGroup<MockProductWithDate>)[]
+      (Filter<MockProductWithDate> | FilterGroup<MockProductWithDate> | AdvancedFilter)[]
     >([
       {
         field: { type: "bool", name: "sellable", label: "Sellable" },
-        operator: "is",
+        operator: "=",
         value: "true",
       },
       {
         field: { type: "number", name: "percentageDiscount", label: "Discount" },
-        operator: "greater_than",
+        operator: ">",
         value: "12",
       },
       {
         filters: [
           {
             field: { type: "bool", name: "inStock", label: "In Stock" },
-            operator: "is",
+            operator: "=",
             value: "true",
           },
           {
             field: { type: "number", name: "percentageDiscount", label: "Discount" },
-            operator: "is",
+            operator: "=",
             value: "120",
           },
         ],
@@ -123,7 +123,7 @@ export const Default: Story = {
           }
         } else {
           // Dragging a whole filter/group
-          draggedItem = updated[sourceInd];
+          draggedItem = updated[sourceInd] as Filter<MockProductWithDate> | FilterGroup<MockProductWithDate>;
           updated.splice(sourceInd, 1);
 
           // Adjust targetInd if needed after splice
@@ -137,7 +137,9 @@ export const Default: Story = {
         }
 
         // Dropped on another chip - merge into a group
-        const targetItem = updated[targetInd];
+        const targetItem = updated[targetInd] as
+          | Filter<MockProductWithDate>
+          | FilterGroup<MockProductWithDate>;
 
         if ("filters" in targetItem) {
           // Target is already a group - add to it
@@ -173,6 +175,14 @@ export const Default: Story = {
           onGroupDrag={handleGroupDrag}
           sortBy={sortBy()}
           setSortBy={setSortBy}
+          onAddAdvancedFilter={(f) => setItems((prev) => [...(prev || []), f])}
+          onUpdateAdvancedFilter={(ind, updatedFilter) => {
+            setItems((prev) => {
+              const updated = [...prev];
+              updated[ind] = updatedFilter;
+              return updated;
+            });
+          }}
         />
       </Container>
     );

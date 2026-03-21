@@ -12,8 +12,8 @@ import { tv } from "tailwind-variants";
 import Loader from "lucide-solid/icons/loader";
 import GripVertical from "lucide-solid/icons/grip-vertical";
 
-import { triggerFlash } from "../../methods/triggerFlash";
-import { iconSize } from "../../constants";
+import { triggerFlash } from "../methods/triggerFlash";
+import { iconSize } from "../constants";
 
 interface TableItem {
   id: string;

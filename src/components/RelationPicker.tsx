@@ -175,13 +175,7 @@ export const RelationPicker = <T extends object>(props: RelationPickerProps<T>) 
                         </a>
                       )}
                       <Combobox.Input
-                        onBlur={(e) => {
-                          if (!props.value) {
-                            e.currentTarget.value = "";
-                          } else {
-                            e.currentTarget.value = String(state.selectedOptions()[0][props.labelKey]);
-                          }
-                        }}
+                        onBlur={(e) => (e.currentTarget.value = "")}
                         ref={inputRef}
                         onInput={(e) => props.onTextInputChange?.(e.currentTarget.value)}
                         onKeyDown={handleKeyDown}

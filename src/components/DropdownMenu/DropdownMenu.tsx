@@ -22,12 +22,12 @@ type DropdownMenuRootProps<T extends ValidComponent = "div"> = PolymorphicProps<
 type DropDownMenuItemProps<T extends ValidComponent = "div"> = PolymorphicProps<
   T,
   DropdownMenuItemProps<T>
-> & { onSelect: () => void };
+> & { onSelect?: () => void };
 
-type DropDownMenuTriggerProps<T extends ValidComponent = "div"> = PolymorphicProps<
-  T,
-  DropdownMenuTriggerProps<T>
-> & { onSelect: () => void };
+// type DropDownMenuTriggerProps<T extends ValidComponent = "div"> = PolymorphicProps<
+//   T,
+//   DropdownMenuTriggerProps<T>
+// > & { onSelect: () => void };
 
 interface DropdownMenuComponents {
   MenuItem: ParentComponent<DropDownMenuItemProps>;
@@ -81,7 +81,7 @@ export const DropdownMenuContent: ParentComponent<DropdownMenuProps> = (props) =
   );
 };
 
-export const DropdownMenuItem: ParentComponent<{ onSelect: () => void }> = (props) => {
+export const DropdownMenuItem: ParentComponent<{ onSelect?: () => void }> = (props) => {
   return (
     <KDropdownMenu.Item as="li" class={item()} {...props}>
       {props.children}

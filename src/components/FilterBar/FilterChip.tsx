@@ -1,14 +1,15 @@
-import { createEffect, createMemo, createSignal, For, onCleanup, Setter } from "solid-js";
+import { Component, createEffect, createMemo, createSignal, For, onCleanup, Setter } from "solid-js";
 import { dropTargetForElements, draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import invariant from "tiny-invariant";
 import CloseIcon from "lucide-solid/icons/x";
+import Sparkles from "lucide-solid/icons/sparkles";
 import { tv } from "tailwind-variants";
 
-import { Filter, FilterGroup, filterLabels } from "./FilterBar";
+import { AdvancedFilter, Filter, FilterGroup, filterLabels } from "./FilterBar";
 import { Button } from "../Button";
 
 interface FilterChipOrGroupProps {
-  onGroupDrag: (sourceInd: number, sourceFilterGroupInd?: number) => void;
+  onGroupDrag?: (sourceInd: number, sourceFilterGroupInd?: number) => void;
   onDelete?: () => void;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   class?: string;
@@ -57,9 +58,7 @@ export const FilterChip = <T,>(props: FilterChipProps<T>) => {
         if ("label" in val) {
           return val.label;
         } else {
-          let valText = val.startDate ? String(val.startDate.toLocaleDateString("en-GB")) : "";
-
-          if (val.endDate) valText += ` - ${val.endDate.toLocaleDateString("en-GB")}`;
+          let valText = val ? String(val.toLocaleDateString("en-GB")) : "";
 
           return valText;
         }
@@ -96,7 +95,7 @@ export const FilterChip = <T,>(props: FilterChipProps<T>) => {
         if ((source.data.index as number) === props.index) return;
 
         // add the target ind and group source ind if it exists
-        props.onGroupDrag(source.data.index as number, source.data.groupIndex as number | undefined);
+        props.onGroupDrag?.(source.data.index as number, source.data.groupIndex as number | undefined);
       },
     });
 
@@ -213,7 +212,7 @@ export const FilterGroupChip = <T,>(props: FilterGroupProps<T>) => {
         if (location.current.dropTargets[0].element !== ref) return;
 
         // add the target ind and group source ind if it exists
-        props.onGroupDrag(source.data.index as number, source.data.groupIndex as number | undefined);
+        props.onGroupDrag?.(source.data.index as number, source.data.groupIndex as number | undefined);
       },
     });
 
@@ -287,6 +286,102 @@ export const FilterGroupChip = <T,>(props: FilterGroupProps<T>) => {
       <Button onClick={props.onDelete} size="xs" variant="ghost" class="p-0.5 m-0 h-min">
         <CloseIcon class="w-[1em] h-[1em]" stroke-width={4} />
       </Button>
+    </div>
+  );
+};
+
+interface AdvancedFilterChipProps extends FilterChipOrGroupProps {
+  filter: AdvancedFilter;
+}
+
+export const AdvancedFilterChip: Component<AdvancedFilterChipProps> = (props) => {
+  let ref!: HTMLDivElement;
+  const [dragging, setDragging] = createSignal<DraggingState>("idle");
+
+  createEffect(() => {
+    const element = ref;
+    invariant(element);
+
+    const dispose = dropTargetForElements({
+      element,
+      canDrop() {
+        return false;
+      },
+      onDragEnter() {
+        setDragging("dragging-over");
+      },
+      onDrag() {
+        if (dragging() !== "dragging-over") {
+          setDragging("dragging-over");
+        }
+      },
+      onDragLeave() {
+        setDragging("idle");
+      },
+      onDrop({ source }) {
+        setDragging("idle");
+
+        if ((source.data.index as number) === props.index) return;
+
+        // add the target ind and group source ind if it exists
+        props.onGroupDrag?.(source.data.index as number, source.data.groupIndex as number | undefined);
+      },
+    });
+
+    onCleanup(dispose);
+  });
+
+  createEffect(() => {
+    const element = ref;
+    invariant(element);
+
+    const dispose = draggable({
+      element,
+      getInitialData() {
+        return {
+          isAdvancedFilterChip: true,
+          index: props.index,
+          isInGroup: false,
+          groupIndex: -1,
+        };
+      },
+      onDragStart() {
+        setDragging("dragging");
+      },
+      onDrop() {
+        setDragging("idle");
+      },
+    });
+
+    onCleanup(() => dispose());
+  });
+
+  const bgStyle = createMemo(() => {
+    if (dragging() === "dragging-over") {
+      return { "background-color": "color-mix(in srgb, var(--color-primary) 10%, transparent)" };
+    }
+    return {};
+  });
+
+  return (
+    <div
+      class={filterChip({ size: props.size, class: props.class })}
+      ref={ref}
+      style={{ opacity: dragging() === "dragging" ? 0.2 : 1, ...bgStyle() }}
+      onClick={() => props.setOpen?.((prev) => !prev)}
+    >
+      <div class="tooltip tooltip-bottom tooltip-neutral flex items-center">
+        <Sparkles class="w-[0.9em] h-[0.9em] mr-1" />
+        <span>{String(props.filter.label)}</span>
+        <div class="inline tooltip-content">
+          <span class="font-bold">{String(props.filter.filter)}</span>
+        </div>
+      </div>
+      {props.onDelete && (
+        <Button onClick={props.onDelete} size="xs" variant="ghost" class="p-0.5 m-0 h-min">
+          <CloseIcon class="w-[1em] h-[1em]" stroke-width={4} />
+        </Button>
+      )}
     </div>
   );
 };

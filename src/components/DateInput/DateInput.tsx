@@ -38,6 +38,9 @@ const dateInput = tv({
       xl: "input-xl",
     },
   },
+  defaultVariants: {
+    size: "sm",
+  },
 });
 
 export const DateInput: Component<DateInputProps> = (props) => {

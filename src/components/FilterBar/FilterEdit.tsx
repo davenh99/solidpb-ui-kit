@@ -1,5 +1,4 @@
 import { createMemo, createSignal, Match, Show, Switch } from "solid-js";
-import { createStore } from "solid-js/store";
 import X from "lucide-solid/icons/x";
 
 import {
@@ -10,7 +9,6 @@ import {
   FilterOperator,
   FilterValue,
   FilterSelectValue,
-  FilterDateValue,
 } from "./FilterBar";
 import { Select } from "../Select";
 import { Input } from "../Input";
@@ -47,10 +45,12 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
   const [selectedSelectValue, setSelectedSelectValue] = createSignal<FilterSelectValue | null>(
     props.filter.field?.type === "select" ? (props.filter.value as FilterSelectValue | null) : null,
   );
-  const [selectedDateValues, setSelectedDateValues] = createStore<FilterDateValue>(
+  const [selectedDateValue, setSelectedDateValue] = createSignal<Date | null>(
     props.filter.field?.type === "date"
-      ? (props.filter.value as FilterDateValue)
-      : { startDate: null, endDate: null },
+      ? props.filter.value
+        ? new Date(props.filter.value as string)
+        : null
+      : null,
   );
 
   const availableOperators = createMemo(() =>
@@ -65,25 +65,17 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
   const handleOperatorChange = (operator?: FilterOperator) => {
     props.setOperator(operator);
 
-    if (["is_set", "is_not_set"].includes(operator ?? "")) {
-      props.setValue(null);
-      props.setCanConfirm(true);
-    } else {
-      switch (props.filter.field?.type) {
-        case "number":
-          props.setValue(0);
-          props.setCanConfirm(true);
-          return;
-        case "text":
-          props.setValue("");
-        default:
-          props.setValue(undefined);
-      }
-      props.setCanConfirm(false);
-      // hmm, for ux I don't want to clear too much when switching operator. will see how this feels.
-      // need to do this for canConfirm behaviour atm
-      setSelectedDateValues("endDate", null);
+    switch (props.filter.field?.type) {
+      case "number":
+        props.setValue(0);
+        props.setCanConfirm(true);
+        return;
+      case "text":
+        props.setValue("");
+      default:
+        props.setValue(undefined);
     }
+    props.setCanConfirm(false);
   };
 
   const handleFieldChange = (f?: FilterField<T>) => {
@@ -93,15 +85,8 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
   };
 
   const canConfirm = (val?: FilterValue) => {
-    if (!props.filter.field || !props.filter.operator || val === undefined || val === "") return false;
-
-    if (
-      props.filter.field?.type === "date" &&
-      props.filter.operator === "between" &&
-      (selectedDateValues.endDate === null || selectedDateValues.startDate === null)
-    ) {
+    if (!props.filter.field || !props.filter.operator || val === undefined || val === "" || val === null)
       return false;
-    }
 
     return true;
   };
@@ -176,12 +161,7 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
               class="min-w-50"
             />
           </Match>
-          <Match
-            when={
-              props.filter.field?.type === "text" &&
-              !["is_set", "is_not_set"].includes(props.filter.operator ?? "")
-            }
-          >
+          <Match when={props.filter.field?.type === "text"}>
             <Input
               label="Value"
               value={selectedTextValue()}
@@ -206,12 +186,7 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
               class="min-w-50"
             />
           </Match>
-          <Match
-            when={
-              props.filter.field?.type === "select" &&
-              !["is_set", "is_not_set"].includes(props.filter.operator ?? "")
-            }
-          >
+          <Match when={props.filter.field?.type === "select"}>
             <Show
               when={["in", "not_in"].includes(props.filter.operator ?? "")}
               fallback={
@@ -243,50 +218,17 @@ export const FilterEdit = <T,>(props: FilterEditProps<T>) => {
               />
             </Show>
           </Match>
-          <Match
-            when={
-              props.filter.field?.type === "date" &&
-              !["is_set", "is_not_set"].includes(props.filter.operator ?? "")
-            }
-          >
+          <Match when={props.filter.field?.type === "date"}>
             <DateInput
-              value={selectedDateValues.startDate}
+              value={selectedDateValue()}
               onChange={(val) => {
-                setSelectedDateValues("startDate", val);
-                let newVal = undefined;
-                if (val && !(props.filter.operator === "between" && selectedDateValues.endDate !== null)) {
-                  newVal = { ...selectedDateValues };
-                }
-                handleValueChange(newVal);
+                setSelectedDateValue(val);
+                handleValueChange(val);
               }}
-              max={
-                selectedDateValues.endDate ? selectedDateValues.endDate.toISOString().slice(0, 10) : undefined
-              }
-              label={props.filter.operator === "between" ? "Start" : ""}
+              label="Date"
               size={props.size}
               class="min-w-50"
             />
-            <Show when={props.filter.operator === "between"}>
-              <DateInput
-                value={selectedDateValues.endDate}
-                label="End"
-                min={
-                  selectedDateValues.startDate
-                    ? selectedDateValues.startDate.toISOString().slice(0, 10)
-                    : undefined
-                }
-                onChange={(val) => {
-                  setSelectedDateValues("endDate", val);
-                  let newVal = undefined;
-                  if (val && selectedDateValues.startDate !== null) {
-                    newVal = { ...selectedDateValues };
-                  }
-                  handleValueChange(newVal);
-                }}
-                size={props.size}
-                class="min-w-50"
-              />
-            </Show>
           </Match>
         </Switch>
       </div>
