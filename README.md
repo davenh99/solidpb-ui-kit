@@ -1,4 +1,4 @@
-## UI components for solidpb
+## UI components for solidjs, based on daisyui and kobalte
 
 Need to add below to vite.config.ts:
 
