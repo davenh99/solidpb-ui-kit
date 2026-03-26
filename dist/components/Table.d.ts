@@ -1,11 +1,6 @@
 import { JSXElement } from "solid-js";
 import { ColumnDef, Row } from "@tanstack/solid-table";
-interface TableItem {
-    id: string;
-    collectionId: string;
-    tablePosition?: number;
-}
-interface TableProps<T extends TableItem> {
+interface TableProps<T> {
     data: T[];
     createFunc?: () => Promise<void>;
     headerActions?: JSXElement;
@@ -19,9 +14,11 @@ interface TableProps<T extends TableItem> {
     showItemCount?: boolean;
     class?: string;
     search?: boolean;
-    headers?: boolean;
+    showHeaders?: boolean;
     size?: "xs" | "sm" | "md" | "lg" | "xl";
+    canReorder?: boolean;
+    tableDataKey?: string | symbol;
     onReorderRow?: (item: T, oldInd: number, newInd: number) => void;
 }
-export declare const Table: <T extends TableItem>(props: TableProps<T>) => JSXElement;
+export declare const Table: <T extends object>(props: TableProps<T>) => JSXElement;
 export default Table;

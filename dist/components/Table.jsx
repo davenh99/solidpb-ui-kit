@@ -30,12 +30,12 @@ const TableRow = (props) => {
     const [dragging, setDragging] = createSignal("idle");
     const [closestEdge, setClosestEdge] = createSignal();
     createEffect(() => {
-        if (props.flashSignal?.() === props.row.original.id && ref) {
+        if (props.flashSignal?.() === props.ind && ref) {
             triggerFlash(ref);
         }
     });
     createEffect(() => {
-        if (!props.dragEnabled())
+        if (!props.canReorder)
             return;
         const element = ref;
         invariant(element);
@@ -46,11 +46,10 @@ const TableRow = (props) => {
                 if (source.element === element) {
                     return false;
                 }
-                // only allowing same collection for now to be dropped on me
-                return source.data.collectionId == props.row.original.collectionId;
+                return props.isTableData(source.data);
             },
             getData({ input }) {
-                return attachClosestEdge({ id: props.row.original.id, ind: props.row.index, collectionId: props.row.original.collectionId }, { element, input, allowedEdges: ["top", "bottom"] });
+                return attachClosestEdge({ [props.tableDataKey]: true, ind: props.row.index }, { element, input, allowedEdges: ["top", "bottom"] });
             },
             onDragEnter({ self }) {
                 const _closestEdge = extractClosestEdge(self.data);
@@ -75,7 +74,7 @@ const TableRow = (props) => {
         onCleanup(dispose);
     });
     createEffect(() => {
-        if (!props.dragEnabled())
+        if (!props.canReorder)
             return;
         const element = ref;
         const elementHandle = handleRef;
@@ -86,9 +85,8 @@ const TableRow = (props) => {
             dragHandle: elementHandle,
             getInitialData() {
                 return {
-                    id: props.row.original.id,
+                    [props.tableDataKey]: true,
                     ind: props.row.index,
-                    collectionId: props.row.original.collectionId,
                 };
             },
             onDragStart() {
@@ -101,7 +99,7 @@ const TableRow = (props) => {
         onCleanup(dispose);
     });
     return (<tr ref={ref} data-drop-edge={dragging() === "dragging-over" ? (closestEdge() ?? undefined) : undefined} class="row-hover relative" style={{ opacity: dragging() == "dragging" ? 0.2 : 1 }} onClick={() => props.onRowClick(props.row.original)}>
-      <Show when={props.row.original.tablePosition !== undefined}>
+      <Show when={props.canReorder}>
         <th ref={handleRef} class="cursor-pointer">
           <GripVertical size={iconSize[props.size ?? "md"]}/>
         </th>
@@ -120,17 +118,16 @@ export const Table = (props) => {
         getCoreRowModel: getCoreRowModel(),
     });
     const rowCount = createMemo(() => table.getRowModel().rows.length);
-    const rows = createMemo(() => table.getRowModel().rows);
-    const dragEnabled = createMemo(() => {
-        return props.data.length > 0 && "tablePosition" in props.data[0];
-    });
-    const [flashedRowId, setFlashedRowId] = createSignal(null);
+    const tableDataKey = props.tableDataKey ?? Symbol("tableData");
+    const isTableData = (data) => data[tableDataKey] === true;
+    const rows = createMemo(() => table.getRowModel().rows.map((r) => ({ [tableDataKey]: true, ...r })));
+    const [flashedRow, setFlashedRow] = createSignal(null);
     createEffect(() => {
-        if (!rows().length || !dragEnabled())
+        if (!rows().length || !props.canReorder)
             return;
         const dispose = monitorForElements({
             canMonitor({ source }) {
-                return source.data.collectionId == props.data[0].collectionId;
+                return isTableData(source.data);
             },
             onDrop({ location, source }) {
                 const target = location.current.dropTargets[0];
@@ -139,7 +136,7 @@ export const Table = (props) => {
                 }
                 const sourceData = source.data;
                 const targetData = target.data;
-                if (sourceData.collectionId !== targetData.collectionId) {
+                if (!isTableData(sourceData) || !isTableData(targetData)) {
                     return;
                 }
                 if (sourceData.ind < 0 || targetData.ind < 0) {
@@ -151,8 +148,8 @@ export const Table = (props) => {
                     newInd--;
                 }
                 if (sourceData.ind !== newInd) {
-                    setFlashedRowId(sourceData.id);
-                    setTimeout(() => setFlashedRowId(null), 10);
+                    setFlashedRow(newInd);
+                    setTimeout(() => setFlashedRow(null), 10);
                 }
                 props.onReorderRow?.(props.data[sourceData.ind], sourceData.ind, newInd);
             },
@@ -165,11 +162,11 @@ export const Table = (props) => {
             </div>)}>
         <Show when={rowCount() > 0} fallback={props.emptyState || <div class="text-center py-4">No results found.</div>}>
           <table class={tableClass({ class: props.class, size: props.size })}>
-            <Show when={props.headers}>
+            <Show when={props.showHeaders || props.showHeaders === undefined}>
               <thead>
                 <For each={table.getHeaderGroups()}>
                   {(headerGroup) => (<tr>
-                      <Show when={dragEnabled()}>
+                      <Show when={props.canReorder}>
                         <th></th>
                       </Show>
                       <For each={headerGroup.headers}>
@@ -182,7 +179,7 @@ export const Table = (props) => {
 
             <tbody>
               <For each={rows()}>
-                {(row, ind) => (<TableRow row={row} ind={ind()} onRowClick={() => props.onRowClick?.(row.original)} dragEnabled={dragEnabled} flashSignal={() => flashedRowId()}/>)}
+                {(row, ind) => (<TableRow row={row} ind={ind()} onRowClick={() => props.onRowClick?.(row.original)} canReorder={!!props.canReorder} flashSignal={flashedRow} isTableData={isTableData} tableDataKey={tableDataKey}/>)}
               </For>
             </tbody>
           </table>
