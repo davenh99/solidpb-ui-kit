@@ -57,13 +57,11 @@ export const Pagination: Component<PaginationProps> = (props) => {
         </p>
       </Show>
       <DropdownMenu>
-        <DropdownMenu.Trigger>
-          <Button size={props.size} class="min-w-25">
-            <div class="flex items-center gap-1">
-              <span>{props.perPage()} / page </span>
-              <ChevronDown size={iconSize[props.size ?? "md"]} />
-            </div>
-          </Button>
+        <DropdownMenu.Trigger size={props.size} class="min-w-25">
+          <div class="flex items-center gap-1">
+            <span>{props.perPage()} / page </span>
+            <ChevronDown size={iconSize[props.size ?? "md"]} />
+          </div>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content size={props.size}>
           <For each={props.perPageOptions}>

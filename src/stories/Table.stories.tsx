@@ -221,8 +221,8 @@ export const Default: Story = {
 
     const reorder = (item: MockProduct, oldInd: number, newInd: number) => {
       const curData = [...data()];
-      curData.splice(oldInd, 1);
-      curData.splice(newInd, 0, item);
+      curData.splice(oldInd + page() * perPage(), 1);
+      curData.splice(newInd + page() * perPage(), 0, item);
       setData(curData);
     };
 
@@ -276,7 +276,7 @@ export const Default: Story = {
               onPerPageChange={handlePerPageChange}
             />
             <Table<MockProduct>
-              headers
+              showHeaders
               size="sm"
               columns={columns}
               data={paginatedData()}
@@ -285,6 +285,7 @@ export const Default: Story = {
                   <Toast {...props} title="Item clicked" msg={`You clicked on ${r.name}`} />
                 ))
               }
+              canReorder
               onReorderRow={reorder}
             />
           </Tabs.Content>
